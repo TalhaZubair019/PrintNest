@@ -41,6 +41,8 @@ export default function CheckoutPage() {
   const [hasMounted, setHasMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Added loading state
+
   const subtotal = cartItems.reduce(
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
     0,
@@ -57,6 +59,7 @@ export default function CheckoutPage() {
     phone: "",
     paymentMethod: "cod",
   });
+
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -98,6 +101,8 @@ export default function CheckoutPage() {
       return;
     }
 
+    setIsSubmitting(true); // Start processing
+
     try {
       const payload = {
         customer: formData,
@@ -118,6 +123,8 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       alert("Error: Could not place order.");
+    } finally {
+      setIsSubmitting(false); // Stop processing if error occurs
     }
   };
 
@@ -169,9 +176,14 @@ export default function CheckoutPage() {
                   </Link>
                   <button
                     type="submit"
-                    className="w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                    disabled={isSubmitting}
+                    className={`w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 transition-all duration-300 ${
+                      isSubmitting
+                        ? "opacity-70 cursor-not-allowed"
+                        : "hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+                    }`}
                   >
-                    Place Order
+                    {isSubmitting ? "Processing..." : "Place Order"}
                   </button>
                 </div>
               </div>

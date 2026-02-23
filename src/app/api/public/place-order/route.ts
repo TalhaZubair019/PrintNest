@@ -6,11 +6,20 @@ import { addOrder, updateUser } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "142.251.127.108", 
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false,
+    servername: "smtp.gmail.com",
+  },
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 30000,
 });
 
 export async function POST(req: Request) {
@@ -40,7 +49,7 @@ export async function POST(req: Request) {
     await addOrder(newOrder);
     if (userId !== "guest") {
       await updateUser(userId, { cart: [] });
-    }
+    } 
     try {
       const emailHtml = `
           <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
@@ -82,7 +91,7 @@ export async function POST(req: Request) {
           </div>
       `;
 
-      await Promise.all([
+      Promise.all([
         transporter.sendMail({
           from: `"Store Orders" ${process.env.EMAIL_USER}`,
           to: process.env.EMAIL_USER,
@@ -96,10 +105,12 @@ export async function POST(req: Request) {
           subject: `Order Confirmation #${orderId}`,
           html: emailHtml,
         }),
-      ]);
+      ]).catch((emailError) => {
+         console.error("Email failed to send in background:", emailError);
+      });
 
     } catch (emailError) {
-       console.error("Email failed", emailError);
+       console.error("Email setup failed", emailError);
     }
 
     return NextResponse.json(

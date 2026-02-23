@@ -24,7 +24,7 @@ export async function connectDB() {
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("✅ MongoDB Connected (Cached)");
+      console.log("✅ MongoDB Connected");
       return mongoose;
     });
   }
@@ -89,7 +89,6 @@ export async function addUser(user: User) {
   await connectDB();
   user.cart = [];
   user.wishlist = [];
-  user.savedCards = [];
   await UserModel.create(user);
 }
 

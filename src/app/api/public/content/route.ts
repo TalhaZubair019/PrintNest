@@ -10,9 +10,15 @@ export async function GET(req: Request) {
     if (section === "products") {
       const shopProducts = await getProducts();
       const dbProducts = db.products.products || [];
+      
+      const allProducts = [...shopProducts, ...dbProducts];
+      const uniqueProducts = Array.from(
+        new Map(allProducts.map((product) => [product.id, product])).values()
+      );
+
       const combinedProducts = {
         ...db.products,
-        products: [...shopProducts, ...dbProducts]
+        products: uniqueProducts
       };
       
       return NextResponse.json(combinedProducts);
