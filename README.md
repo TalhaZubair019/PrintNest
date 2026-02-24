@@ -30,7 +30,8 @@ _Transform ideas into reality with custom printing solutions_
 
 ### Why PrintNest?
 
-✅ **Modern Stack** — Built with Next.js 16, React 19, and TypeScript  
+✅ **Modern Stack** — Built with Next.js 16, React 19, and MongoDB  
+✅ **Database** — MongoDB with Mongoose for robust data modeling  
 ✅ **Lightning Fast** — Server-side rendering and optimized performance  
 ✅ **Type-Safe** — Full TypeScript coverage for robust code  
 ✅ **State Management** — Redux Toolkit for predictable state updates  
@@ -149,11 +150,23 @@ graph LR
 #### Core Technologies
 
 - ⚡ **Next.js App Router** — File-based routing with SSR/SSG
+- 🍃 **MongoDB & Mongoose** — Scalable NoSQL database with object modeling
 - 🔷 **TypeScript** — Full type coverage for reliability
 - 🗃️ **Redux Toolkit** — Centralized state with DevTools
 - 🎨 **Tailwind CSS 4** — Utility-first styling
 - 📧 **Nodemailer** — Automated email workflows
 - 🔐 **JWT + bcrypt** — Military-grade security
+
+---
+
+### 🔧 **Technical Improvements & Fixes**
+
+Recent updates to the platform include:
+
+- **Price Formatting**: Resolved the "double dollar" prefix issue (`$$`) across the entire store and admin dashboard.
+- **Data Consistency**: Fixed the mismatch between the dashboard overview order count and the actual orders table.
+- **Customer Identity**: Transitioned from generic "Guest" placeholders to full dynamic customer profile population in order records.
+- **Admin Optimization**: Improved the visual hierarchy and data loading performance for real-time analytics charts.
 
 ---
 
@@ -401,6 +414,9 @@ pnpm install
 Create a `.env.local` file in the root directory:
 
 ```env
+# MongoDB Connection (Atlas or Local)
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/printnest
+
 # Email Configuration (Gmail SMTP)
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
@@ -423,16 +439,14 @@ ADMIN_PASSWORD=admin123
 
 #### 4. Initialize Database
 
-The application uses JSON files for data storage. On first run:
+The application uses MongoDB for data storage. Ensure your `MONGODB_URI` is correctly configured in `.env.local`.
 
-```bash
-npm run dev
-```
+The system will automatically initialize the following collections:
 
-This will automatically create:
-
-- `src/app/db.json` — Product catalog and content
-- `src/app/logindb.json` — User accounts and orders
+- `products` — Product catalog and content
+- `users` — User accounts and global state (Cart/Wishlist)
+- `orders` — Customer orders and transaction history
+- `reviews` — Product ratings and feedback
 
 #### 5. Access the Application
 
@@ -505,6 +519,7 @@ Create a `.env.local` file with the following variables:
 
 | Variable         | Required | Description                      | Example                            |
 | ---------------- | -------- | -------------------------------- | ---------------------------------- |
+| `MONGODB_URI`    | Yes      | MongoDB connection string        | `mongodb+srv://...`                |
 | `EMAIL_USER`     | Yes\*    | Gmail address for sending emails | `noreply@yourdomain.com`           |
 | `EMAIL_PASS`     | Yes\*    | Gmail app password (16 chars)    | `abcd efgh ijkl mnop`              |
 | `JWT_SECRET`     | Yes      | Secret key for JWT signing       | `my-super-secret-key-32-chars-min` |
@@ -1220,11 +1235,6 @@ taskkill /PID <PID> /F
 
 ### 🚀 Version 2.0 (In Progress)
 
-- [ ] **Database Migration**
-  - [ ] PostgreSQL integration
-  - [ ] Prisma ORM setup
-  - [ ] Migration scripts
-
 - [ ] **Payment Integration**
   - [ ] Stripe payment gateway
   - [ ] PayPal support
@@ -1232,8 +1242,6 @@ taskkill /PID <PID> /F
   - [ ] Payment webhooks
 
 - [ ] **Advanced Features**
-  - [ ] Product reviews and ratings
-  - [ ] Product search with filters
   - [ ] Advanced analytics dashboard
   - [ ] CSV export for orders
   - [ ] PDF invoice generation
