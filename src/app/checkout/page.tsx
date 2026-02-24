@@ -188,7 +188,17 @@ export default function CheckoutPage() {
                 </div>
               </div>
               <div className="lg:col-span-5">
-                <OrderSummary cartItems={cartItems} subtotal={subtotal} />
+                {hasMounted ? (
+                  <OrderSummary cartItems={cartItems} subtotal={subtotal} />
+                ) : (
+                  <div className="bg-white border border-slate-200 rounded-lg p-6 lg:p-8 animate-pulse">
+                    <div className="h-6 w-32 bg-slate-100 rounded mb-6" />
+                    <div className="space-y-6">
+                      <div className="h-16 bg-slate-50 rounded" />
+                      <div className="h-16 bg-slate-50 rounded" />
+                    </div>
+                  </div>
+                )}
               </div>
             </form>
           </div>

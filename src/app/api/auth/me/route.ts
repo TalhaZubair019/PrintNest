@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { getUsers, updateUser } from "@/app/lib/db";
+import { connectDB, UserModel } from "@/app/lib/db";
+import { JWT_SECRET } from "@/app/lib/env";
 
-const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER; 
 
 async function getCurrentUserId() {
@@ -12,7 +12,7 @@ async function getCurrentUserId() {
   if (!token) return null;
   
   try {
-    const decoded = jwt.verify(token, SECRET_KEY!) as { id: string };
+    const decoded = jwt.verify(token, JWT_SECRET!) as { id: string };
     return decoded.id;
   } catch (error) {
     return null;
@@ -25,8 +25,9 @@ export async function GET(req: Request) {
     if (!userId) {
       return NextResponse.json({ message: "No token" }, { status: 401 });
     }
-    const users = await getUsers();
-    const user = users.find((u) => u.id === userId);
+    
+    await connectDB();
+    const user = await UserModel.findOne({ id: userId }).lean() as any;
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 401 });
@@ -42,6 +43,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Invalid token" }, { status: 401 });
   }
 }
+
 export async function PUT(req: Request) {
   try {
     const userId = await getCurrentUserId();
@@ -57,8 +59,11 @@ export async function PUT(req: Request) {
             updateData[field] = body[field];
         }
     }
-    const success = await updateUser(userId, updateData);
-    if (success) {
+    
+    await connectDB();
+    const updatedUser = await UserModel.findOneAndUpdate({ id: userId }, updateData, { new: true }).lean();
+    
+    if (updatedUser) {
       return NextResponse.json({ message: "User updated successfully" });
     } else {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
