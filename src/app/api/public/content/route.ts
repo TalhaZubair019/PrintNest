@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/app/data/db.json";
-import { getProducts } from "@/app/lib/db";
+import { connectDB, ProductModel } from "@/app/lib/db";
 
 export async function GET(req: Request) {
   try {
@@ -8,10 +8,11 @@ export async function GET(req: Request) {
     const section = searchParams.get("section");
 
     if (section === "products") {
-      const shopProducts = await getProducts();
+      await connectDB();
+      const shopProducts = await ProductModel.find({}).sort({ id: -1 }).lean();
       const dbProducts = db.products.products || [];
       
-      const allProducts = [...shopProducts, ...dbProducts];
+      const allProducts = [...(shopProducts as any), ...dbProducts];
       const uniqueProducts = Array.from(
         new Map(allProducts.map((product) => [product.id, product])).values()
       );

@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { addOrder, updateUser } from "@/app/lib/db";
-
-const SECRET_KEY = process.env.JWT_SECRET;
+import { connectDB, OrderModel, UserModel } from "@/app/lib/db";
+import { JWT_SECRET } from "@/app/lib/env";
 const transporter = nodemailer.createTransport({
   host: "142.251.127.108", 
   port: 465,
@@ -31,7 +30,7 @@ export async function POST(req: Request) {
 
     if (token) {
       try {
-        const decoded = jwt.verify(token, SECRET_KEY!) as { id: string };
+        const decoded = jwt.verify(token, JWT_SECRET!) as { id: string };
         userId = decoded.id;
       } catch (error) {
       }
@@ -46,9 +45,10 @@ export async function POST(req: Request) {
       items: items,
       customer: customer, 
     };
-    await addOrder(newOrder);
+    await connectDB();
+    await OrderModel.create(newOrder);
     if (userId !== "guest") {
-      await updateUser(userId, { cart: [] });
+      await UserModel.findOneAndUpdate({ id: userId }, { cart: [] });
     } 
     try {
       const emailHtml = `

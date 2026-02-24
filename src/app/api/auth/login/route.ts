@@ -2,16 +2,17 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { getUsers } from "@/app/lib/db";
+import { connectDB, UserModel } from "@/app/lib/db";
+import { JWT_SECRET } from "@/app/lib/env";
 
-const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
-    const users = await getUsers();
-    const user = users.find((u) => u.email === email);
+    await connectDB();
+    const user = await UserModel.findOne({ email }).lean() as any;
+    
     if (!user || !user.password) {
       return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
     }
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
 
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name }, 
-      SECRET_KEY!, 
+      JWT_SECRET!, 
       { expiresIn: "1h" }
     );
 

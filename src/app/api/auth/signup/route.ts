@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getUsers, addUser } from "@/app/lib/db";
+import { connectDB, UserModel } from "@/app/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -10,8 +10,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
-    const users = await getUsers();
-    const existingUser = users.find((u) => u.email === email);
+    await connectDB();
+    const existingUser = await UserModel.findOne({ email }).lean();
     if (existingUser) {
       return NextResponse.json({ message: "User already exists" }, { status: 400 });
     }
@@ -22,8 +22,11 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      cart: [],
+      wishlist: [],
+      savedCards: []
     };
-    await addUser(newUser);
+    await UserModel.create(newUser);
 
     return NextResponse.json({ message: "User created successfully" }, { status: 201 });
   } catch (error) {
