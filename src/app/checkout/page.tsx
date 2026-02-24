@@ -41,7 +41,7 @@ export default function CheckoutPage() {
   const [hasMounted, setHasMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Added loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const subtotal = cartItems.reduce(
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
@@ -101,7 +101,7 @@ export default function CheckoutPage() {
       return;
     }
 
-    setIsSubmitting(true); // Start processing
+    setIsSubmitting(true);
 
     try {
       const payload = {
@@ -124,7 +124,7 @@ export default function CheckoutPage() {
     } catch (error) {
       alert("Error: Could not place order.");
     } finally {
-      setIsSubmitting(false); // Stop processing if error occurs
+      setIsSubmitting(false);
     }
   };
 

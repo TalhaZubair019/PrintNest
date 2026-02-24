@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { getUsers, getAllOrders, getProducts, getReviews } from "@/app/lib/db";
+import { Order, OrderItem } from "@/app/admin/types";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
 
     const totalUsers = users.length;
     const totalOrders = orders.length;
-    const totalRevenue = orders.reduce(
+    const totalRevenue = (orders as Order[]).reduce(
       (acc, order) => acc + (order.total || 0),
       0,
     );
@@ -67,8 +68,8 @@ export async function GET(request: Request) {
     });
 
     const productSales: Record<string, any> = {};
-    orders.forEach(order => {
-      order.items?.forEach(item => {
+    (orders as Order[]).forEach(order => {
+      order.items?.forEach((item: OrderItem) => {
          if (!productSales[item.name]) {
            productSales[item.name] = { name: item.name, quantity: 0, revenue: 0, image: item.image };
          }
@@ -107,11 +108,10 @@ export async function GET(request: Request) {
     });
 
     const reviews = await getReviews();
-    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     reviews.forEach((r: any) => {
       if (r.rating >= 1 && r.rating <= 5) {
-        // @ts-ignore
-        ratingDistribution[r.rating]++;
+        ratingDistribution[r.rating as keyof typeof ratingDistribution]++;
       }
     });
 

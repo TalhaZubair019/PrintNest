@@ -185,7 +185,7 @@ const RevenueChart = ({
           className={`w-full ${filteredRevenueData.length > 10 ? "overflow-x-auto pb-6" : "overflow-hidden"}`}
         >
           <div
-            className="flex items-end gap-1.5 h-48"
+            className="flex items-end gap-1.5 h-48 pt-15"
             style={{
               minWidth:
                 filteredRevenueData.length > 10
@@ -211,25 +211,36 @@ const RevenueChart = ({
                     minWidth: isLong ? "28px" : undefined,
                   }}
                 >
-                  <div className="w-full bg-slate-50 rounded-t-lg relative flex items-end h-[85%] border-b-2 border-slate-100">
+                  <div className="w-full bg-slate-50/50 rounded-t-lg relative flex items-end h-[85%] border-b border-slate-100">
                     <div
-                      className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-700 ease-out group-hover:from-purple-700 group-hover:to-blue-600 shadow-lg group-hover:shadow-xl"
+                      className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-300 ease-out group-hover:scale-x-105 group-hover:brightness-110 shadow-lg group-hover:shadow-purple-200/50"
                       style={{
                         height: height === "0%" ? "5%" : height,
                       }}
                     ></div>
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-bold whitespace-nowrap shadow-xl">
-                      {new Date(d.date).toLocaleDateString(
-                        undefined,
-                        isLong
-                          ? { month: "short", day: "numeric" }
-                          : {
-                              weekday: "short",
-                              month: "short",
-                              day: "numeric",
-                            },
-                      )}{" "}
-                      — ${d.revenue.toFixed(2)}
+                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-30 group-hover:-translate-y-1">
+                      <div className="bg-slate-900/95 backdrop-blur-md text-white text-[10px] sm:text-xs py-2 px-3 rounded-xl font-bold whitespace-nowrap shadow-2xl border border-white/10 flex flex-col items-center gap-0.5">
+                        <span className="text-slate-400 text-[10px] font-medium leading-none mb-0.5">
+                          {new Date(d.date).toLocaleDateString(
+                            undefined,
+                            isLong
+                              ? { month: "short", day: "numeric" }
+                              : {
+                                  weekday: "short",
+                                  month: "short",
+                                  day: "numeric",
+                                },
+                          )}
+                        </span>
+                        <span className="text-emerald-400 font-extrabold text-sm">
+                          $
+                          {d.revenue.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                      </div>
+                      <div className="w-2.5 h-2.5 bg-slate-900/95 border-r border-b border-white/10 rotate-45 -mt-1.5 mx-auto rounded-xs" />
                     </div>
                   </div>
                   {isLong ? (
