@@ -8,6 +8,8 @@ import { addToCart, removeFromCart, deleteItem } from "@/app/redux/CartSlice";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import db from "@/app/data/db.json";
 import Loading from "@/app/components/ui/Loading";
+import AuthPromptModal from "@/app/components/auth/AuthPromptModal";
+import { useRouter } from "next/navigation";
 
 const cartData = db.cart;
 
@@ -21,16 +23,26 @@ type CartItemType = {
 
 export default function CartPage() {
   const { cartItems } = useSelector((state: any) => state.cart);
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
   const totalAmount = cartItems.reduce(
     (acc: number, item: CartItemType) =>
       acc + item.price * (item.quantity || 1),
     0,
   );
   const [isClient, setIsClient] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleCheckoutClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setShowAuthModal(true);
+    }
+  };
 
   if (!isClient) {
     return (
@@ -42,6 +54,13 @@ export default function CartPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
+      {/* Auth Prompt Modal */}
+      {showAuthModal && (
+        <AuthPromptModal
+          onClose={() => setShowAuthModal(false)}
+          redirectUrl="/checkout"
+        />
+      )}
       <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
         <Image
           src={cartData.backgroundImage}
@@ -76,7 +95,10 @@ export default function CartPage() {
                 </div>
               </div>
               <div className="lg:col-span-4">
-                <CartSummary totalAmount={totalAmount} />
+                <CartSummary
+                  totalAmount={totalAmount}
+                  onCheckout={handleCheckoutClick}
+                />
               </div>
             </div>
           )}
@@ -199,7 +221,13 @@ function CartItem({ item }: { item: CartItemType }) {
     </div>
   );
 }
-function CartSummary({ totalAmount }: { totalAmount: number }) {
+function CartSummary({
+  totalAmount,
+  onCheckout,
+}: {
+  totalAmount: number;
+  onCheckout: (e: React.MouseEvent) => void;
+}) {
   return (
     <div className="bg-white pl-0 lg:pl-8">
       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-200 pb-4">
@@ -234,6 +262,7 @@ function CartSummary({ totalAmount }: { totalAmount: number }) {
       </div>
       <Link
         href={cartData.summary.checkoutUrl}
+        onClick={onCheckout}
         className="block w-full text-center py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
       >
         {cartData.summary.checkoutButtonText}

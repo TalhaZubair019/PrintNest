@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "@/app/redux/AuthSlice";
 import { initializeCart } from "@/app/redux/CartSlice";
 import { initializeWishlist } from "@/app/redux/WishListSlice";
@@ -16,7 +16,10 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const dispatch = useDispatch();
+  const { cartItems: localCartItems } = useSelector((state: any) => state.cart);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,32 +42,46 @@ export default function LoginPage() {
         dispatch(initializeWishlist([]));
       }
 
-      if (data.user.cart && Array.isArray(data.user.cart)) {
-        const totalQty = data.user.cart.reduce(
-          (acc: number, item: any) => acc + (item.quantity || 1),
-          0,
-        );
-        const totalAmt = data.user.cart.reduce(
-          (acc: number, item: any) => acc + item.price * (item.quantity || 1),
-          0,
-        );
+      // Merge Cart Items
+      let mergedCart = [...(data.user.cart || [])];
 
-        dispatch(
-          initializeCart({
-            cartItems: data.user.cart,
-            totalQuantity: totalQty,
-            totalAmount: totalAmt,
-          }),
+      localCartItems.forEach((localItem: any) => {
+        const existingItemIndex = mergedCart.findIndex(
+          (item: any) => item.id === localItem.id,
         );
-      } else {
-        dispatch(
-          initializeCart({ cartItems: [], totalQuantity: 0, totalAmount: 0 }),
-        );
-      }
+        if (existingItemIndex > -1) {
+          mergedCart[existingItemIndex] = {
+            ...mergedCart[existingItemIndex],
+            quantity:
+              mergedCart[existingItemIndex].quantity + localItem.quantity,
+          };
+        } else {
+          mergedCart.push(localItem);
+        }
+      });
+
+      const totalQty = mergedCart.reduce(
+        (acc: number, item: any) => acc + (item.quantity || 1),
+        0,
+      );
+      const totalAmt = mergedCart.reduce(
+        (acc: number, item: any) => acc + item.price * (item.quantity || 1),
+        0,
+      );
+
+      dispatch(
+        initializeCart({
+          cartItems: mergedCart,
+          totalQuantity: totalQty,
+          totalAmount: totalAmt,
+        }),
+      );
 
       dispatch(loginSuccess({ user: data.user, token: data.token }));
 
-      if (data.user.isAdmin) {
+      if (redirect) {
+        router.push(redirect);
+      } else if (data.user.isAdmin) {
         router.push("/admin/dashboard");
       } else {
         router.push("/");

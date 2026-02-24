@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
 import db from "@/app/data/db.json";
 
@@ -16,6 +16,8 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +34,10 @@ export default function SignupPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
-      router.push("/login");
+      const loginUrl = redirect
+        ? `/login?redirect=${encodeURIComponent(redirect)}`
+        : "/login";
+      router.push(loginUrl);
     } catch (err: any) {
       setError(err.message);
     } finally {
