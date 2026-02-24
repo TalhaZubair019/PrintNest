@@ -98,19 +98,21 @@ _Transform ideas into reality with custom printing solutions_
 
 📊 **Analytics & Insights**
 
-- Revenue charts with time series data
-- User growth visualization
-- Product sales analytics
-- Average order value tracking
-- Real-time statistics
+- Real-time revenue charts with dynamic time-filtering
+- User growth and retention visualization
+- Product sales analytics & performance tracking
+- Average Order Value (AOV) trend analysis
+- Review rating distribution & sentiment analysis
+- Real-time dashboard statistics
 
 ⚙️ **Admin Operations**
 
-- Product CRUD operations
-- Blog post management
-- Order management (view, update, delete)
-- User management interface
-- Dynamic status updates
+- **Product Management**: Full CRUD operations for catalog items
+- **Blog Management**: Integrated blogging platform with rich content
+- **Order Management**: View, update status, and delete orders
+- **Review Management**: Monitor and moderate customer feedback
+- **User Management**: Comprehensive user activity overview
+- **Live Notifications**: Integrated toast system for admin actions
 
 </td>
 </tr>
@@ -179,6 +181,7 @@ graph LR
 | **Framework**        | Next.js 16.1.6 (App Router)  |
 | **Frontend**         | React 19.2.3                 |
 | **Language**         | TypeScript 5.x               |
+| **Database**         | MongoDB (via Mongoose)       |
 | **Styling**          | Tailwind CSS 4.x             |
 | **Animations**       | Framer Motion 12.30          |
 | **State Management** | Redux Toolkit 2.11           |
@@ -305,73 +308,31 @@ npm install -D babel-plugin-react-compiler@1.0.0  # React compiler plugin
 
 ---
 
-## �📁 Project Structure
+## 📁 Project Structure
 
 ```
 printnest/
 ├── src/app/
-│   ├── api/                          # API Routes (18 endpoints)
-│   │   ├── auth/                     # Authentication endpoints
-│   │   │   ├── login/route.ts        # User login
-│   │   │   ├── signup/route.ts       # User registration
-│   │   │   └── me/route.ts           # Get current user
-│   │   ├── place-order/route.ts      # Order submission
-│   │   ├── orders/route.ts           # Fetch user orders
-│   │   ├── products/route.ts         # Product data
-│   │   ├── categories/route.ts       # Category data
-│   │   ├── blog/route.ts             # Blog posts
-│   │   └── [other routes]/           # Content endpoints
-│   │
-│   ├── components/                   # React Components (15 components)
-│   │   ├── Navbar.tsx                # Header with cart/wishlist dropdowns
-│   │   ├── Hero.tsx                  # Animated hero section
-│   │   ├── Products.tsx              # Product carousel with modal
-│   │   ├── Categories.tsx            # Category grid
-│   │   ├── Blog.tsx                  # Blog post listing
-│   │   ├── Footer.tsx                # Footer with links
-│   │   ├── AuthInitializer.tsx       # Session check on mount
-│   │   ├── AuthPromptModal.tsx       # Login prompt for checkout
-│   │   └── products/                 # Product sub-components
-│   │       ├── ProductCard.tsx       # Individual product card
-│   │       ├── QuickViewModal.tsx    # Product quick view
-│   │       ├── CompareDrawer.tsx     # Product comparison
-│   │       └── Toast.tsx             # Notification toast
-│   │
-│   ├── redux/                        # Redux Store
-│   │   ├── Store.tsx                 # Redux store configuration
-│   │   ├── CartSlice.tsx             # Cart state & actions
-│   │   ├── WishListSlice.tsx         # Wishlist state & actions
-│   │   ├── AuthSlice.tsx             # Auth state & actions
-│   │   └── Provider.tsx              # Redux provider wrapper
-│   │
-│   ├── lib/                          # Utilities
-│   │   └── db.ts                     # Database operations
-│   │
-│   ├── (pages)/                      # Page Routes
-│   │   ├── account/page.tsx          # User dashboard
-│   │   ├── cart/page.tsx             # Shopping cart
-│   │   ├── checkout/page.tsx         # Checkout form
-│   │   ├── shop/page.tsx             # All products
-│   │   ├── wishlist/page.tsx         # User wishlist
-│   │   ├── login/page.tsx            # Login page
-│   │   ├── signup/page.tsx           # Registration page
-│   │   ├── thank-you/page.tsx        # Order confirmation
-│   │   ├── product/[slug]/page.tsx   # Product detail
-│   │   ├── category/[slug]/page.tsx  # Category products
-│   │   └── blog/[slug]/page.tsx      # Blog post detail
-│   │
-│   ├── db.json                       # Static content data (28KB)
-│   ├── logindb.json                  # User & order data (runtime)
-│   ├── layout.tsx                    # Root layout
-│   ├── page.tsx                      # Home page
-│   └── globals.css                   # Global styles
-│
-├── public/                           # Static assets
-├── .env.local                        # Environment variables
-├── package.json                      # Dependencies
-├── tsconfig.json                     # TypeScript config
-├── tailwind.config.ts                # Tailwind config
-└── next.config.ts                    # Next.js config
+│   ├── (pages)/                      # Page Routes (Shop, Cart, Account, etc.)
+│   ├── admin/                        # Admin Dashboard (Protected)
+│   │   ├── components/               # Admin-specific UI & Charts
+│   │   ├── dashboard/                # Main dashboard page
+│   │   ├── reviews/                  # Review management
+│   │   └── types.ts                  # Admin data types
+│   ├── api/                          # Backend API Routes
+│   │   ├── admin/                    # Admin-only endpoints (Stats, Bulk Ops)
+│   │   ├── auth/                     # Auth (Login, Signup, Me)
+│   │   └── [content]/                # Public data endpoints
+│   ├── components/                   # Shared UI Components
+│   ├── redux/                        # Global State Management
+│   ├── lib/                          # Database Utilities & Config
+│   ├── data/                         # Static Catalog Data (db.json)
+│   ├── layout.tsx                    # Root Layout
+│   └── globals.css                   # Global Styles
+├── public/                           # Assets & Icons
+├── .env.local                        # Configuration
+├── orders.json                       # Local Order Database
+└── package.json                      # Build Config
 ```
 
 ---
@@ -1560,7 +1521,10 @@ If you found this project helpful, please consider:
 [![Styled with Tailwind](https://img.shields.io/badge/Styled%20with-Tailwind-38B2AC?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com)
 
 </div>
-#   p r i n t n e s t _ d b  
- #   p r i n t n e s t _ d b  
- #   P r i n t N e s t  
+#   p r i n t n e s t _ d b 
+ 
+ #   p r i n t n e s t _ d b 
+ 
+ #   P r i n t N e s t 
+ 
  
