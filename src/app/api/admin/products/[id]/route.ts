@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { updateProduct, deleteProductRecord } from "@/app/lib/db";
+import { connectDB, ProductModel } from "@/app/lib/db";
+import { JWT_SECRET } from "@/app/lib/env";
 
-const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -12,14 +12,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const token = cookieStore.get("token")?.value;
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, SECRET_KEY!) as { email: string };
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
     if (decoded.email !== ADMIN_EMAIL) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
     const { id } = await params;
     const data = await req.json();
-    const updatedProduct = await updateProduct(Number(id), data);
+    await connectDB();
+    const updatedProduct = await ProductModel.findOneAndUpdate(
+      { id: Number(id) }, 
+      data, 
+      { returnDocument: 'after' }
+    ).lean();
 
     if (!updatedProduct) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
@@ -38,15 +43,16 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const token = cookieStore.get("token")?.value;
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, SECRET_KEY!) as { email: string };
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
     if (decoded.email !== ADMIN_EMAIL) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
     const { id } = await params;
-    const success = await deleteProductRecord(Number(id));
+    await connectDB();
+    const deleted = await ProductModel.findOneAndDelete({ id: Number(id) });
 
-    if (!success) {
+    if (!deleted) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 

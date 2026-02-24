@@ -1,22 +1,21 @@
 import { NextResponse } from "next/server";
-import { getReviews, addReview } from "@/app/lib/db";
+import { connectDB, ReviewModel } from "@/app/lib/db";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("productId");
 
   try {
-    const allReviews = await getReviews();
-    
+    await connectDB();
+    let query = {};
     if (productId) {
-      const productReviews = allReviews.filter(
-        (review: any) => review.productId.toString() === productId.toString()
-      );
-      return NextResponse.json(productReviews);
+      query = { productId: productId.toString() };
     }
     
-    return NextResponse.json(allReviews);
+    const reviews = await ReviewModel.find(query).sort({ createdAt: -1 }).lean();
+    return NextResponse.json(reviews);
   } catch (error) {
+    console.error("Fetch reviews error:", error);
     return NextResponse.json({ error: "Failed to fetch reviews" }, { status: 500 });
   }
 }
@@ -29,11 +28,16 @@ export async function POST(request: Request) {
     if (!productId || !review) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-    const newReview = { ...review, productId };
-    const savedReview = await addReview(newReview);
+
+    await connectDB();
+    const savedReview = await ReviewModel.create({
+      ...review,
+      productId: productId.toString()
+    });
 
     return NextResponse.json(savedReview, { status: 201 });
   } catch (error) {
+    console.error("Save review error:", error);
     return NextResponse.json({ error: "Failed to save review" }, { status: 500 });
   }
 }

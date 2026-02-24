@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { updateOrderStatus, deleteOrder } from "@/app/lib/db";
+import { connectDB, OrderModel } from "@/app/lib/db";
+import { JWT_SECRET } from "@/app/lib/env";
 import nodemailer from "nodemailer";
 
-const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
 const transporter = nodemailer.createTransport({
@@ -36,7 +36,7 @@ export async function PATCH(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, SECRET_KEY!) as { email: string };
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
     if (decoded.email !== ADMIN_EMAIL) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
@@ -44,7 +44,12 @@ export async function PATCH(
     const { id } = await params;
     const { status } = await req.json();
 
-    const order = await updateOrderStatus(id, status);
+    await connectDB();
+    const order = await OrderModel.findOneAndUpdate(
+      { id }, 
+      { status }, 
+      { returnDocument: 'after' }
+    ).lean() as any;
 
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
@@ -118,13 +123,14 @@ export async function DELETE(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, SECRET_KEY!) as { email: string };
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
     if (decoded.email !== ADMIN_EMAIL) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
     const { id } = await params;
-    const deleted = await deleteOrder(id);
+    await connectDB();
+    const deleted = await OrderModel.findOneAndDelete({ id });
 
     if (!deleted) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });

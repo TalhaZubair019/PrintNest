@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { getUsers, getAllOrders, getProducts, getReviews } from "@/app/lib/db";
+import { connectDB, UserModel, OrderModel, ProductModel, ReviewModel } from "@/app/lib/db";
+import { JWT_SECRET } from "@/app/lib/env";
 import { Order, OrderItem } from "@/app/admin/types";
 
-const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
 export async function GET(request: Request) {
@@ -14,14 +14,16 @@ export async function GET(request: Request) {
     if (!token)
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, SECRET_KEY!) as { email: string };
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
     if (decoded.email !== ADMIN_EMAIL) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
-    const users = await getUsers();
-    const orders = await getAllOrders();
-    const products = await getProducts();
+    await connectDB();
+    const users = await UserModel.find({}).lean() as any[];
+    const orders = await OrderModel.find({}).lean() as any[];
+    const products = await ProductModel.find({}).lean() as any[];
+    const reviews = await ReviewModel.find({}).lean() as any[];
 
     const totalUsers = users.length;
     const totalOrders = orders.length;
@@ -106,8 +108,6 @@ export async function GET(request: Request) {
         wishlistCount: user.wishlist?.length || 0,
       };
     });
-
-    const reviews = await getReviews();
     const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     reviews.forEach((r: any) => {
       if (r.rating >= 1 && r.rating <= 5) {

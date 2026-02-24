@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { addProduct } from "@/app/lib/db";
+import { connectDB, ProductModel } from "@/app/lib/db";
+import { JWT_SECRET } from "@/app/lib/env";
 
-const SECRET_KEY = process.env.JWT_SECRET;
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
 export async function POST(req: Request) {
@@ -12,13 +12,17 @@ export async function POST(req: Request) {
     const token = cookieStore.get("token")?.value;
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, SECRET_KEY!) as { email: string };
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
     if (decoded.email !== ADMIN_EMAIL) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
     const data = await req.json();
-    const newProduct = await addProduct(data);
+    await connectDB();
+    const lastProduct = await ProductModel.findOne().sort({ id: -1 }).lean();
+    const newId = lastProduct && typeof (lastProduct as any).id === 'number' ? (lastProduct as any).id + 1 : 1;
+    
+    const newProduct = await ProductModel.create({ ...data, id: newId });
 
     return NextResponse.json({ message: "Product added successfully", product: newProduct });
   } catch (error) {
