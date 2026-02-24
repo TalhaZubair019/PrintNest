@@ -24,14 +24,15 @@ interface Product {
 
 interface AdminReviewListProps {
   onReviewDeleted?: () => void;
+  reviews: Review[];
+  products: Product[];
 }
 
 export default function AdminReviewList({
   onReviewDeleted,
+  reviews,
+  products,
 }: AdminReviewListProps) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -41,31 +42,6 @@ export default function AdminReviewList({
     message: "",
     type: "add",
   });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [reviewsRes, productsRes] = await Promise.all([
-          fetch("/api/public/reviews"),
-          fetch("/api/public/content?section=products"),
-        ]);
-
-        if (reviewsRes.ok && productsRes.ok) {
-          const reviewsData = await reviewsRes.json();
-          const productsData = await productsRes.json();
-          setReviews(reviewsData);
-          setProducts(productsData.products || []);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data", error);
-        showToast("Failed to load reviews", "remove");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const getProductDetails = (productId: number) => {
     return products.find((p) => p.id === productId);
@@ -85,7 +61,6 @@ export default function AdminReviewList({
       });
 
       if (response.ok) {
-        setReviews(reviews.filter((r) => r.id !== reviewId));
         showToast("Review deleted successfully", "remove");
         if (onReviewDeleted) onReviewDeleted();
       } else {
@@ -96,12 +71,6 @@ export default function AdminReviewList({
       showToast("Error connecting to server", "remove");
     }
   };
-
-  if (loading) {
-    return (
-      <div className="p-8 text-center text-gray-500">Loading reviews...</div>
-    );
-  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

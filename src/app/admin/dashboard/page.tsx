@@ -322,8 +322,8 @@ export default function AdminDashboard() {
 
   const filteredUsers = stats?.users.filter(
     (u) =>
-      u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase()),
+      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
   const paginatedUsers = filteredUsers?.slice(
     (userPage - 1) * ITEMS_PER_PAGE,
@@ -334,8 +334,10 @@ export default function AdminDashboard() {
 
   const filteredOrders = stats?.recentOrders.filter(
     (o) =>
-      o.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      o.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase()),
+      o.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.status?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
   const paginatedOrders = filteredOrders?.slice(
     (orderPage - 1) * ITEMS_PER_PAGE,
@@ -345,7 +347,7 @@ export default function AdminDashboard() {
     Math.ceil((filteredOrders?.length || 0) / ITEMS_PER_PAGE) || 1;
 
   const filteredProducts = stats?.products.filter((p) =>
-    p.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    p.title?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
   const paginatedProducts = filteredProducts?.slice(
     (productPage - 1) * ITEMS_PER_PAGE,
@@ -353,6 +355,12 @@ export default function AdminDashboard() {
   );
   const totalProductPages =
     Math.ceil((filteredProducts?.length || 0) / ITEMS_PER_PAGE) || 1;
+
+  const filteredReviews = stats?.reviews.filter(
+    (r) =>
+      r.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.comment?.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   if (isAuthLoading || loading || !stats) {
     return (
@@ -476,7 +484,11 @@ export default function AdminDashboard() {
               />
             )}
             {activeTab === "reviews" && (
-              <AdminReviewList onReviewDeleted={fetchStats} />
+              <AdminReviewList
+                onReviewDeleted={fetchStats}
+                reviews={filteredReviews || []}
+                products={stats.products}
+              />
             )}
             {activeTab === "users" && (
               <UsersTable

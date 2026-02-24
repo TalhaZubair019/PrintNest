@@ -170,6 +170,7 @@ export async function GET(request: Request) {
       topReviewedProducts,
       totalReviews: reviews.length,
       productSentiment,
+      reviews,
     });
   } catch (error) {
     console.error("Admin stats error:", error);

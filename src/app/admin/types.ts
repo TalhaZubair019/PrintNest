@@ -55,4 +55,5 @@ export interface DashboardStats {
     neutral: number;
     total: number;
   }[];
+  reviews: any[];
 }
