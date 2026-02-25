@@ -5,6 +5,7 @@ import { Providers as ReduxProvider } from "@/app/redux/Provider";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import AuthInitializer from "./components/auth/AuthInitializer";
+import ScrollToTop from "./components/layout/ScrollToTop";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning={true}>
         <ReduxProvider>
           <AuthInitializer />
+          <ScrollToTop />
           <Navbar />
           {children}
           <Footer />

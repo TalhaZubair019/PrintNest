@@ -4,8 +4,10 @@ import Image from "next/image";
 import db from "@/app/data/db.json";
 import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 function Hero() {
+  const router = useRouter();
   const heroData = db.hero;
   const { assets, content } = heroData;
 
@@ -193,9 +195,7 @@ function Hero() {
 
             <motion.button
               className="relative group cursor-pointer"
-              onClick={() =>
-                (window.location.href = content.heroText.headerBtnLink)
-              }
+              onClick={() => router.push(content.heroText.headerBtnLink)}
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}

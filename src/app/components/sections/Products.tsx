@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import db from "@/app/data/db.json";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
@@ -59,6 +60,7 @@ const BlindsImage = ({
 };
 
 function FeaturedProducts() {
+  const router = useRouter();
   const productsData = db.products;
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
@@ -210,9 +212,7 @@ function FeaturedProducts() {
             </motion.p>
 
             <motion.button
-              onClick={() =>
-                (window.location.href = productsData.headerBtnLink)
-              }
+              onClick={() => router.push(productsData.headerBtnLink)}
               className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}

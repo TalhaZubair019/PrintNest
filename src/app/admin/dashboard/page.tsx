@@ -24,6 +24,8 @@ import AverageOrderValueChart from "../components/charts/AverageOrderValueChart"
 import ReviewRatingChart from "../components/charts/ReviewRatingChart";
 import SentimentChart from "../components/charts/SentimentChart";
 import ProductSalesChart from "../components/charts/ProductSalesChart";
+import CategorySalesChart from "../components/charts/CategorySalesChart";
+import OrderVelocityChart from "../components/charts/OrderVelocityChart";
 import TopSellingProducts from "../components/lists/TopSellingProducts";
 import TopReviewedProducts from "../components/lists/TopReviewedProducts";
 import ProductsTable from "../components/tables/ProductsTable";
@@ -131,6 +133,15 @@ export default function AdminDashboard() {
       fetchStats();
     }
   }, [user, isAuthenticated, isAuthLoading, router]);
+
+  useEffect(() => {
+    const contentArea = document.getElementById("admin-content-area");
+    if (contentArea) {
+      contentArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [activeTab]);
 
   const fetchStats = async () => {
     try {
@@ -385,7 +396,7 @@ export default function AdminDashboard() {
             stats={stats}
           />
 
-          <div className="lg:flex-1">
+          <div id="admin-content-area" className="lg:flex-1">
             {["users", "orders", "products", "reviews"].includes(activeTab) && (
               <div className="mb-6">
                 <div className="relative group">
@@ -461,6 +472,11 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <OrderStatusChart stats={stats} />
                   <AverageOrderValueChart stats={stats} />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <OrderVelocityChart stats={stats} />
+                  <CategorySalesChart stats={stats} />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

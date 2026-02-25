@@ -3,6 +3,7 @@ import Image from "next/image";
 import db from "@/app/data/db.json";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const BlindsImage = ({
   src,
@@ -69,6 +70,7 @@ const RevealText = ({
 };
 
 function About() {
+  const router = useRouter();
   const aboutData = db.about;
 
   return (
@@ -151,7 +153,7 @@ function About() {
             </div>
             <motion.button
               className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
-              onClick={() => (window.location.href = aboutData.headerBtnLink)}
+              onClick={() => router.push(aboutData.headerBtnLink)}
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}

@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const BlindsImage = ({
   src,
@@ -67,6 +69,7 @@ interface CategoriesData {
 }
 
 function Categories() {
+  const router = useRouter();
   const [categoriesData, setCategoriesData] = useState<CategoriesData | null>(
     null,
   );
@@ -90,7 +93,7 @@ function Categories() {
 
   if (loading) {
     return (
-      <section className="py-20 lg:py-28 bg-white overflow-hidden">
+      <section className="py-20 lg:py-28 bg-white overflow-hidden min-h-[800px]">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center">Loading...</div>
         </div>
@@ -102,7 +105,10 @@ function Categories() {
     return null;
   }
   return (
-    <section className="py-20 lg:py-28 ml-20 mr-20 overflow-hidden">
+    <section
+      id="services"
+      className="py-20 lg:py-28 ml-20 mr-20 overflow-hidden scroll-mt-24"
+    >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
           <div className="max-w-2xl">
@@ -140,7 +146,7 @@ function Categories() {
               {categoriesData.description}
             </motion.p>
             <motion.button
-              onClick={() => (window.location.href = categoriesData.btnLink)}
+              onClick={() => router.push(categoriesData.btnLink)}
               className="relative group cursor-pointer outline-none border-none bg-transparent p-0"
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
@@ -169,7 +175,7 @@ function Categories() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {categoriesData.categories.map(
             (category: Category, index: number) => (
-              <a
+              <Link
                 key={category.id}
                 href={`/category/${category.title
                   .toLowerCase()
@@ -194,7 +200,7 @@ function Categories() {
                     </span>
                   </div>
                 </div>
-              </a>
+              </Link>
             ),
           )}
         </div>

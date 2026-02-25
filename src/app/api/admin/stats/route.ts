@@ -108,6 +108,45 @@ export async function GET(request: Request) {
         wishlistCount: user.wishlist?.length || 0,
       };
     });
+
+    const categorySales: Record<string, number> = {};
+    const hourCounts: Record<string, number> = {};
+    const dayCounts: Record<string, number> = {};
+
+    for (let i = 0; i < 24; i++) {
+      hourCounts[i.toString().padStart(2, '0') + ':00'] = 0;
+    }
+
+    orders.forEach((order: any) => {
+      const orderDate = new Date(order.date);
+      const hour = orderDate.getHours().toString().padStart(2, '0') + ':00';
+      if (hourCounts[hour] !== undefined) hourCounts[hour]++;
+
+      order.items?.forEach((item: any) => {
+        const product = products.find(p => p.title === item.name);
+        const category = product?.badge || 'General';
+        categorySales[category] = (categorySales[category] || 0) + (item.totalPrice || 0);
+      });
+    });
+
+    const categorySalesData = Object.entries(categorySales).map(([category, value]) => ({
+      category,
+      value
+    })).sort((a, b) => b.value - a.value);
+
+    const orderVelocityData = Object.entries(hourCounts).map(([hour, count]) => ({
+      hour,
+      count
+    }));
+
+    const orderTrendData = dayRange.map(d => {
+      const dateKey = d.toISOString().split('T')[0];
+      return {
+        date: d.toISOString(),
+        count: dayCounts[dateKey] || 0
+      };
+    });
+
     const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     reviews.forEach((r: any) => {
       if (r.rating >= 1 && r.rating <= 5) {
@@ -171,6 +210,8 @@ export async function GET(request: Request) {
       totalReviews: reviews.length,
       productSentiment,
       reviews,
+      categorySalesData,
+      orderVelocityData
     });
   } catch (error) {
     console.error("Admin stats error:", error);

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { getOrders } from "@/app/lib/db";
+import { connectDB, OrderModel } from "@/app/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
@@ -15,7 +15,8 @@ export async function GET(req: Request) {
     }
 
     const decoded = jwt.verify(token, SECRET_KEY!) as { id: string };
-    const orders = await getOrders(decoded.id);
+    await connectDB();
+    const orders = await OrderModel.find({ userId: decoded.id }).lean();
     return NextResponse.json({ orders }, { status: 200 });
   } catch (error) {
     return NextResponse.json(

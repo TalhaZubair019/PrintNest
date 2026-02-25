@@ -56,4 +56,7 @@ export interface DashboardStats {
     total: number;
   }[];
   reviews: any[];
+  categorySalesData: { category: string; value: number }[];
+  orderVelocityData: { hour: string; count: number }[];
+  orderTrendData: { date: string; count: number }[];
 }
