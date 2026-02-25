@@ -105,6 +105,7 @@ export default function AdminDashboard() {
   const [orderDeleteConfirm, setOrderDeleteConfirm] = useState<Order | null>(
     null,
   );
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -223,6 +224,7 @@ export default function AdminDashboard() {
   };
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
+    setUpdatingOrderId(orderId);
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PATCH",
@@ -240,6 +242,8 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       showToast("Error updating status.", "error");
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
@@ -504,6 +508,7 @@ export default function AdminDashboard() {
                 onReviewDeleted={fetchStats}
                 reviews={filteredReviews || []}
                 products={stats.products}
+                users={stats.users}
               />
             )}
             {activeTab === "users" && (
@@ -519,13 +524,14 @@ export default function AdminDashboard() {
             )}
             {activeTab === "orders" && (
               <OrdersTable
-                paginatedOrders={paginatedOrders || []}
+                allOrders={filteredOrders || []}
                 handleStatusChange={handleStatusChange}
                 setSelectedOrder={setSelectedOrder}
                 setOrderDeleteConfirm={setOrderDeleteConfirm}
                 orderPage={orderPage}
                 setOrderPage={setOrderPage}
-                totalOrderPages={totalOrderPages}
+                users={stats.users}
+                updatingOrderId={updatingOrderId}
               />
             )}
           </div>
@@ -583,7 +589,16 @@ export default function AdminDashboard() {
         onClose={() => setDeleteConfirm(null)}
         onConfirm={() => deleteConfirm && handleDeleteUser(deleteConfirm)}
         title="Delete User?"
-        message="This action cannot be undone."
+        message={
+          <>
+            Are you sure you want to delete{" "}
+            <span className="font-bold text-slate-900">
+              {stats?.users.find((u) => u.id === deleteConfirm)?.name ||
+                "this user"}
+            </span>
+            ? This action cannot be undone.
+          </>
+        }
       />
       <DeleteConfirmationModal
         isOpen={!!orderDeleteConfirm}
@@ -594,10 +609,15 @@ export default function AdminDashboard() {
         title="Delete Order?"
         message={
           <>
-            Order{" "}
+            Are you sure you want to delete the order for{" "}
+            <span className="font-bold text-slate-900">
+              {orderDeleteConfirm?.customer?.name || "this customer"}
+            </span>{" "}
+            (
             <span className="font-mono font-bold">
               #{orderDeleteConfirm?.id?.slice(-8).toUpperCase()}
             </span>
+            )?
           </>
         }
         warning="This will permanently remove this order and update all graphs and statistics."

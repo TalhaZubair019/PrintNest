@@ -1,33 +1,152 @@
-import React from "react";
-import { Eye, Trash2 } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import {
+  Eye,
+  Trash2,
+  User,
+  Filter,
+  FilterX,
+  ClipboardList,
+} from "lucide-react";
 import { Order } from "@/app/admin/types";
 
 interface OrdersTableProps {
-  paginatedOrders: Order[];
+  allOrders: Order[]; // Pass all orders for filtering
   handleStatusChange: (orderId: string, newStatus: string) => void;
   setSelectedOrder: React.Dispatch<React.SetStateAction<Order | null>>;
   setOrderDeleteConfirm: React.Dispatch<React.SetStateAction<Order | null>>;
   orderPage: number;
   setOrderPage: React.Dispatch<React.SetStateAction<number>>;
-  totalOrderPages: number;
+  users?: { id: string; name: string }[];
+  updatingOrderId?: string | null;
 }
 
 const OrdersTable = ({
-  paginatedOrders,
+  allOrders,
   handleStatusChange,
   setSelectedOrder,
   setOrderDeleteConfirm,
   orderPage,
   setOrderPage,
-  totalOrderPages,
+  users = [],
+  updatingOrderId,
 }: OrdersTableProps) => {
+  const [selectedUserId, setSelectedUserId] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const ITEMS_PER_PAGE = 5;
+
+  const hasDeletedAccounts = useMemo(() => {
+    const userIds = new Set(users.map((u) => u.id));
+    return allOrders.some((o) => !userIds.has(o.userId));
+  }, [allOrders, users]);
+
+  const filteredOrders = useMemo(() => {
+    const userIds = new Set(users.map((u) => u.id));
+    return allOrders.filter((order) => {
+      let userMatch = false;
+      if (selectedUserId === "all") {
+        userMatch = true;
+      } else if (selectedUserId === "deleted") {
+        userMatch = !userIds.has(order.userId);
+      } else {
+        userMatch = order.userId === selectedUserId;
+      }
+
+      const statusMatch =
+        selectedStatus === "all" || order.status === selectedStatus;
+      return userMatch && statusMatch;
+    });
+  }, [allOrders, selectedUserId, selectedStatus, users]);
+
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE) || 1;
+  const paginatedOrders = filteredOrders.slice(
+    (orderPage - 1) * ITEMS_PER_PAGE,
+    orderPage * ITEMS_PER_PAGE,
+  );
+
+  // Reset page when filters change
+  useEffect(() => {
+    setOrderPage(1);
+  }, [selectedUserId, selectedStatus, setOrderPage]);
+
   return (
     <div
       key="orders"
       className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-300"
     >
-      <div className="p-8 border-b border-slate-100 bg-slate-50/50">
-        <h3 className="text-xl font-bold">Order Management</h3>
+      <div className="p-6 border-b border-slate-100 space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900">
+              Order Management
+            </h3>
+            <p className="text-sm text-slate-500 mt-1">
+              Track and manage customer shipments
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-purple-100">
+              {filteredOrders.length} Showing
+            </span>
+            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold">
+              {allOrders.length} Total
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="relative flex-1 min-w-[200px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <User size={16} />
+            </div>
+            <select
+              value={selectedUserId}
+              onChange={(e) => setSelectedUserId(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+            >
+              <option value="all">All Customers</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+              {hasDeletedAccounts && (
+                <option value="deleted" className="text-red-500 font-bold">
+                  Deleted Accounts
+                </option>
+              )}
+            </select>
+          </div>
+
+          <div className="relative flex-1 min-w-[200px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <Filter size={16} />
+            </div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+            >
+              <option value="all">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          {(selectedUserId !== "all" || selectedStatus !== "all") && (
+            <button
+              onClick={() => {
+                setSelectedUserId("all");
+                setSelectedStatus("all");
+              }}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+            >
+              <FilterX size={16} />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
@@ -71,16 +190,32 @@ const OrdersTable = ({
                 </td>
                 <td className="px-8 py-5 font-bold text-sm">{o.total}</td>
                 <td className="px-8 py-5">
-                  <select
-                    value={o.status}
-                    onChange={(e) => handleStatusChange(o.id, e.target.value)}
-                    className="bg-transparent text-sm font-bold py-1 border rounded px-2 focus:outline-none"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Accepted">Accepted</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
+                  <div className="relative group min-w-[140px]">
+                    <select
+                      value={o.status}
+                      disabled={updatingOrderId === o.id}
+                      onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                      className={`w-full text-xs font-bold py-1.5 border rounded-lg px-3 focus:outline-none transition-all ring-offset-1 focus:ring-2 appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+                        o.status === "Pending"
+                          ? "bg-amber-50 text-amber-600 border-amber-200 focus:ring-amber-500/20"
+                          : o.status === "Accepted"
+                            ? "bg-blue-50 text-blue-600 border-blue-200 focus:ring-blue-500/20"
+                            : o.status === "Completed"
+                              ? "bg-emerald-50 text-emerald-600 border-emerald-200 focus:ring-emerald-500/20"
+                              : "bg-red-50 text-red-600 border-red-200 focus:ring-red-500/20"
+                      } ${updatingOrderId === o.id ? "animate-pulse" : ""}`}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Accepted">Accepted</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                    {updatingOrderId === o.id && (
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="px-8 py-5 text-right">
                   <div className="flex items-center justify-end gap-2">
@@ -111,10 +246,10 @@ const OrdersTable = ({
             Previous
           </button>
           <span className="text-sm text-slate-500 font-medium">
-            Page {orderPage} of {totalOrderPages}
+            Page {orderPage} of {totalPages}
           </span>
           <button
-            disabled={orderPage === totalOrderPages || totalOrderPages === 0}
+            disabled={orderPage === totalPages || totalPages === 0}
             onClick={() => setOrderPage((p) => p + 1)}
             className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
           >
