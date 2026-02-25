@@ -1615,10 +1615,3 @@ If you found this project helpful, please consider:
 [![Styled with Tailwind](https://img.shields.io/badge/Styled%20with-Tailwind-38B2AC?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com)
 
 </div>
-#   p r i n t n e s t _ d b 
- 
- #   p r i n t n e s t _ d b 
- 
- #   P r i n t N e s t 
- 
- 
