@@ -6,11 +6,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, ChevronDown, ShoppingBag, Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "@/app/redux/CartSlice";
-import { toggleWishlist } from "@/app/redux/WishListSlice";
-import { RootState } from "@/app/redux/Store";
-import Toast from "@/app/components/products/Toast";
-import db from "@/app/data/db.json";
+import { addToCart } from "@/redux/CartSlice";
+import { toggleWishlist } from "@/redux/WishListSlice";
+import { RootState } from "@/redux/Store";
+import Toast from "@/components/products/Toast";
+import db from "@/data/db.json";
 
 interface Category {
   id: number;

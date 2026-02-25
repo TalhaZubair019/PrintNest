@@ -2,17 +2,17 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "@/app/redux/CartSlice";
-import { toggleWishlist } from "@/app/redux/WishListSlice";
-import { RootState } from "@/app/redux/Store";
+import { addToCart } from "@/redux/CartSlice";
+import { toggleWishlist } from "@/redux/WishListSlice";
+import { RootState } from "@/redux/Store";
 import { motion } from "framer-motion";
-import Toast from "@/app/components/products/Toast";
-import ProductCard from "@/app/components/products/ProductCard";
-import QuickViewModal from "@/app/components/products/QuickViewModal";
-import CompareDrawer from "@/app/components/products/CompareDrawer";
+import Toast from "@/components/products/Toast";
+import ProductCard from "@/components/products/ProductCard";
+import QuickViewModal from "@/components/products/QuickViewModal";
+import CompareDrawer from "@/components/products/CompareDrawer";
 
 const BlindsImage = ({
   src,
@@ -330,3 +330,4 @@ function FeaturedProducts() {
 }
 
 export default FeaturedProducts;
+

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Star, Trash2, ExternalLink, Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Toast from "@/app/components/products/Toast";
+import Toast from "@/components/products/Toast";
 
 interface Review {
   id: string;
@@ -180,3 +180,4 @@ export default function AdminReviewList({
     </div>
   );
 }
+

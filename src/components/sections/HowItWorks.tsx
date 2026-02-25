@@ -1,6 +1,6 @@
 "use client";
 
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import {
   Play,
   MousePointer2,
@@ -214,3 +214,4 @@ const StepCard = ({ data }: { data: any }) => {
 };
 
 export default HowItWorks;
+

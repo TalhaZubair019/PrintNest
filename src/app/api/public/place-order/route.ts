@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { connectDB, OrderModel, UserModel } from "@/app/lib/db";
-import { JWT_SECRET } from "@/app/lib/env";
+import { connectDB, OrderModel, UserModel } from "@/lib/db";
+import { JWT_SECRET } from "@/lib/env";
 const transporter = nodemailer.createTransport({
   host: "142.251.127.108", 
   port: 465,

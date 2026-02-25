@@ -1,9 +1,9 @@
 "use client";
 
 import { Provider } from "react-redux";
-import { store } from "@/app/redux/Store";
+import { store } from "@/redux/Store";
 import { useEffect } from "react";
-import { initializeCart } from "@/app/redux/CartSlice";
+import { initializeCart } from "@/redux/CartSlice";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -19,3 +19,4 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return <Provider store={store}>{children}</Provider>;
 }
+

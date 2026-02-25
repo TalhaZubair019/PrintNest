@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { connectDB, OrderModel } from "@/app/lib/db";
-import { JWT_SECRET } from "@/app/lib/env";
+import { connectDB, OrderModel } from "@/lib/db";
+import { JWT_SECRET } from "@/lib/env";
 import nodemailer from "nodemailer";
 
 const ADMIN_EMAIL = process.env.EMAIL_USER;

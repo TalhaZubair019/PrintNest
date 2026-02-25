@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -183,3 +183,4 @@ function About() {
 }
 
 export default About;
+

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import { motion } from "framer-motion";
 
 function Testimonials() {
@@ -153,3 +153,4 @@ const NavButton = ({
 };
 
 export default Testimonials;
+

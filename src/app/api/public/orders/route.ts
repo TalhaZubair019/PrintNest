@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { connectDB, OrderModel } from "@/app/lib/db";
+import { connectDB, OrderModel } from "@/lib/db";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
@@ -25,3 +25,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

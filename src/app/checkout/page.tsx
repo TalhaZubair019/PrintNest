@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { clearCart } from "@/app/redux/CartSlice";
-import AuthPromptModal from "@/app/components/auth/AuthPromptModal";
+import { clearCart } from "@/redux/CartSlice";
+import AuthPromptModal from "@/components/auth/AuthPromptModal";
 
 import {
   ChevronRight,
@@ -16,7 +16,7 @@ import {
   ChevronLeft,
   X,
 } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 const checkoutConfig = db.checkout;
 
 interface CheckoutData {
@@ -518,3 +518,4 @@ function PaymentOption({
     </div>
   );
 }
+

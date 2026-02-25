@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Check } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import { motion } from "framer-motion";
 
 function PricingSection() {
@@ -163,3 +163,4 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
 };
 
 export default PricingSection;
+

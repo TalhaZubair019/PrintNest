@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart } from "@/app/redux/CartSlice";
-import { toggleWishlist, WishlistItem } from "@/app/redux/WishListSlice";
+import { addToCart } from "@/redux/CartSlice";
+import { toggleWishlist, WishlistItem } from "@/redux/WishListSlice";
 import { ChevronRight, ShoppingCart, Trash2 } from "lucide-react";
-import db from "@/app/data/db.json";
-import Toast from "@/app/components/products/Toast";
-import Loading from "@/app/components/ui/Loading";
+import db from "@/data/db.json";
+import Toast from "@/components/products/Toast";
+import Loading from "@/components/ui/Loading";
 const pageConfig = {
   backgroundImage: db.cart.backgroundImage,
   breadcrumbs: {
@@ -253,3 +253,4 @@ function WishlistItemComponent({
     </div>
   );
 }
+

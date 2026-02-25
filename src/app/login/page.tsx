@@ -4,11 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess } from "@/app/redux/AuthSlice";
-import { initializeCart } from "@/app/redux/CartSlice";
-import { initializeWishlist } from "@/app/redux/WishListSlice";
+import { loginSuccess } from "@/redux/AuthSlice";
+import { initializeCart } from "@/redux/CartSlice";
+import { initializeWishlist } from "@/redux/WishListSlice";
 import { Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -209,3 +209,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

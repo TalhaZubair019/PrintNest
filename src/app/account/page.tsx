@@ -19,12 +19,12 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/app/redux/Store";
-import { loginSuccess, logout } from "@/app/redux/AuthSlice";
-import { addToCart } from "@/app/redux/CartSlice";
+import { RootState } from "@/redux/Store";
+import { loginSuccess, logout } from "@/redux/AuthSlice";
+import { addToCart } from "@/redux/CartSlice";
 import { useRouter } from "next/navigation";
-import db from "@/app/data/db.json";
-import QuickViewModal from "@/app/components/products/QuickViewModal";
+import db from "@/data/db.json";
+import QuickViewModal from "@/components/products/QuickViewModal";
 
 interface Order {
   id: string;
@@ -123,6 +123,15 @@ export default function MyAccountPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const contentArea = document.getElementById("user-content-area");
+    if (contentArea) {
+      contentArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [activeTab]);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -415,7 +424,7 @@ export default function MyAccountPage() {
               </nav>
             </div>
           </div>
-          <div className="lg:flex-1">
+          <div id="user-content-area" className="lg:flex-1">
             {activeTab === "dashboard" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/app/redux/Store";
+import { RootState } from "@/redux/Store";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,28 +14,28 @@ import {
   X,
   CheckCircle,
 } from "lucide-react";
-import AdminReviewList from "../components/tables/AdminReviewList";
-import db from "@/app/data/db.json";
+import AdminReviewList from "@/components/admin/tables/AdminReviewList";
+import db from "@/data/db.json";
 import { DashboardStats, UserData, Order } from "@/app/admin/types";
-import StatCard from "../components/ui/StatCard";
-import RevenueChart from "../components/charts/RevenueChart";
-import OrderStatusChart from "../components/charts/OrderStatusChart";
-import AverageOrderValueChart from "../components/charts/AverageOrderValueChart";
-import ReviewRatingChart from "../components/charts/ReviewRatingChart";
-import SentimentChart from "../components/charts/SentimentChart";
-import ProductSalesChart from "../components/charts/ProductSalesChart";
-import CategorySalesChart from "../components/charts/CategorySalesChart";
-import OrderVelocityChart from "../components/charts/OrderVelocityChart";
-import TopSellingProducts from "../components/lists/TopSellingProducts";
-import TopReviewedProducts from "../components/lists/TopReviewedProducts";
-import ProductsTable from "../components/tables/ProductsTable";
-import UsersTable from "../components/tables/UsersTable";
-import OrdersTable from "../components/tables/OrdersTable";
-import ProductModal from "../components/modals/ProductModal";
-import UserModal from "../components/modals/UserModal";
-import OrderModal from "../components/modals/OrderModal";
-import DeleteConfirmationModal from "../components/modals/DeleteConfirmationModal";
-import AdminSidebar from "../components/layout/AdminSidebar";
+import StatCard from "@/components/admin/ui/StatCard";
+import RevenueChart from "@/components/admin/charts/RevenueChart";
+import OrderStatusChart from "@/components/admin/charts/OrderStatusChart";
+import AverageOrderValueChart from "@/components/admin/charts/AverageOrderValueChart";
+import ReviewRatingChart from "@/components/admin/charts/ReviewRatingChart";
+import SentimentChart from "@/components/admin/charts/SentimentChart";
+import ProductSalesChart from "@/components/admin/charts/ProductSalesChart";
+import CategorySalesChart from "@/components/admin/charts/CategorySalesChart";
+import OrderVelocityChart from "@/components/admin/charts/OrderVelocityChart";
+import TopSellingProducts from "@/components/admin/lists/TopSellingProducts";
+import TopReviewedProducts from "@/components/admin/lists/TopReviewedProducts";
+import ProductsTable from "@/components/admin/tables/ProductsTable";
+import UsersTable from "@/components/admin/tables/UsersTable";
+import OrdersTable from "@/components/admin/tables/OrdersTable";
+import ProductModal from "@/components/admin/modals/ProductModal";
+import UserModal from "@/components/admin/modals/UserModal";
+import OrderModal from "@/components/admin/modals/OrderModal";
+import DeleteConfirmationModal from "@/components/admin/modals/DeleteConfirmationModal";
+import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 
 const PageHeader = ({ title, breadcrumb }: any) => (
   <div className="relative w-full h-175 z-0">

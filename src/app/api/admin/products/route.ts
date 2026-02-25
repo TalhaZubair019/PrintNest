@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { connectDB, ProductModel } from "@/app/lib/db";
-import { JWT_SECRET } from "@/app/lib/env";
+import { connectDB, ProductModel } from "@/lib/db";
+import { JWT_SECRET } from "@/lib/env";
 
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
@@ -30,3 +30,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Internal Error" }, { status: 500 });
   }
 }
+

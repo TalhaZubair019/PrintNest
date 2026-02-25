@@ -4,11 +4,11 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart, removeFromCart, deleteItem } from "@/app/redux/CartSlice";
+import { addToCart, removeFromCart, deleteItem } from "@/redux/CartSlice";
 import { ChevronRight, ChevronDown } from "lucide-react";
-import db from "@/app/data/db.json";
-import Loading from "@/app/components/ui/Loading";
-import AuthPromptModal from "@/app/components/auth/AuthPromptModal";
+import db from "@/data/db.json";
+import Loading from "@/components/ui/Loading";
+import AuthPromptModal from "@/components/auth/AuthPromptModal";
 import { useRouter } from "next/navigation";
 
 const cartData = db.cart;
@@ -270,3 +270,4 @@ function CartSummary({
     </div>
   );
 }
+

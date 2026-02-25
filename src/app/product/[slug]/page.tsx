@@ -6,10 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Star } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "@/app/redux/CartSlice";
-import { toggleWishlist } from "@/app/redux/WishListSlice";
-import { RootState } from "@/app/redux/Store";
-import Toast from "@/app/components/products/Toast";
+import { addToCart } from "@/redux/CartSlice";
+import { toggleWishlist } from "@/redux/WishListSlice";
+import { RootState } from "@/redux/Store";
+import Toast from "@/components/products/Toast";
 
 interface Review {
   id: string;

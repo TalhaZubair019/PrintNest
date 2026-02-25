@@ -4,9 +4,9 @@ import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "@/app/redux/CartSlice";
-import { toggleWishlist } from "@/app/redux/WishListSlice";
-import { RootState } from "@/app/redux/Store";
+import { addToCart } from "@/redux/CartSlice";
+import { toggleWishlist } from "@/redux/WishListSlice";
+import { RootState } from "@/redux/Store";
 import {
   ChevronRight,
   ChevronDown,
@@ -14,9 +14,9 @@ import {
   Heart,
   Eye,
 } from "lucide-react";
-import db from "@/app/data/db.json";
-import Toast from "@/app/components/products/Toast";
-import QuickViewModal from "@/app/components/products/QuickViewModal";
+import db from "@/data/db.json";
+import Toast from "@/components/products/Toast";
+import QuickViewModal from "@/components/products/QuickViewModal";
 
 const pageConfig = {
   title: "Shop",
@@ -414,3 +414,4 @@ function SimpleProductCard({
     </div>
   );
 }
+

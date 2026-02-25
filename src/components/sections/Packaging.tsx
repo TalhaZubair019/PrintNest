@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import { motion } from "framer-motion";
 
 function PackagingHero() {
@@ -123,3 +123,4 @@ function PackagingHero() {
 }
 
 export default PackagingHero;
+

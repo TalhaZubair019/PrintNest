@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess, setAuthLoaded } from "@/app/redux/AuthSlice";
-import { initializeCart } from "@/app/redux/CartSlice";
-import { initializeWishlist } from "@/app/redux/WishListSlice";
-import { RootState } from "@/app/redux/Store";
+import { loginSuccess, setAuthLoaded } from "@/redux/AuthSlice";
+import { initializeCart } from "@/redux/CartSlice";
+import { initializeWishlist } from "@/redux/WishListSlice";
+import { RootState } from "@/redux/Store";
 
 function AuthInitializer() {
   const dispatch = useDispatch();
@@ -91,3 +91,4 @@ function AuthInitializer() {
 }
 
 export default AuthInitializer;
+

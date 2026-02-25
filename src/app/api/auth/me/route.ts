@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { connectDB, UserModel } from "@/app/lib/db";
-import { JWT_SECRET } from "@/app/lib/env";
+import { connectDB, UserModel } from "@/lib/db";
+import { JWT_SECRET } from "@/lib/env";
 
 const ADMIN_EMAIL = process.env.EMAIL_USER; 
 
@@ -61,7 +61,7 @@ export async function PUT(req: Request) {
     }
     
     await connectDB();
-    const updatedUser = await UserModel.findOneAndUpdate({ id: userId }, updateData, { new: true }).lean();
+    const updatedUser = await UserModel.findOneAndUpdate({ id: userId }, updateData, { returnDocument: "after" }).lean();
     
     if (updatedUser) {
       return NextResponse.json({ message: "User updated successfully" });

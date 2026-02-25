@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB, ReviewModel } from "@/app/lib/db";
+import { connectDB, ReviewModel } from "@/lib/db";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

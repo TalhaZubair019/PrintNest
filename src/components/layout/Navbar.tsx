@@ -13,12 +13,12 @@ import {
   LogOut,
   LayoutDashboard,
 } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/app/redux/Store";
-import { removeFromCart, clearCart } from "@/app/redux/CartSlice";
-import { toggleWishlist, clearWishlist } from "@/app/redux/WishListSlice";
-import { logout } from "@/app/redux/AuthSlice";
+import { RootState } from "@/redux/Store";
+import { removeFromCart, clearCart } from "@/redux/CartSlice";
+import { toggleWishlist, clearWishlist } from "@/redux/WishListSlice";
+import { logout } from "@/redux/AuthSlice";
 
 function Navbar() {
   const navbarData = db.navbar;
@@ -299,3 +299,4 @@ function Navbar() {
 }
 
 export default Navbar;
+

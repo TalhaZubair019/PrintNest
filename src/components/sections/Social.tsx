@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
@@ -58,3 +58,4 @@ function Social() {
 }
 
 export default Social;
+

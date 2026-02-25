@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -189,3 +189,4 @@ const BlogCard = ({ post, index }: { post: any; index: number }) => {
 };
 
 export default LatestNews;
+

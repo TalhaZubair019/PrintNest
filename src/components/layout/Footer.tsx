@@ -7,7 +7,7 @@ import {
   Mail,
   Phone,
 } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 
 function Footer() {
   const footerData = db.footer;
@@ -186,3 +186,4 @@ const FooterLinkColumn = ({
 };
 
 export default Footer;
+

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 
 interface BlogPost {
   id: number;

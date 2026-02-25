@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { connectDB, UserModel } from "@/app/lib/db";
+import { connectDB, UserModel } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -33,3 +33,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
+

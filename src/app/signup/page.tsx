@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
-import db from "@/app/data/db.json";
+import db from "@/data/db.json";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -174,3 +174,4 @@ export default function SignupPage() {
     </div>
   );
 }
+

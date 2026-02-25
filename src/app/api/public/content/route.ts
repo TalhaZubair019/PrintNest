@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import db from "@/app/data/db.json";
-import { connectDB, ProductModel } from "@/app/lib/db";
+import db from "@/data/db.json";
+import { connectDB, ProductModel } from "@/lib/db";
 
 export async function GET(req: Request) {
   try {
@@ -38,3 +38,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

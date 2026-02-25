@@ -1,14 +1,52 @@
 "use client";
-
-import AdminReviewList from "../components/tables/AdminReviewList";
+import React, { useEffect, useState } from "react";
+import AdminReviewList from "@/components/admin/tables/AdminReviewList";
 
 export default function AdminReviewsPage() {
+  const [data, setData] = useState<{ reviews: any[]; products: any[] } | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch("/api/admin/stats");
+      if (res.ok) {
+        const stats = await res.json();
+        setData({
+          reviews: stats.reviews || [],
+          products: stats.products || [],
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  if (loading || !data) {
+    return (
+      <div className="py-20 flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-4">
         <h1 className="text-2xl font-bold text-gray-800">Reviews Management</h1>
       </div>
-      <AdminReviewList />
+      <AdminReviewList
+        reviews={data.reviews}
+        products={data.products}
+        onReviewDeleted={fetchReviews}
+      />
     </div>
   );
 }
