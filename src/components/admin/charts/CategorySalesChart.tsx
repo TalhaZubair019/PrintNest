@@ -53,7 +53,7 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
                   key={i}
                   d={pathData}
                   fill={colors[i % colors.length]}
-                  className="transition-all duration-500 hover:scale-105 hover:brightness-110 cursor-pointer origin-center"
+                  className="transition-all duration-500 hover:brightness-110 cursor-pointer"
                 />
               );
             })}

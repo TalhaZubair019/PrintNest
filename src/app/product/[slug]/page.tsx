@@ -423,7 +423,7 @@ export default function ProductPage() {
                       You must be logged in to leave a review.
                     </p>
                     <Link
-                      href="/login"
+                      href={`/login?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "")}`}
                       className="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition shadow-sm hover:shadow-md"
                     >
                       Log In to Review

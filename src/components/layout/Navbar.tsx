@@ -207,7 +207,7 @@ function Navbar() {
             </div>
           ) : (
             <Link
-              href="/login"
+              href={`/login?redirect=${encodeURIComponent(pathname)}`}
               className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
             >
               <User className="w-5 h-5" />
@@ -259,9 +259,7 @@ function Navbar() {
                           <p className="text-sm font-bold text-slate-700 line-clamp-1">
                             {item.title}
                           </p>
-                          <p className="text-xs text-slate-500">
-                            {item.price}
-                          </p>
+                          <p className="text-xs text-slate-500">{item.price}</p>
                         </div>
                         <button
                           onClick={() => dispatch(toggleWishlist(item))}
@@ -299,4 +297,3 @@ function Navbar() {
 }
 
 export default Navbar;
-
