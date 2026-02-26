@@ -102,7 +102,6 @@ export default function AdminDashboard() {
     badge: "",
   });
 
-  // New state for image file
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
@@ -284,7 +283,6 @@ export default function AdminDashboard() {
     try {
       let imageUrl = productForm.image;
 
-      // Check if there's a file to upload
       if (imageFile) {
         const formData = new FormData();
         formData.append("file", imageFile);

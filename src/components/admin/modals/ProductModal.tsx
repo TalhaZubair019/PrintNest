@@ -24,7 +24,6 @@ interface ProductModalProps {
   >;
   handleSaveProduct: (e: React.FormEvent) => void;
   isSubmitting: boolean;
-  // New props for file handling
   imageFile: File | null;
   setImageFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
@@ -48,7 +47,6 @@ const ProductModal = ({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
-      // Create a fake URL for immediate preview
       setProductForm({ ...productForm, image: URL.createObjectURL(file) });
     }
   };
@@ -120,7 +118,6 @@ const ProductModal = ({
             </div>
           </div>
 
-          {/* Modified Image Upload Section */}
           <div>
             <label className="block text-sm font-bold mb-1.5 text-slate-700">
               Product Image <span className="text-red-500">*</span>
