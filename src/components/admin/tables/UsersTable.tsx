@@ -1,5 +1,5 @@
 import React from "react";
-import { ShoppingCart, Heart, Trash2 } from "lucide-react";
+import { ShoppingCart, Heart, Trash2, Shield } from "lucide-react";
 import { UserData } from "@/app/admin/types";
 
 interface UsersTableProps {
@@ -9,6 +9,7 @@ interface UsersTableProps {
     React.SetStateAction<"cart" | "wishlist" | "both">
   >;
   setDeleteConfirm: React.Dispatch<React.SetStateAction<string | null>>;
+  onPromoteToAdmin: (userId: string, userName: string) => void;
   userPage: number;
   setUserPage: React.Dispatch<React.SetStateAction<number>>;
   totalUserPages: number;
@@ -19,6 +20,7 @@ const UsersTable = ({
   setSelectedUser,
   setViewType,
   setDeleteConfirm,
+  onPromoteToAdmin,
   userPage,
   setUserPage,
   totalUserPages,
@@ -29,7 +31,7 @@ const UsersTable = ({
       className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-300"
     >
       <div className="p-8 border-b border-slate-100 bg-slate-50/50">
-        <h3 className="text-xl font-bold">User Management</h3>
+        <h3 className="text-xl font-bold">Regular Users</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
@@ -82,12 +84,22 @@ const UsersTable = ({
                   </div>
                 </td>
                 <td className="px-8 py-5 text-right">
-                  <button
-                    onClick={() => setDeleteConfirm(u.id)}
-                    className="text-slate-400 hover:text-red-600 p-2.5 rounded-xl hover:bg-red-50"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => onPromoteToAdmin(u.id, u.name)}
+                      className="text-slate-400 hover:text-purple-600 p-2.5 rounded-xl hover:bg-purple-50 transition-colors"
+                      title="Promote to Admin"
+                    >
+                      <Shield size={18} />
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirm(u.id)}
+                      className="text-slate-400 hover:text-red-600 p-2.5 rounded-xl hover:bg-red-50 transition-colors"
+                      title="Delete User"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

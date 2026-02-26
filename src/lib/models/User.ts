@@ -1,5 +1,8 @@
 import mongoose, { Schema, models } from 'mongoose';
 
+
+delete (models as any).User;
+
 const userSchema = new Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
@@ -11,8 +14,9 @@ const userSchema = new Schema({
   country: { type: String },
   cart: { type: Array, default: [] },
   wishlist: { type: Array, default: [] },
-  savedCards: { type: Array, default: [] }
+  savedCards: { type: Array, default: [] },
+  isAdmin: { type: Boolean, default: false }
 }, { timestamps: true });
 
-const User = models.User || mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
 export default User;

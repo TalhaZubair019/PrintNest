@@ -22,8 +22,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
     }
 
+    const isAdmin = user.email === ADMIN_EMAIL || !!user.isAdmin;
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name }, 
+      { id: user.id, email: user.email, name: user.name, isAdmin }, 
       JWT_SECRET!, 
       { expiresIn: "1h" }
     );
@@ -35,7 +36,6 @@ export async function POST(req: Request) {
       maxAge: 3600 
     });
     const { password: _, ...userWithoutPassword } = user;
-    const isAdmin = user.email === ADMIN_EMAIL;
     return NextResponse.json({ 
       token, 
       user: { ...userWithoutPassword, isAdmin }

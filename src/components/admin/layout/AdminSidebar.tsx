@@ -8,15 +8,22 @@ import {
   ClipboardList,
   User as UserIcon,
   LogOut,
+  Shield,
 } from "lucide-react";
 import { UserData } from "@/app/admin/types";
 
 interface AdminSidebarProps {
   user: { name: string; email?: string } | null | any;
-  activeTab: "overview" | "users" | "orders" | "products" | "reviews";
+  activeTab:
+    | "overview"
+    | "users"
+    | "admins"
+    | "orders"
+    | "products"
+    | "reviews";
   setActiveTab: React.Dispatch<
     React.SetStateAction<
-      "overview" | "users" | "orders" | "products" | "reviews"
+      "overview" | "users" | "admins" | "orders" | "products" | "reviews"
     >
   >;
   stats: any;
@@ -89,7 +96,13 @@ const AdminSidebar = ({
             active={activeTab === "users"}
             onClick={() => setActiveTab("users")}
             icon={<Users size={18} />}
-            label={`Users (${stats.totalUsers})`}
+            label={`Users (${stats.users?.filter((u: any) => !u.isAdmin).length ?? 0})`}
+          />
+          <NavButton
+            active={activeTab === "admins"}
+            onClick={() => setActiveTab("admins")}
+            icon={<Shield size={18} />}
+            label={`Admins (${stats.users?.filter((u: any) => u.isAdmin).length ?? 0})`}
           />
           <NavButton
             active={activeTab === "orders"}

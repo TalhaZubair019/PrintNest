@@ -30,11 +30,13 @@ import TopSellingProducts from "@/components/admin/lists/TopSellingProducts";
 import TopReviewedProducts from "@/components/admin/lists/TopReviewedProducts";
 import ProductsTable from "@/components/admin/tables/ProductsTable";
 import UsersTable from "@/components/admin/tables/UsersTable";
+import AdminsTable from "@/components/admin/tables/AdminsTable";
 import OrdersTable from "@/components/admin/tables/OrdersTable";
 import ProductModal from "@/components/admin/modals/ProductModal";
 import UserModal from "@/components/admin/modals/UserModal";
 import OrderModal from "@/components/admin/modals/OrderModal";
 import DeleteConfirmationModal from "@/components/admin/modals/DeleteConfirmationModal";
+import AddAdminModal from "@/components/admin/modals/AddAdminModal";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 
 const PageHeader = ({ title, breadcrumb }: any) => (
@@ -78,7 +80,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "orders" | "products" | "reviews"
+    "overview" | "users" | "admins" | "orders" | "products" | "reviews"
   >("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
@@ -88,12 +90,27 @@ export default function AdminDashboard() {
   );
   const ITEMS_PER_PAGE = 5;
   const [userPage, setUserPage] = useState(1);
+  const [adminPage, setAdminPage] = useState(1);
   const [orderPage, setOrderPage] = useState(1);
   const [productPage, setProductPage] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [isAddAdminModalOpen, setIsAddAdminModalOpen] = useState(false);
+  const [promoteConfirm, setPromoteConfirm] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [revokeConfirm, setRevokeConfirm] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPromoting, setIsPromoting] = useState(false);
+  const [isRevoking, setIsRevoking] = useState(false);
+  const [isDeletingProduct, setIsDeletingProduct] = useState(false);
+  const [isDeletingOrder, setIsDeletingOrder] = useState(false);
   const [productForm, setProductForm] = useState({
     title: "",
     description: "",
@@ -140,6 +157,12 @@ export default function AdminDashboard() {
   }, [user, isAuthenticated, isAuthLoading]);
 
   useEffect(() => {
+    
+    setSearchTerm("");
+    setDeleteConfirm(null);
+    setPromoteConfirm(null);
+    setRevokeConfirm(null);
+
     const contentArea = document.getElementById("admin-content-area");
     if (contentArea) {
       contentArea.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -204,6 +227,7 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteUser = async (userId: string) => {
+    setIsDeleting(true);
     try {
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: "DELETE",
@@ -211,11 +235,66 @@ export default function AdminDashboard() {
       if (res.ok) {
         fetchStats();
         setDeleteConfirm(null);
+        showToast("User deleted successfully.", "success");
       } else {
-        alert("Failed to delete user");
+        showToast("Failed to delete user.", "error");
       }
-    } catch (error) {
-      alert("Error deleting user");
+    } catch {
+      showToast("Error deleting user.", "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handlePromoteToAdmin = async (userId: string) => {
+    setIsPromoting(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isAdmin: true }),
+      });
+      if (res.ok) {
+        fetchStats();
+        setPromoteConfirm(null);
+        showToast(
+          `${promoteConfirm?.name} has been promoted to Admin.`,
+          "success",
+        );
+      } else {
+        const data = await res.json().catch(() => ({}));
+        showToast(data.message || "Failed to promote user.", "error");
+      }
+    } catch {
+      showToast("Error promoting user.", "error");
+    } finally {
+      setIsPromoting(false);
+    }
+  };
+
+  const handleRevokeAdmin = async (userId: string) => {
+    setIsRevoking(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isAdmin: false }),
+      });
+      if (res.ok) {
+        fetchStats();
+        setRevokeConfirm(null);
+        showToast(
+          `${revokeConfirm?.name}'s admin access has been revoked.`,
+          "success",
+        );
+      } else {
+        const data = await res.json().catch(() => ({}));
+        showToast(data.message || "Failed to revoke admin.", "error");
+      }
+    } catch {
+      showToast("Error revoking admin.", "error");
+    } finally {
+      setIsRevoking(false);
     }
   };
 
@@ -344,6 +423,7 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteProduct = async (id: number) => {
+    setIsDeletingProduct(true);
     try {
       const res = await fetch(`/api/admin/products/${id}`, {
         method: "DELETE",
@@ -351,15 +431,19 @@ export default function AdminDashboard() {
       if (res.ok) {
         await fetchStats();
         setProductDeleteConfirm(null);
+        showToast("Product deleted successfully.", "success");
       } else {
-        alert("Failed to delete product");
+        showToast("Failed to delete product.", "error");
       }
-    } catch (error) {
-      alert("Error deleting product");
+    } catch {
+      showToast("Error deleting product.", "error");
+    } finally {
+      setIsDeletingProduct(false);
     }
   };
 
   const handleDeleteOrder = async (orderId: string) => {
+    setIsDeletingOrder(true);
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "DELETE",
@@ -367,25 +451,46 @@ export default function AdminDashboard() {
       if (res.ok) {
         await fetchStats();
         setOrderDeleteConfirm(null);
+        showToast("Order deleted successfully.", "success");
       } else {
-        alert("Failed to delete order");
+        showToast("Failed to delete order.", "error");
       }
-    } catch (error) {
-      alert("Error deleting order");
+    } catch {
+      showToast("Error deleting order.", "error");
+    } finally {
+      setIsDeletingOrder(false);
     }
   };
 
-  const filteredUsers = stats?.users.filter(
-    (u) =>
-      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  
+  const filteredUsers = stats?.users
+    .filter((u) => !u.isAdmin)
+    .filter(
+      (u) =>
+        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
   const paginatedUsers = filteredUsers?.slice(
     (userPage - 1) * ITEMS_PER_PAGE,
     userPage * ITEMS_PER_PAGE,
   );
   const totalUserPages =
     Math.ceil((filteredUsers?.length || 0) / ITEMS_PER_PAGE) || 1;
+
+  
+  const filteredAdmins = stats?.users
+    .filter((u) => u.isAdmin)
+    .filter(
+      (u) =>
+        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  const paginatedAdmins = filteredAdmins?.slice(
+    (adminPage - 1) * ITEMS_PER_PAGE,
+    adminPage * ITEMS_PER_PAGE,
+  );
+  const totalAdminPages =
+    Math.ceil((filteredAdmins?.length || 0) / ITEMS_PER_PAGE) || 1;
 
   const filteredOrders = stats?.recentOrders.filter(
     (o) =>
@@ -441,7 +546,9 @@ export default function AdminDashboard() {
           />
 
           <div id="admin-content-area" className="lg:flex-1">
-            {["users", "orders", "products", "reviews"].includes(activeTab) && (
+            {["users", "admins", "orders", "products", "reviews"].includes(
+              activeTab,
+            ) && (
               <div className="mb-6">
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition duration-300" />
@@ -557,9 +664,21 @@ export default function AdminDashboard() {
                 setSelectedUser={setSelectedUser}
                 setViewType={setViewType}
                 setDeleteConfirm={setDeleteConfirm}
+                onPromoteToAdmin={(id, name) => setPromoteConfirm({ id, name })}
                 userPage={userPage}
                 setUserPage={setUserPage}
                 totalUserPages={totalUserPages}
+              />
+            )}
+            {activeTab === "admins" && (
+              <AdminsTable
+                paginatedAdmins={paginatedAdmins || []}
+                setDeleteConfirm={setDeleteConfirm}
+                onRevokeAdmin={(id, name) => setRevokeConfirm({ id, name })}
+                adminPage={adminPage}
+                setAdminPage={setAdminPage}
+                totalAdminPages={totalAdminPages}
+                onAddAdmin={() => setIsAddAdminModalOpen(true)}
               />
             )}
             {activeTab === "orders" && (
@@ -597,6 +716,12 @@ export default function AdminDashboard() {
           </button>
         </div>
       )}
+      <AddAdminModal
+        isOpen={isAddAdminModalOpen}
+        onClose={() => setIsAddAdminModalOpen(false)}
+        onSuccess={fetchStats}
+        showToast={showToast}
+      />
       <ProductModal
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
@@ -625,6 +750,7 @@ export default function AdminDashboard() {
         }
         title="Delete Product?"
         message={`Remove "${productDeleteConfirm?.title}" from store?`}
+        isLoading={isDeletingProduct}
       />
       <DeleteConfirmationModal
         isOpen={!!deleteConfirm}
@@ -641,6 +767,7 @@ export default function AdminDashboard() {
             ? This action cannot be undone.
           </>
         }
+        isLoading={isDeleting}
       />
       <DeleteConfirmationModal
         isOpen={!!orderDeleteConfirm}
@@ -663,6 +790,77 @@ export default function AdminDashboard() {
           </>
         }
         warning="This will permanently remove this order and update all graphs and statistics."
+        isLoading={isDeletingOrder}
+      />
+      <DeleteConfirmationModal
+        isOpen={!!promoteConfirm}
+        onClose={() => setPromoteConfirm(null)}
+        onConfirm={() =>
+          promoteConfirm && handlePromoteToAdmin(promoteConfirm.id)
+        }
+        title="Promote to Admin?"
+        message={
+          <>
+            Promote{" "}
+            <span className="font-bold text-slate-900">
+              {promoteConfirm?.name}
+            </span>{" "}
+            to Administrator? They will have full access to the admin dashboard.
+          </>
+        }
+        confirmLabel="Promote"
+        confirmClassName="flex-1 px-4 py-3 bg-linear-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl hover:opacity-90"
+        isLoading={isPromoting}
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        }
+      />
+      <DeleteConfirmationModal
+        isOpen={!!revokeConfirm}
+        onClose={() => setRevokeConfirm(null)}
+        onConfirm={() => revokeConfirm && handleRevokeAdmin(revokeConfirm.id)}
+        title="Revoke Admin Access?"
+        message={
+          <>
+            Remove admin privileges from{" "}
+            <span className="font-bold text-slate-900">
+              {revokeConfirm?.name}
+            </span>
+            ? They will become a regular user but their account will remain.
+          </>
+        }
+        confirmLabel="Revoke"
+        confirmClassName="flex-1 px-4 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600"
+        isLoading={isRevoking}
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+          </svg>
+        }
       />
     </div>
   );

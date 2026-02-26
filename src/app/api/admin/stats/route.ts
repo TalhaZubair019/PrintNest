@@ -14,8 +14,9 @@ export async function GET(request: Request) {
     if (!token)
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
-    if (decoded.email !== ADMIN_EMAIL) {
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string; isAdmin?: boolean };
+    const isAuthorized = decoded.email === ADMIN_EMAIL || decoded.isAdmin === true;
+    if (!isAuthorized) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
@@ -102,8 +103,10 @@ export async function GET(request: Request) {
       
     const usersWithDetails = users.map((user) => {
       const { password, ...userWithoutPassword } = user;
+      const isAdmin = !!user.isAdmin || user.email === ADMIN_EMAIL;
       return {
         ...userWithoutPassword,
+        isAdmin,
         cartCount: user.cart?.length || 0,
         wishlistCount: user.wishlist?.length || 0,
       };

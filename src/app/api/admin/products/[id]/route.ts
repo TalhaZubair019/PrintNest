@@ -12,8 +12,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const token = cookieStore.get("token")?.value;
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
-    if (decoded.email !== ADMIN_EMAIL) {
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string; isAdmin?: boolean };
+    if (decoded.email !== ADMIN_EMAIL && !decoded.isAdmin) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
@@ -43,8 +43,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const token = cookieStore.get("token")?.value;
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string };
-    if (decoded.email !== ADMIN_EMAIL) {
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string; isAdmin?: boolean };
+    if (decoded.email !== ADMIN_EMAIL && !decoded.isAdmin) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 

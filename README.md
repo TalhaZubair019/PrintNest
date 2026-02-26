@@ -1,265 +1,111 @@
-<div align="center">
+# 🖨️ PrintNest — Modern Print-on-Demand E-Commerce Store
 
-<br/>
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.6-black?logo=next.js)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19.2.3-blue?logo=react)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://typescriptlang.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-green?logo=mongodb)](https://mongoosejs.com)
+[![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.11-purple?logo=redux)](https://redux-toolkit.js.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-cyan?logo=tailwindcss)](https://tailwindcss.com)
 
-<img src="https://img.shields.io/badge/🖨️-PrintNest-4F46E5?style=for-the-badge&labelColor=0F0F1A&color=4F46E5" height="48" alt="PrintNest"/>
-
-<h3>The Enterprise-Grade Print-on-Demand Platform</h3>
-<p><em>Where Creative Vision Meets High-Quality Physical Reality</em></p>
-
-<br/>
-
-[![Next.js](https://img.shields.io/badge/Next.js-16.1.6-000000?logo=next.js&logoColor=white&style=flat-square)](https://nextjs.org)&nbsp;
-[![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white&style=flat-square)](https://reactjs.org)&nbsp;
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white&style=flat-square)](https://typescriptlang.org)&nbsp;
-[![MongoDB](https://img.shields.io/badge/MongoDB-8.x-47A248?logo=mongodb&logoColor=white&style=flat-square)](https://mongodb.com)&nbsp;
-[![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11-764ABC?logo=redux&logoColor=white&style=flat-square)](https://redux-toolkit.js.org)&nbsp;
-[![Tailwind](https://img.shields.io/badge/Tailwind-4.x-06B6D4?logo=tailwindcss&logoColor=white&style=flat-square)](https://tailwindcss.com)
-
-<br/>
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)&nbsp;
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-8B5CF6?style=flat-square)](https://github.com/TalhaZubair019/PrintNest/pulls)&nbsp;
-[![Stars](https://img.shields.io/github/stars/TalhaZubair019/PrintNest?style=flat-square&color=F59E0B)](https://github.com/TalhaZubair019/PrintNest/stargazers)
-
-<br/>
-
-**[✨ Features](#-features)** &nbsp;·&nbsp; **[🚀 Quick Start](#-quick-start)** &nbsp;·&nbsp; **[🏗️ Architecture](#️-architecture)** &nbsp;·&nbsp; **[📡 API Reference](#-api-reference)** &nbsp;·&nbsp; **[🛡️ Security](#️-security)** &nbsp;·&nbsp; **[🌐 Deploy](#-deployment)**
-
-<br/>
+A modern, full-stack e-commerce platform for custom print-on-demand products. Features a complete admin panel, MongoDB database, AI-powered product descriptions, product reviews, and email order notifications.
 
 ---
 
-</div>
+## ✨ Key Features
 
-## 🌌 What is PrintNest?
+### 🛒 E-Commerce
 
-**PrintNest** is a full-stack, production-ready e-commerce engine purpose-built for the print-on-demand industry. It combines the rendering power of **Next.js 16** with the scalability of **MongoDB**, the precision of **TypeScript**, and the elegance of **Tailwind CSS 4** to deliver a frictionless experience — from browsing to checkout to delivery.
+- **Product Catalog** with quick view, comparison, and wishlist
+- **Shopping Cart** with quantity controls and localStorage persistence
+- **Wishlist** with Redux state management
+- **Dynamic Product Categories** (T-shirts, Business Cards, Hoodies, Packaging)
+- **Product Review System** with ratings and comments
+- **Checkout** with billing, payment selection, and order confirmation
 
-```
-Customer Journey: Browse → Customize → Cart → Checkout → Order Confirmation → Tracking
-Admin Journey:    Dashboard → Analytics → Manage Products → Process Orders → Insights
-```
+### 🔐 Authentication & Users
 
-> **Built by [Talha Zubair](https://github.com/TalhaZubair019)** · Full-stack Next.js application with JWT auth, MongoDB persistence, real-time analytics, and automated email workflows.
+- **Sign Up / Login** with bcrypt password hashing
+- **JWT Authentication** via HTTP-only cookies
+- **User Dashboard** with order history
+- **Guest Checkout** support
+- **Role-based Access** — admin vs standard user
 
----
+### 🛠️ Admin Panel (`/admin`)
 
-## ⚡ Features
+- **Dashboard** with charts: revenue, orders, top products, user stats
+- **Product Management** — add, edit, delete products
+- **Order Management** — view and update order statuses
+- **User Management** — view, promote, delete users
+- **Review Moderation** — view and manage all reviews
+- **AI Description Generator** powered by Groq (Llama 3.1)
+- **Image Upload** endpoint for products
 
-<table>
-<tr>
-<td valign="top" width="50%">
+### 🤖 AI Integration
 
-### 🛍️ Customer Experience
+- **AI Product Descriptions** via Groq API (Llama 3.1 8B Instant)
+- Generates compelling 2–3 sentence product descriptions from a title
 
-**📦 Product Catalog**
+### 📧 Order & Email
 
-- Full product listing with slug-based routing
-- Quick-view modals for instant product preview
-- Side-by-side product comparison drawer
-- Product category pages with dynamic filters
-- Customer reviews & star ratings per product
-
-**🛒 Shopping**
-
-- Real-time cart with Redux + `localStorage` sync
-- Persistent wishlist with heart-toggle UX
-- Guest checkout (no account required)
-- COD & Bank Transfer payment options
-- Automated order confirmation emails (Nodemailer)
-
-**👤 Account System**
-
-- Secure user registration & JWT login
-- Personal dashboard: Order history & tracking
-- Address & profile management
-- Wishlist & cart persistence across sessions
-
-</td>
-<td valign="top" width="50%">
-
-### 👨‍💼 Admin Power Center
-
-**📊 8-Chart Analytics Engine**
-
-| Chart                    | What It Tracks                       |
-| ------------------------ | ------------------------------------ |
-| `RevenueChart`           | Daily/Monthly revenue trends         |
-| `CategorySalesChart`     | Sales by product category (Donut)    |
-| `ProductSalesChart`      | Best-selling products ranking        |
-| `OrderStatusChart`       | Pending / Shipped / Delivered ratios |
-| `OrderVelocityChart`     | Order throughput & peak times        |
-| `AverageOrderValueChart` | AOV trends over time                 |
-| `ReviewRatingChart`      | Rating distribution (1–5 stars)      |
-| `SentimentChart`         | Positive/Neutral/Negative breakdown  |
-
-**⚙️ Management Tools**
-
-- **Products**: Full CRUD (create / edit / delete)
-- **Blog**: Integrated CMS for content marketing
-- **Orders**: Status updates + order deletion
-- **Users**: Account oversight & activity view
-- **Reviews**: Moderation & sentiment analysis
-
-</td>
-</tr>
-</table>
-
-### 🎨 Design & UX
-
-| Feature              | Implementation                              |
-| -------------------- | ------------------------------------------- |
-| 📱 **Responsive**    | Mobile-first across all breakpoints         |
-| ✨ **Animations**    | Framer Motion for page & micro-transitions  |
-| 🪟 **Glassmorphism** | `backdrop-blur` + `border-opacity` admin UI |
-| 🔔 **Toast Alerts**  | Non-intrusive action feedback system        |
-| 🗺️ **Breadcrumbs**   | Full site navigation trail                  |
-| 🖼️ **Image Uploads** | Cloud-ready upload endpoint (`/api/upload`) |
+- Orders saved to **MongoDB**
+- Email confirmation sent to **customer and store** via Nodemailer (Gmail SMTP)
+- Guest and authenticated order tracking
 
 ---
 
-## 🏗️ Architecture
+## 📋 Table of Contents
 
-### Tech Stack
-
-| Layer          | Technology              | Version |
-| -------------- | ----------------------- | ------- |
-| **Framework**  | Next.js (App Router)    | 16.1.6  |
-| **Frontend**   | React                   | 19.2.3  |
-| **Language**   | TypeScript              | 5.x     |
-| **Database**   | MongoDB + Mongoose      | 8.x     |
-| **Styling**    | Tailwind CSS            | 4.x     |
-| **Animations** | Framer Motion           | 12.30   |
-| **State**      | Redux Toolkit           | 2.11    |
-| **Icons**      | Lucide React            | 0.563   |
-| **Auth**       | JWT + bcryptjs          | —       |
-| **Email**      | Nodemailer (Gmail SMTP) | 7.x     |
-| **Charts**     | Recharts                | —       |
-
-### Data Flow
-
-```mermaid
-sequenceDiagram
-    actor User
-    participant UI as Next.js UI
-    participant Redux
-    participant API as API Routes
-    participant DB as MongoDB
-
-    User->>UI: Interaction (add to cart, checkout…)
-    UI->>Redux: Dispatch action
-    Redux-->>UI: Update local state instantly
-    UI->>API: HTTP + JWT cookie
-    API->>DB: Mongoose query / mutation
-    DB-->>API: Result
-    API-->>UI: JSON response
-    UI->>Redux: Hydrate / persist state
-```
-
-### Database Models (Mongoose)
-
-```
-📁 src/lib/models/
-├── User.ts      — name, email, hashedPassword, cart[], wishlist[], savedCards[]
-├── Product.ts   — title, price, oldPrice, image, badge, printText, slug
-├── Order.ts     — userId, items[], total, status, customer{}, createdAt
-└── Review.ts    — productId, userId, userName, rating, comment, sentiment
-```
-
-### Project Structure
-
-```
-printnest/
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── admin/           # Protected admin CRUD endpoints
-│   │   │   │   ├── orders/      # GET, PUT, DELETE orders
-│   │   │   │   ├── products/    # GET, POST, PUT, DELETE products
-│   │   │   │   ├── stats/       # Dashboard summary stats
-│   │   │   │   └── users/       # User management
-│   │   │   ├── auth/            # signup, login, me, logout
-│   │   │   ├── public/          # Products, reviews, blog (public)
-│   │   │   └── upload/          # Image upload handler
-│   │   ├── admin/
-│   │   │   ├── dashboard/       # Admin dashboard page
-│   │   │   └── reviews/         # Review moderation
-│   │   └── (store pages)        # shop, cart, checkout, account…
-│   ├── components/
-│   │   ├── admin/
-│   │   │   ├── charts/          # 8 Recharts analytics components
-│   │   │   ├── tables/          # Orders, Products, Users tables
-│   │   │   ├── modals/          # Edit modals for admin CRUD
-│   │   │   └── lists/           # Admin list views
-│   │   ├── sections/            # 11 homepage sections (Hero, Blog…)
-│   │   ├── products/            # ProductCard, QuickView, Compare, Toast
-│   │   └── layout/              # Navbar, Footer, AuthInitializer
-│   ├── redux/
-│   │   ├── Store.ts
-│   │   ├── CartSlice.ts         # cart items, quantity, total
-│   │   ├── WishListSlice.ts     # toggled wishlist items
-│   │   └── AuthSlice.ts         # user session state
-│   └── lib/
-│       ├── db.ts                # MongoDB connection (cached)
-│       ├── env.ts               # Environment variable validation
-│       └── models/              # Mongoose schemas
-├── public/                      # Static assets
-├── .env.local                   # Secrets (never commit!)
-├── next.config.ts
-├── tailwind.config.ts
-└── tsconfig.json
-```
+- [Tech Stack](#-tech-stack)
+- [Package Installation](#-package-installation-commands)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [API Routes](#-api-routes)
+- [Database & Models](#-database--models)
+- [Redux Store](#-redux-store)
+- [Admin Panel](#-admin-panel)
+- [Pages & Routes](#-pages--routes)
+- [Deployment](#-deployment)
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Tech Stack
 
-### Prerequisites
+| Category             | Technology                   |
+| -------------------- | ---------------------------- |
+| **Framework**        | Next.js 16.1.6 (App Router)  |
+| **Frontend**         | React 19.2.3                 |
+| **Language**         | TypeScript 5.x               |
+| **Database**         | MongoDB via Mongoose 9.x     |
+| **Styling**          | Tailwind CSS 4.x             |
+| **Animations**       | Framer Motion 12.x           |
+| **State Management** | Redux Toolkit 2.x            |
+| **Icons**            | Lucide React                 |
+| **Authentication**   | JWT + bcryptjs               |
+| **Email**            | Nodemailer (Gmail SMTP)      |
+| **AI**               | Groq API (Llama 3.1 8B)      |
+| **Utilities**        | clsx, tailwind-merge, cookie |
 
-| Requirement              | Version    |
-| ------------------------ | ---------- |
-| Node.js                  | 18.0+      |
-| npm / yarn / pnpm        | Latest     |
-| MongoDB Atlas (or local) | Any        |
-| Gmail account            | For emails |
+---
 
-### 1-Minute Setup
+## 📦 Package Installation Commands
+
+### Install All at Once
 
 ```bash
-# Clone
-git clone https://github.com/TalhaZubair019/PrintNest.git
-cd PrintNest
-
-# Install all dependencies at once
 npm install
-
-# Configure (see Environment Variables below)
-cp .env.example .env.local
-# → edit .env.local with your credentials
-
-# Run
-npm run dev
-# → http://localhost:3000
 ```
 
-### 📦 Package Installation Commands
-
-If you need to install packages individually (e.g. adding to an existing project):
-
-#### Install All at Once
+### Production Dependencies
 
 ```bash
-# All production dependencies
-npm install @reduxjs/toolkit bcryptjs clsx cookie framer-motion jsonwebtoken lucide-react mongoose next nodemailer react react-dom react-redux recharts tailwind-merge
-
-# All dev dependencies
-npm install -D @tailwindcss/postcss @types/bcryptjs @types/cookie @types/jsonwebtoken @types/node @types/nodemailer @types/react @types/react-dom babel-plugin-react-compiler eslint eslint-config-next tailwindcss typescript
+# Install all production deps at once
+npm install @google/generative-ai @reduxjs/toolkit bcryptjs clsx cookie framer-motion jsonwebtoken lucide-react mongoose next nodemailer react react-dom react-redux tailwind-merge
 ```
 
-#### Install by Category
+Or install individually:
 
-**Framework & Core**
+#### Framework & Core
 
 ```bash
 npm install next@16.1.6          # Next.js framework
@@ -267,361 +113,498 @@ npm install react@19.2.3         # React library
 npm install react-dom@19.2.3     # React DOM renderer
 ```
 
-**Database**
+#### Database
 
 ```bash
-npm install mongoose@^8.0.0      # MongoDB ODM (schemas, queries, models)
+npm install mongoose@^9.2.1      # MongoDB ODM
 ```
 
-**Authentication & Security**
+#### State Management
 
 ```bash
-npm install bcryptjs@^3.0.3      # Password hashing (10 salt rounds)
-npm install jsonwebtoken@^9.0.3  # JWT token creation & verification
-npm install cookie@^1.1.1        # HTTP cookie parsing utilities
-```
-
-**State Management**
-
-```bash
-npm install @reduxjs/toolkit@^2.11.2   # Simplified Redux (slices, store)
+npm install @reduxjs/toolkit@^2.11.2   # Redux Toolkit
 npm install react-redux@^9.2.0         # React bindings for Redux
 ```
 
-**UI & Styling**
+#### Authentication & Security
 
 ```bash
-npm install framer-motion@^12.30.0     # Page transitions & micro-animations
-npm install lucide-react@^0.563.0      # Icon library (600+ icons)
-npm install clsx@^2.1.1                # Conditional className utility
-npm install tailwind-merge@^3.4.0      # Merge Tailwind classes safely
+npm install bcryptjs@^3.0.3            # Password hashing
+npm install jsonwebtoken@^9.0.3        # JWT tokens
+npm install cookie@^1.1.1              # Cookie parsing
 ```
 
-**Charts & Analytics**
+#### UI & Styling
 
 ```bash
-npm install recharts                   # Chart library for admin dashboard
+npm install framer-motion@^12.30.0     # Animations
+npm install lucide-react@^0.563.0      # Icons
+npm install clsx@^2.1.1                # Conditional classNames
+npm install tailwind-merge@^3.4.0      # Tailwind class merging
 ```
 
-**Email**
+#### Email & AI
 
 ```bash
-npm install nodemailer@^7.0.13         # SMTP email (order confirmations)
+npm install nodemailer@^7.0.13         # Email sending (SMTP)
+npm install @google/generative-ai@^0.24.1  # Google AI SDK (installed but Groq used via fetch)
 ```
 
-**Dev Dependencies**
+### Development Dependencies
 
 ```bash
-npm install -D typescript@^5                        # TypeScript compiler
-npm install -D @types/node@^20                      # Node.js type definitions
-npm install -D @types/react@^19                     # React type definitions
-npm install -D @types/react-dom@^19                 # React DOM types
-npm install -D @types/bcryptjs@^2.4.6               # bcryptjs types
-npm install -D @types/cookie@^0.6.0                 # cookie types
-npm install -D @types/jsonwebtoken@^9.0.10           # JWT types
-npm install -D @types/nodemailer@^7.0.9              # Nodemailer types
-npm install -D tailwindcss@^4                        # Tailwind CSS framework
-npm install -D @tailwindcss/postcss@^4               # PostCSS integration
-npm install -D eslint@^9                             # Linter
-npm install -D eslint-config-next@16.1.6             # Next.js ESLint rules
-npm install -D babel-plugin-react-compiler@1.0.0     # React compiler plugin
+# Install all dev deps at once
+npm install -D @tailwindcss/postcss @types/bcryptjs @types/cookie @types/jsonwebtoken @types/node @types/nodemailer @types/react @types/react-dom babel-plugin-react-compiler eslint eslint-config-next tailwindcss typescript
 ```
 
-#### Package Reference
+Or install individually:
 
-| Package            | Purpose                                                |
-| ------------------ | ------------------------------------------------------ |
-| `next`             | Core framework — SSR, App Router, API routes           |
-| `mongoose`         | MongoDB ODM — schemas for User, Product, Order, Review |
-| `@reduxjs/toolkit` | Cart, wishlist, and auth global state                  |
-| `bcryptjs`         | Secure password hashing before DB storage              |
-| `jsonwebtoken`     | Stateless JWT auth tokens                              |
-| `framer-motion`    | Smooth animations across all pages                     |
-| `recharts`         | Admin analytics charts (8 chart types)                 |
-| `nodemailer`       | Order confirmation emails via Gmail                    |
-| `lucide-react`     | Consistent icon set throughout the app                 |
-| `tailwind-merge`   | Prevents Tailwind class conflicts                      |
-| `clsx`             | Dynamic conditional class building                     |
+#### TypeScript & Types
 
-### Environment Variables
+```bash
+npm install -D typescript@^5
+npm install -D @types/node@^20
+npm install -D @types/react@^19
+npm install -D @types/react-dom@^19
+npm install -D @types/bcryptjs@^2.4.6
+npm install -D @types/cookie@^0.6.0
+npm install -D @types/jsonwebtoken@^9.0.10
+npm install -D @types/nodemailer@^7.0.9
+```
+
+#### CSS & Build Tools
+
+```bash
+npm install -D tailwindcss@^4
+npm install -D @tailwindcss/postcss@^4
+npm install -D eslint@^9
+npm install -D eslint-config-next@16.1.6
+npm install -D babel-plugin-react-compiler@1.0.0
+```
+
+### Package Purposes
+
+| Package                 | Purpose                                           |
+| ----------------------- | ------------------------------------------------- |
+| `@google/generative-ai` | Google AI SDK (installed alongside Groq)          |
+| `@reduxjs/toolkit`      | Simplified Redux with createSlice, configureStore |
+| `bcryptjs`              | Secure password hashing                           |
+| `clsx`                  | Conditional className utility                     |
+| `cookie`                | HTTP cookie parsing                               |
+| `framer-motion`         | Page and component animations                     |
+| `jsonwebtoken`          | JWT creation and verification                     |
+| `lucide-react`          | Icon component library                            |
+| `mongoose`              | MongoDB ODM for data modeling                     |
+| `next`                  | React framework (SSR, routing, API)               |
+| `nodemailer`            | Send order confirmation emails                    |
+| `react` / `react-dom`   | UI library and DOM renderer                       |
+| `react-redux`           | Redux bindings for React                          |
+| `tailwind-merge`        | Merge Tailwind classes without conflicts          |
+| `tailwindcss`           | Utility-first CSS framework                       |
+| `typescript`            | Static typing for JavaScript                      |
+
+---
+
+## 📁 Project Structure
+
+```
+printnest/
+├── src/
+│   ├── app/                              # Next.js App Router
+│   │   ├── api/                          # API Routes
+│   │   │   ├── admin/                    # Admin-only endpoints
+│   │   │   │   ├── ai-description/       # POST - AI product description (Groq)
+│   │   │   │   ├── orders/               # GET/PATCH - Manage all orders
+│   │   │   │   ├── products/             # GET/POST/DELETE - Manage products
+│   │   │   │   ├── stats/                # GET - Dashboard analytics
+│   │   │   │   └── users/                # GET/DELETE/PATCH - Manage users
+│   │   │   ├── auth/                     # Authentication endpoints
+│   │   │   │   ├── login/route.ts
+│   │   │   │   ├── logout/route.ts
+│   │   │   │   ├── me/route.ts
+│   │   │   │   └── signup/route.ts
+│   │   │   ├── public/                   # Public data endpoints
+│   │   │   │   ├── content/route.ts      # db.json content
+│   │   │   │   ├── orders/route.ts       # User orders
+│   │   │   │   ├── place-order/route.ts  # Submit order + email
+│   │   │   │   └── reviews/              # GET/POST reviews
+│   │   │   └── upload/route.ts           # Image upload
+│   │   │
+│   │   ├── admin/                        # Admin pages
+│   │   │   ├── dashboard/page.tsx        # Analytics dashboard
+│   │   │   ├── products/page.tsx         # Product management
+│   │   │   ├── reviews/page.tsx          # Review moderation
+│   │   │   └── types.ts                  # Admin TypeScript types
+│   │   │
+│   │   ├── account/page.tsx              # User dashboard
+│   │   ├── blog/[slug]/page.tsx          # Blog post detail
+│   │   ├── cart/page.tsx                 # Shopping cart
+│   │   ├── category/[slug]/page.tsx      # Category products
+│   │   ├── checkout/page.tsx             # Checkout form
+│   │   ├── login/page.tsx                # Login page
+│   │   ├── product/[slug]/page.tsx       # Product detail
+│   │   ├── shop/page.tsx                 # All products
+│   │   ├── signup/page.tsx               # Registration
+│   │   ├── thank-you/page.tsx            # Order confirmation
+│   │   ├── wishlist/page.tsx             # Wishlist
+│   │   ├── layout.tsx                    # Root layout
+│   │   ├── page.tsx                      # Home page
+│   │   └── globals.css
+│   │
+│   ├── components/                       # Reusable Components
+│   │   ├── sections/                     # Home page sections
+│   │   │   ├── Hero.tsx
+│   │   │   ├── Products.tsx
+│   │   │   ├── Categories.tsx
+│   │   │   ├── Blog.tsx
+│   │   │   ├── About.tsx
+│   │   │   ├── HowItWorks.tsx
+│   │   │   ├── WhyUs.tsx
+│   │   │   ├── Packaging.tsx
+│   │   │   ├── Price.tsx
+│   │   │   ├── Testimonials.tsx
+│   │   │   └── Social.tsx
+│   │   ├── admin/                        # Admin UI components
+│   │   │   ├── charts/                   # Chart components (8)
+│   │   │   ├── tables/                   # Data tables (5)
+│   │   │   ├── modals/                   # Modal dialogs (5)
+│   │   │   ├── lists/                    # List components (2)
+│   │   │   ├── layout/                   # Admin layout (1)
+│   │   │   └── ui/                       # Admin UI elements (2)
+│   │   ├── auth/                         # Auth components
+│   │   ├── layout/                       # Navbar, Footer, etc.
+│   │   ├── products/                     # ProductCard, QuickView, etc.
+│   │   └── ui/                           # Shared UI components
+│   │
+│   ├── lib/                              # Utilities & DB
+│   │   ├── db.ts                         # DB connection + interfaces
+│   │   ├── env.ts                        # Environment variable exports
+│   │   └── models/                       # Mongoose models
+│   │       ├── User.ts
+│   │       ├── Product.ts
+│   │       ├── Order.ts
+│   │       └── Review.ts
+│   │
+│   ├── redux/                            # Redux Store
+│   │   ├── Store.tsx
+│   │   ├── CartSlice.tsx
+│   │   ├── WishListSlice.tsx
+│   │   ├── AuthSlice.tsx
+│   │   └── Provider.tsx
+│   │
+│   └── data/                             # Static data files
+│
+├── public/                               # Static assets
+├── .env.local                            # Environment variables
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+└── next.config.ts
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** 18.0 or higher
+- **MongoDB** database (Atlas or local)
+- **Groq API key** (for AI descriptions)
+- **Gmail** account (for email notifications)
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <your-repo-url>
+   cd printnest
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Create `.env.local`** (see [Environment Variables](#-environment-variables))
+
+4. **Run development server**
+
+   ```bash
+   npm run dev
+   ```
+
+5. **Open browser**
+   ```
+   http://localhost:3000
+   ```
+
+### Scripts
+
+| Command         | Description              |
+| --------------- | ------------------------ |
+| `npm run dev`   | Start development server |
+| `npm run build` | Build for production     |
+| `npm start`     | Start production server  |
+| `npm run lint`  | Run ESLint               |
+
+---
+
+## 🔐 Environment Variables
 
 Create `.env.local` in the project root:
 
 ```env
-# ─── Database ──────────────────────────────────────
-MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/printnest
+# MongoDB
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/printnest
 
-# ─── Authentication ────────────────────────────────
-JWT_SECRET=your-random-32-char-secret-key-here
+# JWT Authentication
+JWT_SECRET=your-secret-key-minimum-32-characters
 
-# ─── Email (Gmail SMTP) ────────────────────────────
-EMAIL_USER=your-gmail@gmail.com
-EMAIL_PASS=xxxx-xxxx-xxxx-xxxx   # 16-char App Password
+# Email (Gmail SMTP)
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-gmail-app-password
 
-# ─── App ───────────────────────────────────────────
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+# AI Descriptions (Groq)
+GROQ_API_KEY=your-groq-api-key
 ```
 
-**Gmail App Password setup:**
+### Getting API Keys
 
-1. Enable 2FA at [myaccount.google.com/security](https://myaccount.google.com/security)
-2. Generate App Password at [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+| Service                | URL                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| **MongoDB Atlas**      | [cloud.mongodb.com](https://cloud.mongodb.com)                                 |
+| **Groq API**           | [console.groq.com](https://console.groq.com)                                   |
+| **Gmail App Password** | [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) |
 
-**Generate a secure JWT secret:**
+> **Note**: `MONGODB_URI` and `JWT_SECRET` are **required** — the app will throw on startup if missing.
 
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+---
+
+## 📡 API Routes
+
+### Auth Routes
+
+| Endpoint           | Method | Description                    |
+| ------------------ | ------ | ------------------------------ |
+| `/api/auth/signup` | POST   | Register new user              |
+| `/api/auth/login`  | POST   | Login and receive JWT cookie   |
+| `/api/auth/me`     | GET    | Get current authenticated user |
+| `/api/auth/logout` | POST   | Clear auth cookie              |
+
+### Public Routes
+
+| Endpoint                  | Method | Description                   |
+| ------------------------- | ------ | ----------------------------- |
+| `/api/public/content`     | GET    | All site content from db.json |
+| `/api/public/place-order` | POST   | Submit order + send emails    |
+| `/api/public/orders`      | GET    | Get orders for current user   |
+| `/api/public/reviews`     | GET    | Get product reviews           |
+| `/api/public/reviews`     | POST   | Submit a new review           |
+
+### Admin Routes (🔒 Admin only)
+
+| Endpoint                    | Method          | Description                     |
+| --------------------------- | --------------- | ------------------------------- |
+| `/api/admin/stats`          | GET             | Dashboard analytics & charts    |
+| `/api/admin/products`       | GET/POST/DELETE | Manage product catalog          |
+| `/api/admin/orders`         | GET/PATCH       | View and update orders          |
+| `/api/admin/users`          | GET             | List all users                  |
+| `/api/admin/users/[id]`     | DELETE/PATCH    | Delete or promote users         |
+| `/api/admin/ai-description` | POST            | Generate AI product description |
+| `/api/upload`               | POST            | Upload product image            |
+
+---
+
+## 🗄️ Database & Models
+
+The app uses **MongoDB** with Mongoose. Connection is cached globally for serverless efficiency.
+
+### Models
+
+#### User
+
+```typescript
+{ name, email, password, phone, address, city, country, cart[], wishlist[], isAdmin }
 ```
 
-### Scripts
+#### Product
 
-```bash
-npm run dev      # Start dev server with HMR
-npm run build    # Production build
-npm start        # Serve production build
-npm run lint     # ESLint check
+```typescript
+{
+  (id, title, price, oldPrice, image, badge, printText, createdAt, updatedAt);
+}
 ```
 
-### Default Access
+#### Order
 
-| Route                                   | Description                       |
-| --------------------------------------- | --------------------------------- |
-| `http://localhost:3000`                 | Customer storefront               |
-| `http://localhost:3000/admin/dashboard` | Admin panel (requires admin role) |
-| `http://localhost:3000/login`           | User login                        |
-| `http://localhost:3000/signup`          | User registration                 |
+```typescript
+{ id, userId, date, status, total, items[], customer }
+```
 
----
+#### Review
 
-## 📡 API Reference
+```typescript
+{
+  (productId, userId, userName, userImage, rating, comment, date, createdAt);
+}
+```
 
-All routes return JSON. Admin routes require a valid JWT in the cookie.
+### Admin Promotion
 
-### 🔓 Public Routes
-
-| Method | Endpoint                      | Description              |
-| ------ | ----------------------------- | ------------------------ |
-| `GET`  | `/api/public/products`        | Fetch all products       |
-| `GET`  | `/api/public/products/[slug]` | Single product + reviews |
-| `GET`  | `/api/public/reviews/[id]`    | Reviews for a product    |
-| `POST` | `/api/public/reviews/[id]`    | Submit a review          |
-| `GET`  | `/api/public/blog`            | Blog posts list          |
-
-### 🔐 Auth Routes
-
-| Method | Endpoint           | Description                       |
-| ------ | ------------------ | --------------------------------- |
-| `POST` | `/api/auth/signup` | Register new user (bcrypt hashed) |
-| `POST` | `/api/auth/login`  | Login → sets HTTP-only JWT cookie |
-| `GET`  | `/api/auth/me`     | Get current session user          |
-| `POST` | `/api/auth/logout` | Clear session cookie              |
-
-### 📦 Order Routes
-
-| Method | Endpoint           | Auth     | Description                  |
-| ------ | ------------------ | -------- | ---------------------------- |
-| `POST` | `/api/place-order` | Optional | Submit order (guest or user) |
-| `GET`  | `/api/orders`      | ✅       | Get current user's orders    |
-
-### 👨‍💼 Admin Routes
-
-> All require admin-role JWT.
-
-**Orders**
-
-| Method   | Endpoint                 | Description                       |
-| -------- | ------------------------ | --------------------------------- |
-| `GET`    | `/api/admin/orders`      | All orders (with customer detail) |
-| `PUT`    | `/api/admin/orders/[id]` | Update order status               |
-| `DELETE` | `/api/admin/orders/[id]` | Delete order                      |
-
-**Products**
-
-| Method   | Endpoint                   | Description    |
-| -------- | -------------------------- | -------------- |
-| `GET`    | `/api/admin/products`      | All products   |
-| `POST`   | `/api/admin/products`      | Create product |
-| `PUT`    | `/api/admin/products/[id]` | Update product |
-| `DELETE` | `/api/admin/products/[id]` | Delete product |
-
-**Users & Stats**
-
-| Method | Endpoint           | Description                                       |
-| ------ | ------------------ | ------------------------------------------------- |
-| `GET`  | `/api/admin/users` | All users list                                    |
-| `GET`  | `/api/admin/stats` | Dashboard summary (total orders, revenue, users…) |
-
-**File Upload**
-
-| Method | Endpoint      | Description                            |
-| ------ | ------------- | -------------------------------------- |
-| `POST` | `/api/upload` | Upload product/blog image, returns URL |
+The user matching `EMAIL_USER` env var is automatically granted admin on each DB connection.
 
 ---
 
-## 🛡️ Security
+## 🏪 Redux Store
 
-| Mechanism            | Implementation                                           |
-| -------------------- | -------------------------------------------------------- |
-| **Password Hashing** | `bcryptjs` with 10 salt rounds                           |
-| **Authentication**   | JWT signed with `JWT_SECRET`, stored in HTTP-only cookie |
-| **Route Protection** | Middleware checks JWT on every protected route           |
-| **Role Guards**      | Admin routes verify `user.role === "admin"`              |
-| **Input Validation** | TypeScript types + server-side checks on all inputs      |
-| **CORS**             | Next.js built-in origin matching                         |
-| **Env Variables**    | Validated at startup via `src/lib/env.ts`                |
+### Slices
+
+#### Cart (`CartSlice.tsx`)
+
+```typescript
+// State
+{ cartItems: CartItem[], totalQuantity: number, totalAmount: number }
+
+// Actions
+addToCart(item)         // Add or increment
+removeFromCart(id)      // Decrement by 1
+deleteItem(id)          // Remove entirely
+initializeCart(state)   // Restore from localStorage
+```
+
+#### Wishlist (`WishListSlice.tsx`)
+
+```typescript
+// State
+{ items: WishlistItem[] }
+
+// Actions
+toggleWishlist(item)    // Add or remove
+```
+
+#### Auth (`AuthSlice.tsx`)
+
+```typescript
+// State
+{ isAuthenticated: boolean, user: User | null, token: string | null }
+
+// Actions
+loginSuccess({ user, token })
+logout()
+```
 
 ---
 
-## 👨‍👩‍👧‍👦 User Roles
+## 🛠️ Admin Panel
 
-| Capability              | Guest | User | Admin |
-| ----------------------- | :---: | :--: | :---: |
-| Browse products & blog  |  ✅   |  ✅  |  ✅   |
-| Add to cart             |  ✅   |  ✅  |  ✅   |
-| Add to wishlist         |  ❌   |  ✅  |  ✅   |
-| Place order             |  ✅   |  ✅  |  ✅   |
-| View order history      |  ❌   |  ✅  |  ✅   |
-| Submit product review   |  ❌   |  ✅  |  ✅   |
-| Access admin dashboard  |  ❌   |  ❌  |  ✅   |
-| Manage products / blog  |  ❌   |  ❌  |  ✅   |
-| View all orders & users |  ❌   |  ❌  |  ✅   |
-| View analytics charts   |  ❌   |  ❌  |  ✅   |
+Access the admin panel at `/admin/dashboard` (requires admin account).
+
+### Dashboard Analytics
+
+- **KPI Cards** — Total users, orders, revenue, reviews
+- **Revenue Chart** — Daily revenue over a date range
+- **Order Trend** — Orders per day
+- **Top Products** — Best-selling items
+- **Category Sales** — Revenue breakdown by category
+- **Order Velocity** — Orders by hour of day
+- **Review Stats** — Rating distribution and sentiment analysis
+
+### Product Management
+
+- Add products with title, price, image, badge
+- **AI description generator** — click to auto-generate from title using Groq
+- Edit and delete existing products
+- Image upload support
+
+### User & Order Management
+
+- View all users with order counts
+- Promote/demote admin status
+- Delete users
+- Update order statuses
 
 ---
 
-## 🌍 Homepage Sections
+## 📄 Pages & Routes
 
-The storefront homepage is composed of **11 animated sections**:
+### Public Pages
 
-| Section      | Component          | Description                      |
-| ------------ | ------------------ | -------------------------------- |
-| Hero         | `Hero.tsx`         | Animated hero with CTA           |
-| Products     | `Products.tsx`     | Product carousel with quick-view |
-| Categories   | `Categories.tsx`   | Dynamic category grid            |
-| How It Works | `HowItWorks.tsx`   | 3-step process explainer         |
-| Pricing      | `Price.tsx`        | Pricing tiers                    |
-| Packaging    | `Packaging.tsx`    | Custom packaging showcase        |
-| Why Us       | `WhyUs.tsx`        | USP highlights                   |
-| Testimonials | `Testimonials.tsx` | Customer review carousel         |
-| Blog         | `Blog.tsx`         | Latest blog posts                |
-| Social       | `Social.tsx`       | Social proof / follow links      |
-| About        | `About.tsx`        | Company background               |
+| Route              | Description                                   |
+| ------------------ | --------------------------------------------- |
+| `/`                | Home (Hero, Products, Categories, Blog, etc.) |
+| `/shop`            | All products grid                             |
+| `/product/[slug]`  | Product detail with reviews                   |
+| `/category/[slug]` | Category-filtered products                    |
+| `/blog/[slug]`     | Blog post                                     |
+| `/cart`            | Shopping cart                                 |
+| `/wishlist`        | Saved products                                |
+| `/login`           | Login                                         |
+| `/signup`          | Registration                                  |
+| `/thank-you`       | Order confirmation                            |
+
+### Protected Pages
+
+| Route       | Description                        |
+| ----------- | ---------------------------------- |
+| `/account`  | User dashboard + order history     |
+| `/checkout` | Checkout (login prompt for guests) |
+
+### Admin Pages (Admin only)
+
+| Route              | Description             |
+| ------------------ | ----------------------- |
+| `/admin/dashboard` | Analytics & data charts |
+| `/admin/products`  | Product management      |
+| `/admin/reviews`   | Review moderation       |
+
+### Dynamic Route Slugs
+
+```
+"Print Mug"  →  /product/print-mug
+"T-shirts"   →  /category/t-shirts
+```
 
 ---
 
 ## 🌐 Deployment
 
-### ▲ Vercel (Recommended)
+### Vercel (Recommended)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TalhaZubair019/PrintNest)
+1. Push code to GitHub
+2. Import project on [vercel.com](https://vercel.com)
+3. Add all environment variables in the Vercel dashboard
+4. Deploy — Next.js detected automatically
 
-1. Click **Deploy with Vercel** above
-2. Set Environment Variables in Vercel dashboard
-3. Deploy — your site is live in ~2 minutes ✅
+> ⚠️ Vercel's filesystem is ephemeral. All data **must** be stored in MongoDB.
 
-**Manual Vercel CLI:**
+### Other Platforms
 
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-### 🐳 Docker
-
-```dockerfile
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM node:18-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/static ./.next/static
-EXPOSE 3000
-CMD ["node", "server.js"]
-```
+Works on any Node.js 18+ host (Railway, Render, DigitalOcean, AWS):
 
 ```bash
-docker build -t printnest .
-docker run -p 3000:3000 --env-file .env.local printnest
+npm run build
+npm start
 ```
-
-### Production Checklist
-
-- [ ] `JWT_SECRET` is 32+ random characters
-- [ ] MongoDB Atlas IP whitelist configured
-- [ ] Gmail App Password (not account password) used
-- [ ] `NEXT_PUBLIC_BASE_URL` set to production domain
-- [ ] HTTPS enabled on hosting platform
-- [ ] Error monitoring set up (Sentry recommended)
-- [ ] All admin credentials changed from defaults
-
----
-
-## 🗺️ Roadmap
-
-### v2.0
-
-- [ ] Stripe / PayPal payment gateway
-- [ ] PDF invoice generation
-- [ ] Product reviews on admin analytics
-
-### v2.5
-
-- [ ] Multi-vendor marketplace mode
-- [ ] Dark mode theme toggle
-- [ ] WhatsApp order notifications
-
-### v3.0
-
-- [ ] React Native mobile app
-- [ ] AI design suggestions
-- [ ] Multi-language / multi-currency
 
 ---
 
 ## 🤝 Contributing
 
-1. **Fork** the repo
-2. **Branch** — `git checkout -b feat/your-feature`
-3. **Commit** — `git commit -m "feat: describe your change"`
-4. **Push** — `git push origin feat/your-feature`
-5. **Pull Request** — open one on GitHub
-
-Please follow the existing code style (ESLint + Prettier) and update relevant documentation.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Commit changes (`git commit -m 'feat: add my feature'`)
+4. Push branch (`git push origin feature/my-feature`)
+5. Open a Pull Request
 
 ---
 
 ## 📝 License
 
-This project is open-source under the **[MIT License](LICENSE)**.  
-Free to use, modify, and distribute — commercial use included.
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 🙏 Acknowledgments
-
-Built with the best open-source technologies:
-
-[Next.js](https://nextjs.org) · [MongoDB](https://mongodb.com) · [Tailwind CSS](https://tailwindcss.com) · [Redux Toolkit](https://redux-toolkit.js.org) · [Framer Motion](https://www.framer.com/motion/) · [Recharts](https://recharts.org) · [Lucide](https://lucide.dev) · [Nodemailer](https://nodemailer.com)
-
----
-
-<div align="center">
-
-**Made with ❤️ by [Talha Zubair](https://github.com/TalhaZubair019)**
-
-🖨️ **PrintNest** — _Where Ideas Take Shape_
-
-<br/>
-
-[![GitHub](https://img.shields.io/badge/GitHub-TalhaZubair019-181717?logo=github&logoColor=white&style=for-the-badge)](https://github.com/TalhaZubair019/PrintNest)&nbsp;
-[![Stars](https://img.shields.io/github/stars/TalhaZubair019/PrintNest?style=for-the-badge&color=F59E0B)](https://github.com/TalhaZubair019/PrintNest/stargazers)
-
-</div>
+**Made with ❤️ for the printing community** 🖨️✨

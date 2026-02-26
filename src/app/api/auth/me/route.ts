@@ -33,7 +33,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "User not found" }, { status: 401 });
     }
     const { password, ...userWithoutPassword } = user;
-    const isAdmin = user.email === ADMIN_EMAIL;
+    const isAdmin = user.email === ADMIN_EMAIL || !!user.isAdmin;
 
     return NextResponse.json({ 
       user: { ...userWithoutPassword, isAdmin } 

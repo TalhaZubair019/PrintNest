@@ -29,6 +29,19 @@ export async function connectDB() {
 
   try {
     cached.conn = await cached.promise;
+    
+    await UserModel.updateMany(
+      { isAdmin: { $exists: false } },
+      { $set: { isAdmin: false } }
+    );
+    
+    const adminEmail = process.env.EMAIL_USER;
+    if (adminEmail) {
+      await UserModel.updateOne(
+        { email: adminEmail },
+        { $set: { isAdmin: true } }
+      );
+    }
   } catch (e) {
     cached.promise = null;
     throw e;
@@ -57,6 +70,7 @@ export interface User {
   cart?: any[];
   wishlist?: any[];
   savedCards?: SavedCard[];
+  isAdmin?: boolean;
 }
 
 export interface Order {
