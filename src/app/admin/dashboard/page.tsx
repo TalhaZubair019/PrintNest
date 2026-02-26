@@ -96,6 +96,7 @@ export default function AdminDashboard() {
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [productForm, setProductForm] = useState({
     title: "",
+    description: "",
     price: "",
     oldPrice: "",
     image: "",
@@ -136,7 +137,7 @@ export default function AdminDashboard() {
     if (user?.isAdmin) {
       fetchStats();
     }
-  }, [user, isAuthenticated, isAuthLoading, router]);
+  }, [user, isAuthenticated, isAuthLoading]);
 
   useEffect(() => {
     const contentArea = document.getElementById("admin-content-area");
@@ -255,6 +256,7 @@ export default function AdminDashboard() {
     setImageFile(null);
     setProductForm({
       title: "",
+      description: "",
       price: "",
       oldPrice: "",
       image: "",
@@ -268,6 +270,7 @@ export default function AdminDashboard() {
     setImageFile(null);
     setProductForm({
       title: product.title || "",
+      description: product.description || "",
       price: product.price?.toString().replace("$", "") || "",
       oldPrice: product.oldPrice?.toString().replace("$", "") || "",
       image: product.image || "",
@@ -281,7 +284,7 @@ export default function AdminDashboard() {
     setIsSubmitting(true);
 
     try {
-      let imageUrl = productForm.image;
+      let imageUrl = productForm.image.trim();
 
       if (imageFile) {
         const formData = new FormData();
@@ -298,8 +301,15 @@ export default function AdminDashboard() {
         imageUrl = uploadData.url;
       }
 
+      if (!imageUrl) {
+        alert("Please provide a product image (upload a file or enter a URL).");
+        setIsSubmitting(false);
+        return;
+      }
+
       const newProductData = {
         title: productForm.title,
+        description: productForm.description,
         price: `$${parseFloat(productForm.price).toFixed(2)}`,
         oldPrice: productForm.oldPrice
           ? `$${parseFloat(productForm.oldPrice).toFixed(2)}`
@@ -317,15 +327,17 @@ export default function AdminDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProductData),
       });
+
       if (res.ok) {
         await fetchStats();
         setIsProductModalOpen(false);
       } else {
-        alert("Failed to save product");
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to save product: ${errData.message ?? res.statusText}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Error saving product");
+      alert(`Error saving product: ${error?.message ?? "Unknown error"}`);
     } finally {
       setIsSubmitting(false);
     }

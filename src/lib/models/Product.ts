@@ -3,6 +3,7 @@ import mongoose, { Schema, models } from 'mongoose';
 const productSchema = new Schema({
   id: { type: Number, required: true, unique: true },
   title: { type: String, required: true },
+  description: { type: String, default: "" },
   price: { type: String, required: true },
   oldPrice: { type: String, default: null },
   image: { type: String, required: true },

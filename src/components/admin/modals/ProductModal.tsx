@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { X, Upload, Image as ImageIcon } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { X, Upload, Image as ImageIcon, Sparkles, Loader2 } from "lucide-react";
 import Image from "next/image";
 
 interface ProductModalProps {
@@ -8,20 +8,13 @@ interface ProductModalProps {
   editingProduct: any;
   productForm: {
     title: string;
+    description: string;
     price: string;
     oldPrice: string;
     image: string;
     badge: string;
   };
-  setProductForm: React.Dispatch<
-    React.SetStateAction<{
-      title: string;
-      price: string;
-      oldPrice: string;
-      image: string;
-      badge: string;
-    }>
-  >;
+  setProductForm: React.Dispatch<React.SetStateAction<any>>;
   handleSaveProduct: (e: React.FormEvent) => void;
   isSubmitting: boolean;
   imageFile: File | null;
@@ -40,6 +33,7 @@ const ProductModal = ({
   setImageFile,
 }: ProductModalProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   if (!isOpen) return null;
 
@@ -48,6 +42,37 @@ const ProductModal = ({
       const file = e.target.files[0];
       setImageFile(file);
       setProductForm({ ...productForm, image: URL.createObjectURL(file) });
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!productForm.title) {
+      alert("Please enter a product title first.");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/admin/ai-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: productForm.title }),
+      });
+
+      const data = await res.json();
+      if (data.description) {
+        setProductForm((prev: any) => ({
+          ...prev,
+          description: data.description,
+        }));
+      } else if (data.error) {
+        alert(data.error);
+      }
+    } catch (error) {
+      console.error("Failed to generate", error);
+      alert("Could not generate description. Please try again.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -81,6 +106,40 @@ const ProductModal = ({
               className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
             />
           </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="block text-sm font-bold text-slate-700">
+                Description
+              </label>
+              <button
+                type="button"
+                onClick={handleGenerateDescription}
+                disabled={isGenerating || !productForm.title}
+                className="text-xs flex items-center gap-1.5 bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full font-bold hover:bg-purple-200 transition-colors disabled:opacity-50"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 size={12} className="animate-spin" /> Writing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={12} /> AI Generate
+                  </>
+                )}
+              </button>
+            </div>
+            <textarea
+              rows={3}
+              value={productForm.description}
+              onChange={(e) =>
+                setProductForm({ ...productForm, description: e.target.value })
+              }
+              placeholder="Enter description or use AI to generate from title & image..."
+              className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none text-sm"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold mb-1.5 text-slate-700">
@@ -107,10 +166,7 @@ const ProductModal = ({
                 step="0.01"
                 value={productForm.oldPrice}
                 onChange={(e) =>
-                  setProductForm({
-                    ...productForm,
-                    oldPrice: e.target.value,
-                  })
+                  setProductForm({ ...productForm, oldPrice: e.target.value })
                 }
                 placeholder="0.00"
                 className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
@@ -122,7 +178,6 @@ const ProductModal = ({
             <label className="block text-sm font-bold mb-1.5 text-slate-700">
               Product Image <span className="text-red-500">*</span>
             </label>
-
             <input
               type="file"
               ref={fileInputRef}
@@ -130,7 +185,6 @@ const ProductModal = ({
               accept="image/*"
               className="hidden"
             />
-
             <div className="flex gap-4 items-start">
               <div className="w-24 h-24 bg-slate-100 rounded-xl border flex items-center justify-center relative overflow-hidden shrink-0">
                 {productForm.image ? (
@@ -145,7 +199,6 @@ const ProductModal = ({
                   <ImageIcon className="text-slate-400" />
                 )}
               </div>
-
               <div className="flex-1 space-y-2">
                 <button
                   type="button"
@@ -154,16 +207,6 @@ const ProductModal = ({
                 >
                   <Upload size={16} /> Choose Image
                 </button>
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-200"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-2 text-slate-400 font-bold">
-                      OR URL
-                    </span>
-                  </div>
-                </div>
                 <input
                   type="text"
                   value={productForm.image}
@@ -192,6 +235,7 @@ const ProductModal = ({
               className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
             />
           </div>
+
           <div className="pt-4 flex gap-3">
             <button
               type="button"

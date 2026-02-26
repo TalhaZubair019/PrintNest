@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Plus, Package, Edit, Trash2 } from "lucide-react";
 
 interface ProductsTableProps {
@@ -28,12 +29,12 @@ const ProductsTable = ({
     >
       <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
         <h3 className="text-xl font-bold">Product Management</h3>
-        <button
-          onClick={openAddProduct}
+        <Link
+          href="/admin/products/new"
           className="flex items-center gap-2 bg-slate-900 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
         >
           <Plus size={16} /> Add Product
-        </button>
+        </Link>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
