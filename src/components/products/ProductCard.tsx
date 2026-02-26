@@ -13,6 +13,7 @@ function ProductCard({
 }: any) {
   const slug = product.title.toLowerCase().replace(/\s+/g, "-");
   const [isMounted, setIsMounted] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -84,12 +85,20 @@ function ProductCard({
           <button
             onClick={(e) => {
               e.preventDefault();
+              if (addingToCart) return;
+              setAddingToCart(true);
               onAddToCart(product, 1);
+              setTimeout(() => setAddingToCart(false), 700);
             }}
-            className="w-full h-full bg-linear-to-r from-[#6366F1] to-[#22D3EE] text-white font-bold text-lg flex items-center justify-between px-8 cursor-pointer"
+            disabled={addingToCart}
+            className="w-full h-full bg-linear-to-r from-[#6366F1] to-[#22D3EE] text-white font-bold text-lg flex items-center justify-between px-8 cursor-pointer disabled:opacity-90"
           >
-            <span>Add to cart</span>
-            <ShoppingCart className="w-6 h-6" />
+            <span>{addingToCart ? "Adding..." : "Add to cart"}</span>
+            {addingToCart ? (
+              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <ShoppingCart className="w-6 h-6" />
+            )}
           </button>
         </div>
       </div>

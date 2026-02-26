@@ -159,6 +159,31 @@ function EmptyWishlist() {
   );
 }
 
+function AddToCartButton({ onAdd }: { onAdd: () => void }) {
+  const [adding, setAdding] = useState(false);
+  const handleClick = () => {
+    setAdding(true);
+    onAdd();
+    setTimeout(() => setAdding(false), 700);
+  };
+  return (
+    <button
+      onClick={handleClick}
+      disabled={adding}
+      className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-500 to-cyan-400 text-white text-sm font-bold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all disabled:opacity-80 disabled:cursor-not-allowed"
+    >
+      {adding ? (
+        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      ) : (
+        <ShoppingCart size={16} />
+      )}
+      <span className="hidden lg:inline">
+        {adding ? "Adding..." : "Add to Cart"}
+      </span>
+    </button>
+  );
+}
+
 function WishlistItemComponent({
   item,
   onToast,
@@ -232,13 +257,7 @@ function WishlistItemComponent({
           </span>
         </div>
         <div className="w-full md:w-1/6 flex items-center justify-between md:justify-end gap-4 mt-4 md:mt-0">
-          <button
-            onClick={handleAddToCart}
-            className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-500 to-cyan-400 text-white text-sm font-bold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all"
-          >
-            <ShoppingCart size={16} />
-            <span className="hidden lg:inline">Add to Cart</span>
-          </button>
+          <AddToCartButton onAdd={handleAddToCart} />
 
           <button
             onClick={handleRemove}
@@ -253,4 +272,3 @@ function WishlistItemComponent({
     </div>
   );
 }
-

@@ -5,6 +5,7 @@ import { X, Minus, Plus } from "lucide-react";
 
 function QuickViewModal({ product, onClose, onAddToCart }: any) {
   const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
   if (!product) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -56,12 +57,20 @@ function QuickViewModal({ product, onClose, onAddToCart }: any) {
             </div>
             <button
               onClick={() => {
+                setAddingToCart(true);
                 onAddToCart(product, quantity);
-                onClose();
+                setTimeout(() => {
+                  setAddingToCart(false);
+                  onClose();
+                }, 700);
               }}
-              className="px-8 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              disabled={addingToCart}
+              className="px-8 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-80 disabled:cursor-not-allowed"
             >
-              Add to cart
+              {addingToCart ? (
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : null}
+              {addingToCart ? "Adding..." : "Add to cart"}
             </button>
           </div>
         </div>

@@ -43,6 +43,7 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -114,6 +115,8 @@ export default function ProductPage() {
       }),
     );
     showToast(`Added ${quantity} ${product.title} to cart!`, "add");
+    setAddingToCart(true);
+    setTimeout(() => setAddingToCart(false), 700);
   };
 
   const handleToggleWishlist = () => {
@@ -379,9 +382,13 @@ export default function ProductPage() {
                 <div className="flex gap-4">
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full hover:shadow-lg transition-all"
+                    disabled={addingToCart}
+                    className="flex-1 px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:cursor-not-allowed"
                   >
-                    Add to Cart
+                    {addingToCart ? (
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : null}
+                    {addingToCart ? "Adding..." : "Add to Cart"}
                   </button>
                   <button
                     onClick={handleToggleWishlist}

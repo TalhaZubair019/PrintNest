@@ -322,10 +322,17 @@ function SimpleProductCard({
   onQuickView,
 }: any) {
   const [mounted, setMounted] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleCartClick = () => {
+    setAddingToCart(true);
+    onAddToCart(product);
+    setTimeout(() => setAddingToCart(false), 700);
+  };
 
   const showFilled = mounted && isWishlisted;
   const showInCart = mounted && isInCart;
@@ -367,11 +374,16 @@ function SimpleProductCard({
           {showInCart ? (
             <>
               <button
-                onClick={() => onAddToCart(product)}
-                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                onClick={handleCartClick}
+                disabled={addingToCart}
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-80 disabled:cursor-not-allowed"
               >
-                <ShoppingBag size={14} fill="currentColor" />
-                Add Again
+                {addingToCart ? (
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <ShoppingBag size={14} fill="currentColor" />
+                )}
+                {addingToCart ? "Adding..." : "Add Again"}
               </button>
               <Link
                 href="/cart"
@@ -382,11 +394,16 @@ function SimpleProductCard({
             </>
           ) : (
             <button
-              onClick={() => onAddToCart(product)}
-              className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              onClick={handleCartClick}
+              disabled={addingToCart}
+              className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-80 disabled:cursor-not-allowed"
             >
-              <ShoppingBag size={16} fill="currentColor" />
-              Add to cart
+              {addingToCart ? (
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <ShoppingBag size={16} fill="currentColor" />
+              )}
+              {addingToCart ? "Adding..." : "Add to cart"}
             </button>
           )}
         </div>
@@ -414,4 +431,3 @@ function SimpleProductCard({
     </div>
   );
 }
-

@@ -10,6 +10,35 @@ import {
   Plus as PlusIcon,
 } from "lucide-react";
 
+function CartButton({
+  item,
+  onAddToCart,
+}: {
+  item: any;
+  onAddToCart: (item: any, qty: number) => void;
+}) {
+  const [adding, setAdding] = useState(false);
+  const handleClick = () => {
+    setAdding(true);
+    onAddToCart(item, 1);
+    setTimeout(() => setAdding(false), 700);
+  };
+  return (
+    <button
+      onClick={handleClick}
+      disabled={adding}
+      className="px-6 py-2 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg text-sm flex gap-2 items-center disabled:opacity-80 disabled:cursor-not-allowed"
+    >
+      {adding ? (
+        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      ) : (
+        <ShoppingCart size={14} />
+      )}
+      {adding ? "Adding..." : "Add to cart"}
+    </button>
+  );
+}
+
 function CompareDrawer({
   isOpen,
   compareItems,
@@ -109,12 +138,7 @@ function CompareDrawer({
                 key={item.id}
                 className="col-span-1 p-6 border-l border-slate-100 bg-white flex items-center"
               >
-                <button
-                  onClick={() => onAddToCart(item, 1)}
-                  className="px-6 py-2 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full shadow-lg text-sm flex gap-2 items-center"
-                >
-                  <ShoppingCart size={14} /> Add to cart
-                </button>
+                <CartButton item={item} onAddToCart={onAddToCart} />
               </div>
             ))}
             {[...Array(3 - compareItems.length)].map((_, i) => (
