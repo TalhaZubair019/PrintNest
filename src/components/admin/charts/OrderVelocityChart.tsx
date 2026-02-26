@@ -16,37 +16,49 @@ const OrderVelocityChart = ({ stats }: OrderVelocityChartProps) => {
         <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-300" />
       </h3>
 
-      <div className="h-48 flex items-end gap-1 px-2 pt-8">
-        {data.map((d, i) => {
-          const height = `${(d.count / maxCount) * 100}%`;
-          const showLabel = i % 4 === 0;
+      <div className="overflow-x-auto pb-6 -mx-2">
+        <div
+          className="flex items-end gap-1.5 h-48 pt-15"
+          style={{
+            minWidth: data.length > 0 ? `${data.length * 28}px` : "100%",
+          }}
+        >
+          {data.map((d, i) => {
+            const height = `${(d.count / maxCount) * 100}%`;
+            const showLabel = i % 4 === 0 || i === data.length - 1;
 
-          return (
-            <div
-              key={i}
-              className="flex-1 flex flex-col items-center gap-2 group h-full justify-end"
-            >
-              <div className="w-full bg-slate-50/50 rounded-t-md relative flex items-end h-[85%] border-b border-slate-100">
-                <div
-                  className="w-full bg-linear-to-t from-blue-600 to-indigo-500 rounded-t-md transition-all duration-300 ease-out group-hover:scale-x-110 group-hover:brightness-110 shadow-sm"
-                  style={{ height: d.count === 0 ? "2%" : height }}
-                />
+            return (
+              <div
+                key={i}
+                className="flex-1 flex flex-col items-center gap-2 group h-full justify-end"
+                style={{ minWidth: "28px" }}
+              >
+                <div className="w-full bg-slate-50/50 rounded-t-lg relative flex items-end h-[85%] border-b border-slate-100">
+                  <div
+                    className="w-full bg-linear-to-t from-blue-600 to-indigo-500 rounded-t-lg transition-all duration-300 ease-out group-hover:scale-x-105 group-hover:brightness-110 shadow-lg group-hover:shadow-blue-200/50"
+                    style={{ height: d.count === 0 ? "5%" : height }}
+                  />
 
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-30">
-                  <div className="bg-slate-900 text-white text-[10px] py-1 px-2 rounded-lg font-bold whitespace-nowrap shadow-xl">
-                    {d.hour}: {d.count} orders
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-30 group-hover:-translate-y-1">
+                    <div className="bg-slate-900/95 backdrop-blur-md text-white text-[10px] sm:text-xs py-2 px-3 rounded-xl font-bold whitespace-nowrap shadow-2xl border border-white/10 flex flex-col items-center gap-0.5">
+                      <span className="text-slate-400 text-[10px] font-medium leading-none mb-0.5">
+                        {d.hour}
+                      </span>
+                      <span className="text-blue-400 font-extrabold text-sm">
+                        {d.count} {d.count === 1 ? "order" : "orders"}
+                      </span>
+                    </div>
+                    <div className="w-2.5 h-2.5 bg-slate-900/95 border-r border-b border-white/10 rotate-45 -mt-1.5 mx-auto rounded-xs" />
                   </div>
                 </div>
-              </div>
 
-              {showLabel && (
-                <span className="text-[10px] text-slate-400 font-medium">
+                <span className="text-[10px] text-slate-500 font-medium">
                   {d.hour}
                 </span>
-              )}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <p className="text-xs text-slate-500 mt-4 text-center italic">

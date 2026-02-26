@@ -10,7 +10,7 @@ import {
 import { Order } from "@/app/admin/types";
 
 interface OrdersTableProps {
-  allOrders: Order[]; // Pass all orders for filtering
+  allOrders: Order[];
   handleStatusChange: (orderId: string, newStatus: string) => void;
   setSelectedOrder: React.Dispatch<React.SetStateAction<Order | null>>;
   setOrderDeleteConfirm: React.Dispatch<React.SetStateAction<Order | null>>;
@@ -63,7 +63,6 @@ const OrdersTable = ({
     orderPage * ITEMS_PER_PAGE,
   );
 
-  // Reset page when filters change
   useEffect(() => {
     setOrderPage(1);
   }, [selectedUserId, selectedStatus, setOrderPage]);

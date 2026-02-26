@@ -42,7 +42,6 @@ export default function LoginPage() {
         dispatch(initializeWishlist([]));
       }
 
-      // Merge Cart Items
       let mergedCart = [...(data.user.cart || [])];
 
       localCartItems.forEach((localItem: any) => {
@@ -209,4 +208,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

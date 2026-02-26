@@ -54,7 +54,6 @@ export default function CartPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
-      {/* Auth Prompt Modal */}
       {showAuthModal && (
         <AuthPromptModal
           onClose={() => setShowAuthModal(false)}
@@ -270,4 +269,3 @@ function CartSummary({
     </div>
   );
 }
-
