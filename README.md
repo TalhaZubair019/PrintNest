@@ -231,7 +231,7 @@ printnest/
 git clone https://github.com/TalhaZubair019/PrintNest.git
 cd PrintNest
 
-# Install
+# Install all dependencies at once
 npm install
 
 # Configure (see Environment Variables below)
@@ -242,6 +242,106 @@ cp .env.example .env.local
 npm run dev
 # → http://localhost:3000
 ```
+
+### 📦 Package Installation Commands
+
+If you need to install packages individually (e.g. adding to an existing project):
+
+#### Install All at Once
+
+```bash
+# All production dependencies
+npm install @reduxjs/toolkit bcryptjs clsx cookie framer-motion jsonwebtoken lucide-react mongoose next nodemailer react react-dom react-redux recharts tailwind-merge
+
+# All dev dependencies
+npm install -D @tailwindcss/postcss @types/bcryptjs @types/cookie @types/jsonwebtoken @types/node @types/nodemailer @types/react @types/react-dom babel-plugin-react-compiler eslint eslint-config-next tailwindcss typescript
+```
+
+#### Install by Category
+
+**Framework & Core**
+
+```bash
+npm install next@16.1.6          # Next.js framework
+npm install react@19.2.3         # React library
+npm install react-dom@19.2.3     # React DOM renderer
+```
+
+**Database**
+
+```bash
+npm install mongoose@^8.0.0      # MongoDB ODM (schemas, queries, models)
+```
+
+**Authentication & Security**
+
+```bash
+npm install bcryptjs@^3.0.3      # Password hashing (10 salt rounds)
+npm install jsonwebtoken@^9.0.3  # JWT token creation & verification
+npm install cookie@^1.1.1        # HTTP cookie parsing utilities
+```
+
+**State Management**
+
+```bash
+npm install @reduxjs/toolkit@^2.11.2   # Simplified Redux (slices, store)
+npm install react-redux@^9.2.0         # React bindings for Redux
+```
+
+**UI & Styling**
+
+```bash
+npm install framer-motion@^12.30.0     # Page transitions & micro-animations
+npm install lucide-react@^0.563.0      # Icon library (600+ icons)
+npm install clsx@^2.1.1                # Conditional className utility
+npm install tailwind-merge@^3.4.0      # Merge Tailwind classes safely
+```
+
+**Charts & Analytics**
+
+```bash
+npm install recharts                   # Chart library for admin dashboard
+```
+
+**Email**
+
+```bash
+npm install nodemailer@^7.0.13         # SMTP email (order confirmations)
+```
+
+**Dev Dependencies**
+
+```bash
+npm install -D typescript@^5                        # TypeScript compiler
+npm install -D @types/node@^20                      # Node.js type definitions
+npm install -D @types/react@^19                     # React type definitions
+npm install -D @types/react-dom@^19                 # React DOM types
+npm install -D @types/bcryptjs@^2.4.6               # bcryptjs types
+npm install -D @types/cookie@^0.6.0                 # cookie types
+npm install -D @types/jsonwebtoken@^9.0.10           # JWT types
+npm install -D @types/nodemailer@^7.0.9              # Nodemailer types
+npm install -D tailwindcss@^4                        # Tailwind CSS framework
+npm install -D @tailwindcss/postcss@^4               # PostCSS integration
+npm install -D eslint@^9                             # Linter
+npm install -D eslint-config-next@16.1.6             # Next.js ESLint rules
+npm install -D babel-plugin-react-compiler@1.0.0     # React compiler plugin
+```
+
+#### Package Reference
+
+| Package            | Purpose                                                |
+| ------------------ | ------------------------------------------------------ |
+| `next`             | Core framework — SSR, App Router, API routes           |
+| `mongoose`         | MongoDB ODM — schemas for User, Product, Order, Review |
+| `@reduxjs/toolkit` | Cart, wishlist, and auth global state                  |
+| `bcryptjs`         | Secure password hashing before DB storage              |
+| `jsonwebtoken`     | Stateless JWT auth tokens                              |
+| `framer-motion`    | Smooth animations across all pages                     |
+| `recharts`         | Admin analytics charts (8 chart types)                 |
+| `nodemailer`       | Order confirmation emails via Gmail                    |
+| `lucide-react`     | Consistent icon set throughout the app                 |
+| `tailwind-merge`   | Prevents Tailwind class conflicts                      |
+| `clsx`             | Dynamic conditional class building                     |
 
 ### Environment Variables
 
