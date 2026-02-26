@@ -101,6 +101,10 @@ export default function AdminDashboard() {
     image: "",
     badge: "",
   });
+
+  // New state for image file
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
   const [orderDeleteConfirm, setOrderDeleteConfirm] = useState<Order | null>(
     null,
@@ -249,6 +253,7 @@ export default function AdminDashboard() {
 
   const openAddProduct = () => {
     setEditingProduct(null);
+    setImageFile(null);
     setProductForm({
       title: "",
       price: "",
@@ -258,8 +263,10 @@ export default function AdminDashboard() {
     });
     setIsProductModalOpen(true);
   };
+
   const openEditProduct = (product: any) => {
     setEditingProduct(product);
+    setImageFile(null);
     setProductForm({
       title: product.title || "",
       price: product.price?.toString().replace("$", "") || "",
@@ -269,20 +276,41 @@ export default function AdminDashboard() {
     });
     setIsProductModalOpen(true);
   };
+
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const newProductData = {
-      title: productForm.title,
-      price: `$${parseFloat(productForm.price).toFixed(2)}`,
-      oldPrice: productForm.oldPrice
-        ? `$${parseFloat(productForm.oldPrice).toFixed(2)}`
-        : null,
-      image: productForm.image,
-      badge: productForm.badge || null,
-      printText: "We print with",
-    };
+
     try {
+      let imageUrl = productForm.image;
+
+      // Check if there's a file to upload
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("file", imageFile);
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadRes.ok) throw new Error("Image upload failed");
+
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.url;
+      }
+
+      const newProductData = {
+        title: productForm.title,
+        price: `$${parseFloat(productForm.price).toFixed(2)}`,
+        oldPrice: productForm.oldPrice
+          ? `$${parseFloat(productForm.oldPrice).toFixed(2)}`
+          : null,
+        image: imageUrl,
+        badge: productForm.badge || null,
+        printText: "We print with",
+      };
+
       const url = editingProduct
         ? `/api/admin/products/${editingProduct.id}`
         : `/api/admin/products`;
@@ -298,11 +326,13 @@ export default function AdminDashboard() {
         alert("Failed to save product");
       }
     } catch (error) {
+      console.error(error);
       alert("Error saving product");
     } finally {
       setIsSubmitting(false);
     }
   };
+
   const handleDeleteProduct = async (id: number) => {
     try {
       const res = await fetch(`/api/admin/products/${id}`, {
@@ -565,6 +595,8 @@ export default function AdminDashboard() {
         setProductForm={setProductForm}
         handleSaveProduct={handleSaveProduct}
         isSubmitting={isSubmitting}
+        imageFile={imageFile}
+        setImageFile={setImageFile}
       />
       <UserModal
         selectedUser={selectedUser}

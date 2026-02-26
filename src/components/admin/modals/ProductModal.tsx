@@ -1,5 +1,6 @@
-import React from "react";
-import { X } from "lucide-react";
+import React, { useRef } from "react";
+import { X, Upload, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -23,6 +24,9 @@ interface ProductModalProps {
   >;
   handleSaveProduct: (e: React.FormEvent) => void;
   isSubmitting: boolean;
+  // New props for file handling
+  imageFile: File | null;
+  setImageFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 const ProductModal = ({
@@ -33,12 +37,25 @@ const ProductModal = ({
   setProductForm,
   handleSaveProduct,
   isSubmitting,
+  imageFile,
+  setImageFile,
 }: ProductModalProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   if (!isOpen) return null;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      // Create a fake URL for immediate preview
+      setProductForm({ ...productForm, image: URL.createObjectURL(file) });
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b flex justify-between items-center bg-slate-50">
           <h3 className="text-xl font-black">
             {editingProduct ? "Edit Product" : "Add New Product"}
@@ -102,21 +119,68 @@ const ProductModal = ({
               />
             </div>
           </div>
+
+          {/* Modified Image Upload Section */}
           <div>
             <label className="block text-sm font-bold mb-1.5 text-slate-700">
-              Image URL <span className="text-red-500">*</span>
+              Product Image <span className="text-red-500">*</span>
             </label>
+
             <input
-              required
-              type="text"
-              value={productForm.image}
-              onChange={(e) =>
-                setProductForm({ ...productForm, image: e.target.value })
-              }
-              placeholder="https://example.com/image.png"
-              className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
             />
+
+            <div className="flex gap-4 items-start">
+              <div className="w-24 h-24 bg-slate-100 rounded-xl border flex items-center justify-center relative overflow-hidden shrink-0">
+                {productForm.image ? (
+                  <Image
+                    src={productForm.image}
+                    alt="Preview"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <ImageIcon className="text-slate-400" />
+                )}
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Upload size={16} /> Choose Image
+                </button>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-slate-400 font-bold">
+                      OR URL
+                    </span>
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  value={productForm.image}
+                  onChange={(e) => {
+                    setImageFile(null);
+                    setProductForm({ ...productForm, image: e.target.value });
+                  }}
+                  placeholder="https://example.com/image.png"
+                  className="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:border-purple-500"
+                />
+              </div>
+            </div>
           </div>
+
           <div>
             <label className="block text-sm font-bold mb-1.5 text-slate-700">
               Badge
