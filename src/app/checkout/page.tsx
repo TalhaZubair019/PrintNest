@@ -44,6 +44,7 @@ export default function CheckoutPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUsingSavedAddress, setIsUsingSavedAddress] = useState(false);
 
   const subtotal = cartItems.reduce(
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
@@ -84,20 +85,61 @@ export default function CheckoutPage() {
   }, [formData, hasMounted]);
 
   useEffect(() => {
-    // Only prefill user data if the current form fields are empty,
-    // so we don't accidentally wipe out what they just typed or loaded from storage.
+    // Check if user has a saved address. If so, default to using it and prefill.
     if (user) {
-      setFormData((prev) => ({
-        ...prev,
-        email: prev.email || user.email || "",
-        firstName: prev.firstName || user.name?.split(" ")[0] || "",
-        lastName: prev.lastName || user.name?.split(" ")[1] || "",
-        phone: prev.phone || user.phone || "",
-        address: prev.address || user.address || "",
-        city: prev.city || user.city || "",
-      }));
+      const hasSavedAddress = !!(user.address && user.city);
+      setIsUsingSavedAddress(hasSavedAddress);
+
+      if (hasSavedAddress) {
+        setFormData((prev) => ({
+          ...prev,
+          email: prev.email || user.email || "",
+          firstName: prev.firstName || user.name?.split(" ")[0] || "",
+          lastName: prev.lastName || user.name?.split(" ")[1] || "",
+          phone: prev.phone || user.phone || "",
+          address: prev.address || user.address || "",
+          city: prev.city || user.city || "",
+          province: prev.province || user.province || "",
+          postcode: prev.postcode || user.postcode || "",
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          email: prev.email || user.email || "",
+          firstName: prev.firstName || user.name?.split(" ")[0] || "",
+          lastName: prev.lastName || user.name?.split(" ")[1] || "",
+        }));
+      }
     }
   }, [user]);
+
+  // Handle toggling address mode
+  const handleAddressModeChange = (useSaved: boolean) => {
+    setIsUsingSavedAddress(useSaved);
+    if (useSaved && user) {
+      setFormData((prev) => ({
+        ...prev,
+        firstName: user.name?.split(" ")[0] || prev.firstName,
+        lastName: user.name?.split(" ")[1] || prev.lastName,
+        phone: user.phone || prev.phone,
+        address: user.address || prev.address,
+        city: user.city || prev.city,
+        province: user.province || prev.province,
+        postcode: user.postcode || prev.postcode,
+      }));
+    } else {
+      // Clear fields when switching to "new address" so they can type a new one
+      setFormData((prev) => ({
+        ...prev,
+        address: "",
+        apartment: "",
+        city: "",
+        province: "",
+        postcode: "",
+        phone: "",
+      }));
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -239,7 +281,13 @@ export default function CheckoutPage() {
                   update={updateData}
                   isReadOnly={hasMounted && !!user?.email}
                 />
-                <BillingSection data={formData} update={updateData} />
+                <BillingSection
+                  data={formData}
+                  update={updateData}
+                  user={user}
+                  isUsingSavedAddress={isUsingSavedAddress}
+                  onAddressModeChange={handleAddressModeChange}
+                />
                 <PaymentSection data={formData} update={updateData} />
                 <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
                   <Link
@@ -331,136 +379,183 @@ function ContactSection({ email, update, isReadOnly }: any) {
   );
 }
 
-function BillingSection({ data, update }: any) {
+function BillingSection({
+  data,
+  update,
+  user,
+  isUsingSavedAddress,
+  onAddressModeChange,
+}: any) {
   const InputClass =
     "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400";
   const LabelClass =
     "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block";
+
+  const hasProfileAddress = !!(user && user.address && user.city);
+
   return (
     <section>
       <h2 className="text-lg font-bold text-slate-700 mb-4">Billing address</h2>
-      <div className="space-y-4">
-        <div className="relative">
-          <label className={LabelClass}>
-            Country / Region <span className="text-red-500">*</span>
+
+      {hasProfileAddress && (
+        <div className="mb-6 space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer p-3 border rounded-lg border-slate-200 hover:border-blue-300 transition-colors bg-white">
+            <input
+              type="radio"
+              name="addressMode"
+              checked={isUsingSavedAddress}
+              onChange={() => onAddressModeChange(true)}
+              className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+            />
+            <div>
+              <span className="block text-sm font-bold text-slate-700">
+                Use saved address
+              </span>
+              <span className="block text-xs text-slate-500 mt-1">
+                {user.address}, {user.city}
+              </span>
+            </div>
           </label>
-          <select
-            className={`${InputClass} appearance-none bg-slate-50 cursor-pointer`}
-          >
-            <option value="PK">Pakistan</option>
-          </select>
-          <ChevronDown
-            className="absolute right-4 top-9 text-slate-400 pointer-events-none"
-            size={16}
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className={LabelClass}>
-              First Name <span className="text-red-500">*</span>
-            </label>
+
+          <label className="flex items-center gap-3 cursor-pointer p-3 border rounded-lg border-slate-200 hover:border-blue-300 transition-colors bg-white">
             <input
-              type="text"
-              required
-              className={InputClass}
-              value={data.firstName}
-              onChange={(e) => update({ firstName: e.target.value })}
+              type="radio"
+              name="addressMode"
+              checked={!isUsingSavedAddress}
+              onChange={() => onAddressModeChange(false)}
+              className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
             />
-          </div>
-          <div>
-            <label className={LabelClass}>
-              Last Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              className={InputClass}
-              value={data.lastName}
-              onChange={(e) => update({ lastName: e.target.value })}
-            />
-          </div>
-        </div>
-        <div>
-          <label className={LabelClass}>
-            Address <span className="text-red-500">*</span>
+            <span className="block text-sm font-bold text-slate-700">
+              Use a different address
+            </span>
           </label>
-          <input
-            type="text"
-            required
-            placeholder="House number and street name"
-            className={`${InputClass} mb-3`}
-            value={data.address}
-            onChange={(e) => update({ address: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Apartment, suite, unit, etc. (optional)"
-            className={InputClass}
-            value={data.apartment}
-            onChange={(e) => update({ apartment: e.target.value })}
-          />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className={LabelClass}>
-              City <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              className={InputClass}
-              value={data.city}
-              onChange={(e) => update({ city: e.target.value })}
-            />
-          </div>
+      )}
+
+      {(!hasProfileAddress || !isUsingSavedAddress) && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="relative">
             <label className={LabelClass}>
-              Province <span className="text-red-500">*</span>
+              Country / Region <span className="text-red-500">*</span>
             </label>
             <select
-              required
-              className={`${InputClass} appearance-none bg-transparent cursor-pointer`}
-              value={data.province}
-              onChange={(e) => update({ province: e.target.value })}
+              className={`${InputClass} appearance-none bg-slate-50 cursor-pointer`}
             >
-              <option value="">Select...</option>
-              {checkoutConfig.provinces.map((p: any) => (
-                <option key={p.code} value={p.code}>
-                  {p.name}
-                </option>
-              ))}
+              <option value="PK">Pakistan</option>
             </select>
             <ChevronDown
               className="absolute right-4 top-9 text-slate-400 pointer-events-none"
               size={16}
             />
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={LabelClass}>
+                First Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                className={InputClass}
+                value={data.firstName}
+                onChange={(e) => update({ firstName: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className={LabelClass}>
+                Last Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                className={InputClass}
+                value={data.lastName}
+                onChange={(e) => update({ lastName: e.target.value })}
+              />
+            </div>
+          </div>
           <div>
             <label className={LabelClass}>
-              Postcode <span className="text-red-500">*</span>
+              Address <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
+              placeholder="House number and street name"
+              className={`${InputClass} mb-3`}
+              value={data.address}
+              onChange={(e) => update({ address: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Apartment, suite, unit, etc. (optional)"
               className={InputClass}
-              value={data.postcode}
-              onChange={(e) => update({ postcode: e.target.value })}
+              value={data.apartment}
+              onChange={(e) => update({ apartment: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className={LabelClass}>
+                City <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                className={InputClass}
+                value={data.city}
+                onChange={(e) => update({ city: e.target.value })}
+              />
+            </div>
+            <div className="relative">
+              <label className={LabelClass}>
+                Province <span className="text-red-500">*</span>
+              </label>
+              <select
+                required
+                className={`${InputClass} appearance-none bg-transparent cursor-pointer`}
+                value={data.province}
+                onChange={(e) => update({ province: e.target.value })}
+              >
+                <option value="">Select...</option>
+                {checkoutConfig.provinces.map((p: any) => (
+                  <option key={p.code} value={p.code}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                className="absolute right-4 top-9 text-slate-400 pointer-events-none"
+                size={16}
+              />
+            </div>
+            <div>
+              <label className={LabelClass}>
+                Postcode <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                className={InputClass}
+                value={data.postcode}
+                onChange={(e) => update({ postcode: e.target.value })}
+              />
+            </div>
+          </div>
+          <div>
+            <label className={LabelClass}>
+              Phone <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              required
+              className={InputClass}
+              value={data.phone}
+              onChange={(e) => update({ phone: e.target.value })}
             />
           </div>
         </div>
-        <div>
-          <label className={LabelClass}>
-            Phone <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="tel"
-            required
-            className={InputClass}
-            value={data.phone}
-            onChange={(e) => update({ phone: e.target.value })}
-          />
-        </div>
-      </div>
+      )}
     </section>
   );
 }
