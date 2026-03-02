@@ -31,7 +31,7 @@ interface CheckoutData {
   province: string;
   postcode: string;
   phone: string;
-  paymentMethod: "cod" | "stripe" | "payfast";
+  paymentMethod: "cod" | "stripe";
 }
 
 export default function CheckoutPage() {
@@ -146,26 +146,6 @@ export default function CheckoutPage() {
         throw new Error(session.error || "Failed to initialize Stripe");
       }
 
-      if (formData.paymentMethod === "payfast") {
-        localStorage.setItem("pendingCheckoutData", JSON.stringify(formData));
-        const orderId = Date.now().toString();
-
-        const response = await fetch("/api/payfast/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            totalAmount: subtotal,
-            customer: formData,
-            orderId: orderId,
-          }),
-        });
-        const session = await response.json();
-        if (session.url) {
-          window.location.href = session.url;
-          return;
-        }
-        throw new Error(session.error || "Failed to initialize PayFast");
-      }
       // 3. STANDARD FLOW (Cash on Delivery)
       if (formData.paymentMethod === "cod") {
         await saveOrderToDB("Pending");
@@ -522,15 +502,6 @@ function PaymentSection({
     <section>
       <h2 className="text-lg font-bold text-slate-700 mb-4">Payment options</h2>
       <div className="space-y-3">
-        <PaymentOption
-          id="payfast"
-          label="PayFast (JazzCash, EasyPaisa, Local Cards)"
-          icon={<Smartphone className="text-slate-600" size={20} />}
-          description="Pay securely using Pakistani local banks, JazzCash, or EasyPaisa."
-          isSelected={data.paymentMethod === "payfast"}
-          onSelect={() => update({ paymentMethod: "payfast" })}
-        />
-
         <PaymentOption
           id="stripe"
           label="Credit / Debit Card (International)"
