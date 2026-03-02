@@ -31,7 +31,7 @@ interface CheckoutData {
   province: string;
   postcode: string;
   phone: string;
-  paymentMethod: "cod" | "stripe";
+  paymentMethod: "cod" | "stripe" | "paypal";
 }
 
 export default function CheckoutPage() {
@@ -65,18 +65,36 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setHasMounted(true);
+    // Load saved form data from local storage on mount
+    const savedForm = localStorage.getItem("checkoutFormData");
+    if (savedForm) {
+      try {
+        setFormData((prev) => ({ ...prev, ...JSON.parse(savedForm) }));
+      } catch (e) {
+        console.error("Could not parse saved form data", e);
+      }
+    }
   }, []);
 
+  // Save form data to local storage whenever it changes, but only after mount
   useEffect(() => {
+    if (hasMounted) {
+      localStorage.setItem("checkoutFormData", JSON.stringify(formData));
+    }
+  }, [formData, hasMounted]);
+
+  useEffect(() => {
+    // Only prefill user data if the current form fields are empty,
+    // so we don't accidentally wipe out what they just typed or loaded from storage.
     if (user) {
       setFormData((prev) => ({
         ...prev,
-        email: user.email || "",
-        firstName: user.name?.split(" ")[0] || "",
-        lastName: user.name?.split(" ")[1] || "",
-        phone: user.phone || "",
-        address: user.address || "",
-        city: user.city || "",
+        email: prev.email || user.email || "",
+        firstName: prev.firstName || user.name?.split(" ")[0] || "",
+        lastName: prev.lastName || user.name?.split(" ")[1] || "",
+        phone: prev.phone || user.phone || "",
+        address: prev.address || user.address || "",
+        city: prev.city || user.city || "",
       }));
     }
   }, [user]);
@@ -144,6 +162,27 @@ export default function CheckoutPage() {
           return;
         }
         throw new Error(session.error || "Failed to initialize Stripe");
+      }
+
+      if (formData.paymentMethod === "paypal") {
+        localStorage.setItem("pendingCheckoutData", JSON.stringify(formData));
+        const orderId = Date.now().toString();
+
+        const response = await fetch("/api/paypal/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            totalAmount: subtotal,
+            customer: formData,
+            orderId: orderId,
+          }),
+        });
+        const session = await response.json();
+        if (session.url) {
+          window.location.href = session.url;
+          return;
+        }
+        throw new Error(session.error || "Failed to initialize PayPal");
       }
 
       // 3. STANDARD FLOW (Cash on Delivery)
@@ -502,6 +541,14 @@ function PaymentSection({
     <section>
       <h2 className="text-lg font-bold text-slate-700 mb-4">Payment options</h2>
       <div className="space-y-3">
+        <PaymentOption
+          id="paypal"
+          label="PayPal"
+          icon={<Wallet className="text-slate-600" size={20} />}
+          description="Pay securely using your PayPal account."
+          isSelected={data.paymentMethod === "paypal"}
+          onSelect={() => update({ paymentMethod: "paypal" })}
+        />
         <PaymentOption
           id="stripe"
           label="Credit / Debit Card (International)"
