@@ -14,9 +14,11 @@ import {
   CreditCard,
   Banknote,
   ChevronLeft,
-  X,
+  Wallet,
+  Smartphone,
 } from "lucide-react";
 import db from "@/data/db.json";
+
 const checkoutConfig = db.checkout;
 
 interface CheckoutData {
@@ -29,7 +31,7 @@ interface CheckoutData {
   province: string;
   postcode: string;
   phone: string;
-  paymentMethod: "cod" | "bank";
+  paymentMethod: "cod" | "stripe" | "payfast";
 }
 
 export default function CheckoutPage() {
@@ -47,6 +49,7 @@ export default function CheckoutPage() {
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
     0,
   );
+
   const [formData, setFormData] = useState<CheckoutData>({
     email: "",
     firstName: "",
@@ -91,6 +94,23 @@ export default function CheckoutPage() {
   const updateData = (newData: Partial<CheckoutData>) =>
     setFormData((prev) => ({ ...prev, ...newData }));
 
+  const saveOrderToDB = async (paymentStatus: string) => {
+    const payload = {
+      customer: formData,
+      items: cartItems,
+      totalAmount: subtotal,
+      paymentStatus,
+    };
+    const response = await fetch("/api/public/place-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) throw new Error("API request failed");
+    return await response.json();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formRef.current?.checkValidity()) {
@@ -104,25 +124,56 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      const payload = {
-        customer: formData,
-        items: cartItems,
-        totalAmount: subtotal,
-      };
-      const response = await fetch("/api/public/place-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      if (formData.paymentMethod === "stripe") {
+        // Save form data to local storage so Thank You page knows what to submit
+        localStorage.setItem("pendingCheckoutData", JSON.stringify(formData));
+        const orderId = Date.now().toString();
 
-      if (response.ok) {
+        const response = await fetch("/api/stripe/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: cartItems,
+            customerEmail: formData.email,
+            orderId: orderId,
+          }),
+        });
+        const session = await response.json();
+        if (session.url) {
+          window.location.href = session.url;
+          return;
+        }
+        throw new Error(session.error || "Failed to initialize Stripe");
+      }
+
+      if (formData.paymentMethod === "payfast") {
+        localStorage.setItem("pendingCheckoutData", JSON.stringify(formData));
+        const orderId = Date.now().toString();
+
+        const response = await fetch("/api/payfast/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            totalAmount: subtotal,
+            customer: formData,
+            orderId: orderId,
+          }),
+        });
+        const session = await response.json();
+        if (session.url) {
+          window.location.href = session.url;
+          return;
+        }
+        throw new Error(session.error || "Failed to initialize PayFast");
+      }
+      // 3. STANDARD FLOW (Cash on Delivery)
+      if (formData.paymentMethod === "cod") {
+        await saveOrderToDB("Pending");
         dispatch(clearCart());
         router.push("/thank-you");
-      } else {
-        throw new Error("API request failed");
       }
     } catch (error) {
-      alert("Error: Could not place order.");
+      alert("Error: Could not process checkout. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -152,7 +203,11 @@ export default function CheckoutPage() {
         <CheckoutHeader />
         <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
           <div
-            className={`transition-all duration-300 ${showAuthModal || isCheckingAuth ? "opacity-50 blur-sm pointer-events-none" : "opacity-100"}`}
+            className={`transition-all duration-300 ${
+              showAuthModal || isCheckingAuth
+                ? "opacity-50 blur-sm pointer-events-none"
+                : "opacity-100"
+            }`}
           >
             <form
               ref={formRef}
@@ -242,7 +297,9 @@ function ContactSection({ email, update, isReadOnly }: any) {
         required
         readOnly={isReadOnly}
         placeholder="Email address"
-        className={`w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-500 placeholder:text-slate-400 ${isReadOnly ? "bg-slate-50 text-slate-500 cursor-not-allowed" : ""}`}
+        className={`w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-500 placeholder:text-slate-400 ${
+          isReadOnly ? "bg-slate-50 text-slate-500 cursor-not-allowed" : ""
+        }`}
         value={email}
         onChange={(e) => update({ email: e.target.value })}
       />
@@ -466,20 +523,30 @@ function PaymentSection({
       <h2 className="text-lg font-bold text-slate-700 mb-4">Payment options</h2>
       <div className="space-y-3">
         <PaymentOption
+          id="payfast"
+          label="PayFast (JazzCash, EasyPaisa, Local Cards)"
+          icon={<Smartphone className="text-slate-600" size={20} />}
+          description="Pay securely using Pakistani local banks, JazzCash, or EasyPaisa."
+          isSelected={data.paymentMethod === "payfast"}
+          onSelect={() => update({ paymentMethod: "payfast" })}
+        />
+
+        <PaymentOption
+          id="stripe"
+          label="Credit / Debit Card (International)"
+          icon={<Wallet className="text-slate-600" size={20} />}
+          description="Pay securely using your international credit or debit card."
+          isSelected={data.paymentMethod === "stripe"}
+          onSelect={() => update({ paymentMethod: "stripe" })}
+        />
+
+        <PaymentOption
           id="cod"
           label="Cash on Delivery"
           icon={<Banknote className="text-slate-600" size={20} />}
           description="Pay with cash upon delivery."
           isSelected={data.paymentMethod === "cod"}
           onSelect={() => update({ paymentMethod: "cod" })}
-        />
-        <PaymentOption
-          id="bank"
-          label="Direct Bank Transfer"
-          icon={<CreditCard className="text-slate-600" size={20} />}
-          description="Make your payment directly into our bank account."
-          isSelected={data.paymentMethod === "bank"}
-          onSelect={() => update({ paymentMethod: "bank" })}
         />
       </div>
     </section>
@@ -497,11 +564,17 @@ function PaymentOption({
   return (
     <div
       onClick={onSelect}
-      className={`border rounded-xl p-4 cursor-pointer transition-all ${isSelected ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500" : "border-slate-200 hover:border-slate-300"}`}
+      className={`border rounded-xl p-4 cursor-pointer transition-all ${
+        isSelected
+          ? "border-blue-500 bg-blue-50/50 ring-1 ring-blue-500"
+          : "border-slate-200 hover:border-slate-300"
+      }`}
     >
       <div className="flex items-center gap-3">
         <div
-          className={`w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? "border-blue-600" : "border-slate-400"}`}
+          className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+            isSelected ? "border-blue-600" : "border-slate-400"
+          }`}
         >
           {isSelected && (
             <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
@@ -518,4 +591,3 @@ function PaymentOption({
     </div>
   );
 }
-
