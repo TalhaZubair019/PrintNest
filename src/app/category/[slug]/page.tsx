@@ -59,9 +59,10 @@ export default function CategoryPage() {
           const dbCategories: Category[] = catData.categories || [];
 
           const foundCategory = dbCategories.find(
-            (cat: Category) =>
-              cat.title?.toLowerCase().replace(/\s+/g, "-") === slug ||
-              (cat as any).slug === slug,
+            (cat: any) =>
+              (cat.name || cat.title || "")
+                .toLowerCase()
+                .replace(/\s+/g, "-") === slug || (cat as any).slug === slug,
           );
 
           if (!foundCategory) {
@@ -75,25 +76,38 @@ export default function CategoryPage() {
             if (staticCat && productsRes.ok) {
               const data = await productsRes.json();
               const allProducts: Product[] = data.products || [];
-              const keyword = staticCat.title.toLowerCase().replace(/s$/, "");
-              const filtered = allProducts.filter((p) =>
-                p.category
-                  ? p.category.toLowerCase().replace(/\s+/g, "-") === slug
-                  : p.title.toLowerCase().includes(keyword),
-              );
+              const keyword = staticCat.title.toLowerCase().replace(/s$/, ""); // Removing trailing 's'
+              const filtered = allProducts.filter((p) => {
+                const pCategory = p.category?.toLowerCase() || "";
+                const slugMatch = pCategory.replace(/\s+/g, "-") === slug;
+                const titleMatch = p.title.toLowerCase().includes(keyword);
+                return pCategory ? slugMatch || titleMatch : titleMatch;
+              });
               setCategoryProducts(filtered);
             }
           } else {
-            setCategory(foundCategory);
+            setCategory({
+              ...foundCategory,
+              title: (foundCategory as any).name || foundCategory.title,
+            });
             if (productsRes.ok) {
               const data = await productsRes.json();
               const allProducts: Product[] = data.products || [];
-              const filtered = allProducts.filter(
-                (p) =>
-                  p.category &&
-                  p.category.toLowerCase() ===
-                    foundCategory.title?.toLowerCase(),
-              );
+              const catTitle = (
+                (foundCategory as any).name ||
+                foundCategory.title ||
+                ""
+              ).toLowerCase();
+              const keyword = catTitle.replace(/s$/, "");
+
+              const filtered = allProducts.filter((p) => {
+                const pCategory = p.category?.toLowerCase() || "";
+                const slugMatch =
+                  pCategory === catTitle ||
+                  pCategory.replace(/\s+/g, "-") === slug;
+                const titleMatch = p.title.toLowerCase().includes(keyword);
+                return pCategory ? slugMatch || titleMatch : titleMatch;
+              });
               setCategoryProducts(filtered);
             }
           }
@@ -109,11 +123,12 @@ export default function CategoryPage() {
             const data = await productsRes.json();
             const allProducts: Product[] = data.products || [];
             const keyword = staticCat.title.toLowerCase().replace(/s$/, "");
-            const filtered = allProducts.filter((p) =>
-              p.category
-                ? p.category.toLowerCase().replace(/\s+/g, "-") === slug
-                : p.title.toLowerCase().includes(keyword),
-            );
+            const filtered = allProducts.filter((p) => {
+              const pCategory = p.category?.toLowerCase() || "";
+              const slugMatch = pCategory.replace(/\s+/g, "-") === slug;
+              const titleMatch = p.title.toLowerCase().includes(keyword);
+              return pCategory ? slugMatch || titleMatch : titleMatch;
+            });
             setCategoryProducts(filtered);
           }
         }

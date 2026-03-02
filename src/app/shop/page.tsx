@@ -35,6 +35,9 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState("Default Sorting");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -44,13 +47,26 @@ export default function ShopPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/public/content?section=products");
-        if (response.ok) {
-          const data = await response.json();
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          fetch("/api/public/content?section=products"),
+          fetch("/api/admin/categories").catch(() => null),
+        ]);
+
+        if (productsResponse.ok) {
+          const data = await productsResponse.json();
           setProducts(data.products || []);
         }
+
+        if (categoriesResponse && categoriesResponse.ok) {
+          const catData = await categoriesResponse.json();
+          const dbCategories = catData.categories || [];
+          setCategories(dbCategories);
+        } else {
+          // Fallback to static db if api fails or throws error
+          setCategories(db.categories.categories || []);
+        }
       } catch (error) {
-        console.error("Failed to fetch products:", error);
+        console.error("Failed to fetch products or categories:", error);
       } finally {
         setLoading(false);
       }
@@ -58,18 +74,40 @@ export default function ShopPage() {
     fetchProducts();
   }, []);
 
+  const filteredProducts = useMemo(() => {
+    if (selectedCategory === "All Categories") return products;
+
+    // Find the category object to get title / name accurately
+    const activeCat = categories.find(
+      (c: any) => c.title === selectedCategory || c.name === selectedCategory,
+    );
+    if (!activeCat) return products;
+
+    const catTitle = (activeCat.title || activeCat.name || "").toLowerCase();
+    const keyword = catTitle.replace(/s$/, ""); // Removing trailing 's'
+    const slug = catTitle.replace(/\s+/g, "-");
+
+    return products.filter((p) => {
+      const pCategory = p.category?.toLowerCase() || "";
+      const slugMatch =
+        pCategory === catTitle || pCategory.replace(/\s+/g, "-") === slug;
+      const titleMatch = p.title.toLowerCase().includes(keyword);
+      return pCategory ? slugMatch || titleMatch : titleMatch;
+    });
+  }, [products, selectedCategory, categories]);
+
   const sortedProducts = useMemo(() => {
-    let prods = [...products];
+    let prods = [...filteredProducts];
 
     switch (sortBy) {
       case "Sort By Price: Low To High":
-        return products.sort((a, b) => {
+        return prods.sort((a, b) => {
           const priceA = parseFloat(String(a.price).replace(/[^0-9.]/g, ""));
           const priceB = parseFloat(String(b.price).replace(/[^0-9.]/g, ""));
           return priceA - priceB;
         });
       case "Sort By Price: High To Low":
-        return products.sort((a, b) => {
+        return prods.sort((a, b) => {
           const priceA = parseFloat(String(a.price).replace(/[^0-9.]/g, ""));
           const priceB = parseFloat(String(b.price).replace(/[^0-9.]/g, ""));
           return priceB - priceA;
@@ -79,7 +117,7 @@ export default function ShopPage() {
       default:
         return prods;
     }
-  }, [products, sortBy]);
+  }, [filteredProducts, sortBy]);
 
   const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -159,7 +197,7 @@ export default function ShopPage() {
         <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
       </div>
 
-      <div className="relative z-10 pt-80">
+      <div className="relative z-40 pt-80">
         <ShopHeader currentPage={currentPage} />
 
         {loading ? (
@@ -171,48 +209,91 @@ export default function ShopPage() {
           </div>
         ) : (
           <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-12 px-6 py-3 bg-white rounded-full border border-slate-200 shadow-sm relative z-30">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-12 px-6 py-3 bg-white rounded-full border border-slate-200 shadow-sm relative z-50">
               <p className="text-sm font-semibold text-slate-500 pl-2">
                 Showing {startIndex + 1}–
                 {Math.min(startIndex + ITEMS_PER_PAGE, sortedProducts.length)}{" "}
                 Of {sortedProducts.length} Results
               </p>
 
-              <div className="relative">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors px-4 py-2"
-                >
-                  {sortBy} <ChevronDown size={14} />
-                </button>
-                {isSortOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden py-1 z-40">
-                    {[
-                      "Default Sorting",
-                      "Sort By Popularity",
-                      "Sort By Average Rating",
-                      "Sort By Latest",
-                      "Sort By Price: Low To High",
-                      "Sort By Price: High To Low",
-                    ].map((option) => (
-                      <button
-                        key={option}
-                        onClick={() => {
-                          setSortBy(option);
-                          setIsSortOpen(false);
-                          setCurrentPage(1);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
-                          sortBy === option
-                            ? "bg-purple-50 text-purple-600"
-                            : "text-slate-600"
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="flex items-center gap-4 relative">
+                {/* Category Filter */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setIsCategoryOpen(!isCategoryOpen);
+                      setIsSortOpen(false);
+                    }}
+                    className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors px-4 py-2 border-r border-slate-200"
+                  >
+                    {selectedCategory} <ChevronDown size={14} />
+                  </button>
+                  {isCategoryOpen && (
+                    <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden py-1 z-50">
+                      {[
+                        "All Categories",
+                        ...categories.map((c: any) => c.title || c.name),
+                      ].map((option: string) => (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            setSelectedCategory(option);
+                            setIsCategoryOpen(false);
+                            setCurrentPage(1);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
+                            selectedCategory === option
+                              ? "bg-purple-50 text-purple-600"
+                              : "text-slate-600"
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Sort Filter */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setIsSortOpen(!isSortOpen);
+                      setIsCategoryOpen(false);
+                    }}
+                    className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors px-4 py-2"
+                  >
+                    {sortBy} <ChevronDown size={14} />
+                  </button>
+                  {isSortOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden py-1 z-50">
+                      {[
+                        "Default Sorting",
+                        "Sort By Popularity",
+                        "Sort By Average Rating",
+                        "Sort By Latest",
+                        "Sort By Price: Low To High",
+                        "Sort By Price: High To Low",
+                      ].map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            setSortBy(option);
+                            setIsSortOpen(false);
+                            setCurrentPage(1);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
+                            sortBy === option
+                              ? "bg-purple-50 text-purple-600"
+                              : "text-slate-600"
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">

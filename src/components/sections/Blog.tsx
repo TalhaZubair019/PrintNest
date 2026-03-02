@@ -97,14 +97,14 @@ const LatestNews = () => {
               </span>
             </motion.h2>
           </div>
-          <div className="lg:text-right lg:max-w-md">
+          <div className="lg:w-1/3 lg:pt-12">
             <motion.p
               custom={2}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={headerVariants}
-              className="text-gray-600 text-sm md:text-base mb-6 leading-relaxed"
+              className="text-gray-600 text-sm md:text-[17px] leading-relaxed mb-6 max-w-sm lg:ml-auto"
             >
               {sectionInfo.description}
             </motion.p>
@@ -189,4 +189,3 @@ const BlogCard = ({ post, index }: { post: any; index: number }) => {
 };
 
 export default LatestNews;
-

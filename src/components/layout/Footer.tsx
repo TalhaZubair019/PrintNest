@@ -29,7 +29,6 @@ function Footer() {
               <div className="max-w-lg">
                 <h2 className="text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-white mb-4 leading-tight">
                   {newsletter.titlePart1}
-                  <br />
                   {newsletter.titlePart2}
                 </h2>
                 <p className="text-white/90 mb-8 text-base md:text-lg">
@@ -48,7 +47,7 @@ function Footer() {
                 </form>
               </div>
             </div>
-            <div className="absolute -top-16 right-0 lg:right-12 w-64 h-80 md:w-80 md:h-112 z-20 hidden md:block pointer-events-none">
+            <div className="absolute -top-27 right-0 lg:right-12 w-64 h-80 md:w-80 md:h-112 z-20 hidden md:block pointer-events-none">
               <Image
                 src={newsletter.modelImage}
                 alt="Subscribe Model"
@@ -186,4 +185,3 @@ const FooterLinkColumn = ({
 };
 
 export default Footer;
-

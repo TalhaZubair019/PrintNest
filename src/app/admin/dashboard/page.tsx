@@ -143,6 +143,25 @@ export default function AdminDashboard() {
   const [revenueLoading, setRevenueLoading] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      const validTabs = [
+        "overview",
+        "users",
+        "admins",
+        "orders",
+        "products",
+        "reviews",
+        "categories",
+      ];
+      if (tab && validTabs.includes(tab)) {
+        setActiveTab(tab as any);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (isAuthLoading) return;
     if (!isAuthenticated) {
       router.push("/login");
@@ -162,6 +181,16 @@ export default function AdminDashboard() {
     setDeleteConfirm(null);
     setPromoteConfirm(null);
     setRevokeConfirm(null);
+
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (activeTab === "overview") {
+        url.searchParams.delete("tab");
+      } else {
+        url.searchParams.set("tab", activeTab);
+      }
+      window.history.replaceState({}, "", url.toString());
+    }
 
     const contentArea = document.getElementById("admin-content-area");
     if (contentArea) {

@@ -153,7 +153,7 @@ export default function EditProductPage() {
       });
 
       if (res.ok) {
-        router.push("/admin/dashboard");
+        router.push("/admin/dashboard?tab=products");
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to save product: ${errData.message ?? res.statusText}`);
