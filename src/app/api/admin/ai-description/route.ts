@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         messages: [
           {
             role: "user",
-            content: `Write a short, compelling product description (2-3 sentences) for an e-commerce product titled: "${title}"${category ? ` in the category: "${category}"` : ""}. Focus on quality, appeal, and key benefits. Do not use bullet points. Return only the description text.`,
+            content: `Write an SEO-friendly, compelling product description (2-3 sentences) for an e-commerce product titled: "${title}"${category ? ` in the category: "${category}"` : ""}. Focus on quality, appeal, and key benefits. Do not use bullet points. Return only the description text.`,
           },
         ],
         max_tokens: 150,
