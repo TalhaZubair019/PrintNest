@@ -29,10 +29,12 @@ import OrderVelocityChart from "@/components/admin/charts/OrderVelocityChart";
 import TopSellingProducts from "@/components/admin/lists/TopSellingProducts";
 import TopReviewedProducts from "@/components/admin/lists/TopReviewedProducts";
 import ProductsTable from "@/components/admin/tables/ProductsTable";
+import CategoriesTable from "@/components/admin/tables/CategoriesTable";
 import UsersTable from "@/components/admin/tables/UsersTable";
 import AdminsTable from "@/components/admin/tables/AdminsTable";
 import OrdersTable from "@/components/admin/tables/OrdersTable";
-import ProductModal from "@/components/admin/modals/ProductModal";
+
+import CategoryModal from "@/components/admin/modals/CategoryModal";
 import UserModal from "@/components/admin/modals/UserModal";
 import OrderModal from "@/components/admin/modals/OrderModal";
 import DeleteConfirmationModal from "@/components/admin/modals/DeleteConfirmationModal";
@@ -80,7 +82,13 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "admins" | "orders" | "products" | "reviews"
+    | "overview"
+    | "users"
+    | "admins"
+    | "orders"
+    | "products"
+    | "reviews"
+    | "categories"
   >("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
@@ -95,8 +103,6 @@ export default function AdminDashboard() {
   const [productPage, setProductPage] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isAddAdminModalOpen, setIsAddAdminModalOpen] = useState(false);
   const [promoteConfirm, setPromoteConfirm] = useState<{
     id: string;
@@ -111,16 +117,11 @@ export default function AdminDashboard() {
   const [isRevoking, setIsRevoking] = useState(false);
   const [isDeletingProduct, setIsDeletingProduct] = useState(false);
   const [isDeletingOrder, setIsDeletingOrder] = useState(false);
-  const [productForm, setProductForm] = useState({
-    title: "",
-    description: "",
-    price: "",
-    oldPrice: "",
-    image: "",
-    badge: "",
-  });
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [categoryDeleteConfirm, setCategoryDeleteConfirm] = useState<any>(null);
+  const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
   const [orderDeleteConfirm, setOrderDeleteConfirm] = useState<Order | null>(
@@ -157,7 +158,6 @@ export default function AdminDashboard() {
   }, [user, isAuthenticated, isAuthLoading]);
 
   useEffect(() => {
-    
     setSearchTerm("");
     setDeleteConfirm(null);
     setPromoteConfirm(null);
@@ -330,98 +330,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const openAddProduct = () => {
-    setEditingProduct(null);
-    setImageFile(null);
-    setProductForm({
-      title: "",
-      description: "",
-      price: "",
-      oldPrice: "",
-      image: "",
-      badge: "",
-    });
-    setIsProductModalOpen(true);
-  };
-
-  const openEditProduct = (product: any) => {
-    setEditingProduct(product);
-    setImageFile(null);
-    setProductForm({
-      title: product.title || "",
-      description: product.description || "",
-      price: product.price?.toString().replace("$", "") || "",
-      oldPrice: product.oldPrice?.toString().replace("$", "") || "",
-      image: product.image || "",
-      badge: product.badge || "",
-    });
-    setIsProductModalOpen(true);
-  };
-
-  const handleSaveProduct = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      let imageUrl = productForm.image.trim();
-
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append("file", imageFile);
-
-        const uploadRes = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadRes.ok) throw new Error("Image upload failed");
-
-        const uploadData = await uploadRes.json();
-        imageUrl = uploadData.url;
-      }
-
-      if (!imageUrl) {
-        alert("Please provide a product image (upload a file or enter a URL).");
-        setIsSubmitting(false);
-        return;
-      }
-
-      const newProductData = {
-        title: productForm.title,
-        description: productForm.description,
-        price: `$${parseFloat(productForm.price).toFixed(2)}`,
-        oldPrice: productForm.oldPrice
-          ? `$${parseFloat(productForm.oldPrice).toFixed(2)}`
-          : null,
-        image: imageUrl,
-        badge: productForm.badge || null,
-        printText: "We print with",
-      };
-
-      const url = editingProduct
-        ? `/api/admin/products/${editingProduct.id}`
-        : `/api/admin/products`;
-      const res = await fetch(url, {
-        method: editingProduct ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProductData),
-      });
-
-      if (res.ok) {
-        await fetchStats();
-        setIsProductModalOpen(false);
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        alert(`Failed to save product: ${errData.message ?? res.statusText}`);
-      }
-    } catch (error: any) {
-      console.error(error);
-      alert(`Error saving product: ${error?.message ?? "Unknown error"}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleDeleteProduct = async (id: number) => {
     setIsDeletingProduct(true);
     try {
@@ -462,7 +370,26 @@ export default function AdminDashboard() {
     }
   };
 
-  
+  const handleDeleteCategory = async (id: string) => {
+    setIsDeletingCategory(true);
+    try {
+      const res = await fetch(`/api/admin/categories/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        await fetchStats();
+        setCategoryDeleteConfirm(null);
+        showToast("Category deleted successfully.", "success");
+      } else {
+        showToast("Failed to delete category.", "error");
+      }
+    } catch {
+      showToast("Error deleting category.", "error");
+    } finally {
+      setIsDeletingCategory(false);
+    }
+  };
+
   const filteredUsers = stats?.users
     .filter((u) => !u.isAdmin)
     .filter(
@@ -477,7 +404,6 @@ export default function AdminDashboard() {
   const totalUserPages =
     Math.ceil((filteredUsers?.length || 0) / ITEMS_PER_PAGE) || 1;
 
-  
   const filteredAdmins = stats?.users
     .filter((u) => u.isAdmin)
     .filter(
@@ -642,8 +568,6 @@ export default function AdminDashboard() {
             {activeTab === "products" && (
               <ProductsTable
                 paginatedProducts={paginatedProducts || []}
-                openAddProduct={openAddProduct}
-                openEditProduct={openEditProduct}
                 setProductDeleteConfirm={setProductDeleteConfirm}
                 productPage={productPage}
                 setProductPage={setProductPage}
@@ -693,6 +617,20 @@ export default function AdminDashboard() {
                 updatingOrderId={updatingOrderId}
               />
             )}
+            {activeTab === "categories" && (
+              <CategoriesTable
+                categories={stats.categories || []}
+                onAdd={() => {
+                  setEditingCategory(null);
+                  setIsCategoryModalOpen(true);
+                }}
+                onEdit={(cat) => {
+                  setEditingCategory(cat);
+                  setIsCategoryModalOpen(true);
+                }}
+                onDelete={(cat) => setCategoryDeleteConfirm(cat)}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -722,16 +660,13 @@ export default function AdminDashboard() {
         onSuccess={fetchStats}
         showToast={showToast}
       />
-      <ProductModal
-        isOpen={isProductModalOpen}
-        onClose={() => setIsProductModalOpen(false)}
-        editingProduct={editingProduct}
-        productForm={productForm}
-        setProductForm={setProductForm}
-        handleSaveProduct={handleSaveProduct}
-        isSubmitting={isSubmitting}
-        imageFile={imageFile}
-        setImageFile={setImageFile}
+
+      <CategoryModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        editingCategory={editingCategory}
+        onSaved={fetchStats}
+        showToast={showToast}
       />
       <UserModal
         selectedUser={selectedUser}
@@ -861,6 +796,17 @@ export default function AdminDashboard() {
             <line x1="15" y1="9" x2="9" y2="15" />
           </svg>
         }
+      />
+      <DeleteConfirmationModal
+        isOpen={!!categoryDeleteConfirm}
+        onClose={() => setCategoryDeleteConfirm(null)}
+        onConfirm={() =>
+          categoryDeleteConfirm &&
+          handleDeleteCategory(categoryDeleteConfirm._id)
+        }
+        title="Delete Category?"
+        message={`Remove the "${categoryDeleteConfirm?.name}" category? Products assigned to this category will become uncategorized.`}
+        isLoading={isDeletingCategory}
       />
     </div>
   );

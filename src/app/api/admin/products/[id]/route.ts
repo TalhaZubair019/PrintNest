@@ -6,6 +6,32 @@ import { JWT_SECRET } from "@/lib/env";
 
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+    const decoded = jwt.verify(token, JWT_SECRET!) as { email: string; isAdmin?: boolean };
+    if (decoded.email !== ADMIN_EMAIL && !decoded.isAdmin) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    const { id } = await params;
+    await connectDB();
+    const product = await ProductModel.findOne({ id: Number(id) }).lean();
+
+    if (!product) {
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ product });
+  } catch (error) {
+    console.error("Get product error:", error);
+    return NextResponse.json({ message: "Internal Error" }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies();

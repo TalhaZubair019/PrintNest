@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -18,9 +18,13 @@ interface Category {
   slug: string;
 }
 
-export default function NewProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -41,6 +45,29 @@ export default function NewProductPage() {
       .then((data) => setCategories(data.categories || []))
       .catch(() => setCategories([]));
   }, []);
+
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/admin/products/${id}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.product) {
+            const p = data.product;
+            setProductForm({
+              title: p.title || "",
+              description: p.description || "",
+              price: p.price ? p.price.replace("$", "") : "",
+              oldPrice: p.oldPrice ? p.oldPrice.replace("$", "") : "",
+              image: p.image || "",
+              badge: p.badge || "",
+              category: p.category || "",
+            });
+          }
+        })
+        .catch((error) => console.error("Error fetching product:", error))
+        .finally(() => setIsLoading(false));
+    }
+  }, [id]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -119,8 +146,8 @@ export default function NewProductPage() {
         category: productForm.category || null,
       };
 
-      const res = await fetch("/api/admin/products", {
-        method: "POST",
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -137,6 +164,14 @@ export default function NewProductPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen font-sans flex items-center justify-center bg-slate-50">
+        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans">
@@ -155,7 +190,7 @@ export default function NewProductPage() {
         </div>
         <div className="relative z-10 pt-80 flex flex-col items-center justify-center pb-10">
           <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
-            Add New Product
+            Edit Product
           </h1>
           <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10" />
           <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
@@ -170,7 +205,7 @@ export default function NewProductPage() {
               Dashboard
             </Link>
             <ChevronRight size={14} />
-            <span className="text-slate-900">Add Product</span>
+            <span className="text-slate-900">Edit Product</span>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { title } = await req.json();
+    const { title, category } = await req.json();
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         messages: [
           {
             role: "user",
-            content: `Write a short, compelling product description (2-3 sentences) for an e-commerce product titled: "${title}". Focus on quality, appeal, and key benefits. Do not use bullet points. Return only the description text.`,
+            content: `Write a short, compelling product description (2-3 sentences) for an e-commerce product titled: "${title}"${category ? ` in the category: "${category}"` : ""}. Focus on quality, appeal, and key benefits. Do not use bullet points. Return only the description text.`,
           },
         ],
         max_tokens: 150,

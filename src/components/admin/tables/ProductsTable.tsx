@@ -5,8 +5,6 @@ import { Plus, Package, Edit, Trash2 } from "lucide-react";
 
 interface ProductsTableProps {
   paginatedProducts: any[];
-  openAddProduct: () => void;
-  openEditProduct: (product: any) => void;
   setProductDeleteConfirm: (product: any) => void;
   productPage: number;
   setProductPage: React.Dispatch<React.SetStateAction<number>>;
@@ -15,8 +13,6 @@ interface ProductsTableProps {
 
 const ProductsTable = ({
   paginatedProducts,
-  openAddProduct,
-  openEditProduct,
   setProductDeleteConfirm,
   productPage,
   setProductPage,
@@ -100,12 +96,12 @@ const ProductsTable = ({
                   </td>
                   <td className="px-8 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => openEditProduct(p)}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                      <Link
+                        href={`/admin/products/edit/${p.id}`}
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg inline-flex"
                       >
                         <Edit size={16} />
-                      </button>
+                      </Link>
                       <button
                         onClick={() => setProductDeleteConfirm(p)}
                         className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"

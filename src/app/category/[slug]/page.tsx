@@ -49,28 +49,71 @@ export default function CategoryPage() {
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
-        const categoriesSource = db.categories.categories;
-        const foundCategory = categoriesSource.find(
-          (cat: Category) =>
-            cat.title.toLowerCase().replace(/\s+/g, "-") === slug,
-        );
+        const [catRes, productsRes] = await Promise.all([
+          fetch("/api/admin/categories"),
+          fetch("/api/public/content?section=products"),
+        ]);
 
-        setCategory(foundCategory || null);
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          const dbCategories: Category[] = catData.categories || [];
 
-        if (foundCategory) {
-          const response = await fetch("/api/public/content?section=products");
-          if (response.ok) {
-            const data = await response.json();
-            const allProducts: Product[] = data.products || [];
-            const keyword = foundCategory.title.toLowerCase().replace(/s$/, "");
+          const foundCategory = dbCategories.find(
+            (cat: Category) =>
+              cat.title?.toLowerCase().replace(/\s+/g, "-") === slug ||
+              (cat as any).slug === slug,
+          );
 
-            let filtered = allProducts.filter((product) =>
-              product.title.toLowerCase().includes(keyword),
+          if (!foundCategory) {
+            const staticCategories = db.categories.categories;
+            const staticCat = staticCategories.find(
+              (cat: Category) =>
+                cat.title.toLowerCase().replace(/\s+/g, "-") === slug,
             );
-            if (filtered.length === 0) {
-              filtered = allProducts.slice(0, 4);
-            }
+            setCategory(staticCat || null);
 
+            if (staticCat && productsRes.ok) {
+              const data = await productsRes.json();
+              const allProducts: Product[] = data.products || [];
+              const keyword = staticCat.title.toLowerCase().replace(/s$/, "");
+              const filtered = allProducts.filter((p) =>
+                p.category
+                  ? p.category.toLowerCase().replace(/\s+/g, "-") === slug
+                  : p.title.toLowerCase().includes(keyword),
+              );
+              setCategoryProducts(filtered);
+            }
+          } else {
+            setCategory(foundCategory);
+            if (productsRes.ok) {
+              const data = await productsRes.json();
+              const allProducts: Product[] = data.products || [];
+              const filtered = allProducts.filter(
+                (p) =>
+                  p.category &&
+                  p.category.toLowerCase() ===
+                    foundCategory.title?.toLowerCase(),
+              );
+              setCategoryProducts(filtered);
+            }
+          }
+        } else {
+          const staticCategories = db.categories.categories;
+          const staticCat = staticCategories.find(
+            (cat: Category) =>
+              cat.title.toLowerCase().replace(/\s+/g, "-") === slug,
+          );
+          setCategory(staticCat || null);
+
+          if (staticCat && productsRes.ok) {
+            const data = await productsRes.json();
+            const allProducts: Product[] = data.products || [];
+            const keyword = staticCat.title.toLowerCase().replace(/s$/, "");
+            const filtered = allProducts.filter((p) =>
+              p.category
+                ? p.category.toLowerCase().replace(/\s+/g, "-") === slug
+                : p.title.toLowerCase().includes(keyword),
+            );
             setCategoryProducts(filtered);
           }
         }

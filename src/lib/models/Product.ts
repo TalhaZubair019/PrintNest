@@ -8,7 +8,8 @@ const productSchema = new Schema({
   oldPrice: { type: String, default: null },
   image: { type: String, required: true },
   badge: { type: String, default: null },
-  printText: { type: String, default: "We print with" }
+  printText: { type: String, default: "We print with" },
+  category: { type: String, default: null },
 }, { timestamps: true });
 
 const Product = models.Product || mongoose.model('Product', productSchema);

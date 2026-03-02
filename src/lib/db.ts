@@ -3,6 +3,7 @@ import UserModel from './models/User';
 import ProductModel from './models/Product';
 import OrderModel from './models/Order';
 import ReviewModel from './models/Review';
+import CategoryModel from './models/Category';
 import { MONGODB_URI } from './env';
 
 let cached = (global as any).mongoose;
@@ -29,12 +30,12 @@ export async function connectDB() {
 
   try {
     cached.conn = await cached.promise;
-    
+
     await UserModel.updateMany(
       { isAdmin: { $exists: false } },
       { $set: { isAdmin: false } }
     );
-    
+
     const adminEmail = process.env.EMAIL_USER;
     if (adminEmail) {
       await UserModel.updateOne(
@@ -91,6 +92,7 @@ export interface Product {
   image: string;
   badge?: string | null;
   printText?: string;
+  category?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -108,4 +110,4 @@ export interface Review {
   updatedAt?: Date;
 }
 
-export { UserModel, ProductModel, OrderModel, ReviewModel };
+export { UserModel, ProductModel, OrderModel, ReviewModel, CategoryModel };

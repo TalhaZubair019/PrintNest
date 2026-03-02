@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { connectDB, UserModel, OrderModel, ProductModel, ReviewModel } from "@/lib/db";
+import { connectDB, UserModel, OrderModel, ProductModel, ReviewModel, CategoryModel } from "@/lib/db";
 import { JWT_SECRET } from "@/lib/env";
 import { Order, OrderItem } from "@/app/admin/types";
 
@@ -25,6 +25,7 @@ export async function GET(request: Request) {
     const orders = await OrderModel.find({}).lean() as any[];
     const products = await ProductModel.find({}).lean() as any[];
     const reviews = await ReviewModel.find({}).lean() as any[];
+    const categories = await CategoryModel.find({}).sort({ name: 1 }).lean() as any[];
 
     const totalUsers = users.length;
     const totalOrders = orders.length;
@@ -214,7 +215,8 @@ export async function GET(request: Request) {
       productSentiment,
       reviews,
       categorySalesData,
-      orderVelocityData
+      orderVelocityData,
+      categories,
     });
   } catch (error) {
     console.error("Admin stats error:", error);

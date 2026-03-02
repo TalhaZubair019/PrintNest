@@ -9,6 +9,7 @@ import {
   User as UserIcon,
   LogOut,
   Shield,
+  Tag,
 } from "lucide-react";
 import { UserData } from "@/app/admin/types";
 
@@ -20,10 +21,17 @@ interface AdminSidebarProps {
     | "admins"
     | "orders"
     | "products"
-    | "reviews";
+    | "reviews"
+    | "categories";
   setActiveTab: React.Dispatch<
     React.SetStateAction<
-      "overview" | "users" | "admins" | "orders" | "products" | "reviews"
+      | "overview"
+      | "users"
+      | "admins"
+      | "orders"
+      | "products"
+      | "reviews"
+      | "categories"
     >
   >;
   stats: any;
@@ -109,6 +117,12 @@ const AdminSidebar = ({
             onClick={() => setActiveTab("orders")}
             icon={<ClipboardList size={18} />}
             label={`Orders (${stats.totalOrders})`}
+          />
+          <NavButton
+            active={activeTab === "categories"}
+            onClick={() => setActiveTab("categories")}
+            icon={<Tag size={18} />}
+            label={`Categories (${stats.categories?.length ?? 0})`}
           />
           <Link
             href="/account"
