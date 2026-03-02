@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 
-// Base URL for PayPal Sandbox API
 const PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com";
 
 export async function POST(req: Request) {
   try {
     const { totalAmount, orderId } = await req.json();
 
-    // 1. Get an OAuth2 Access Token
     const authString = Buffer.from(
       `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
     ).toString("base64");
@@ -30,7 +28,6 @@ export async function POST(req: Request) {
     const authData = await authResponse.json();
     const accessToken = authData.access_token;
 
-    // 2. Create an Order using the Orders V2 API
     const orderResponse = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
       method: "POST",
       headers: {
@@ -44,7 +41,7 @@ export async function POST(req: Request) {
             reference_id: orderId,
             description: "PrintNest Products",
             amount: {
-              currency_code: "USD", // Ensure currency matches your pricing
+              currency_code: "USD",
               value: totalAmount.toFixed(2),
             },
           },
@@ -55,9 +52,7 @@ export async function POST(req: Request) {
               payment_method_preference: "IMMEDIATE_PAYMENT_REQUIRED",
               brand_name: "PrintNest",
               user_action: "PAY_NOW",
-              // We return the user back to the thank-you screen if successful
               return_url: `${process.env.NEXT_PUBLIC_APP_URL}/thank-you?order=${orderId}`,
-              // If they cancel payment, return them to checkout
               cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout?error=paypal_cancelled`,
             },
           },
@@ -73,7 +68,6 @@ export async function POST(req: Request) {
 
     const orderData = await orderResponse.json();
 
-    // 3. Find the exact HATEOAS link for the user to approve the payment.
     const approveLink = orderData.links.find(
       (link: any) => link.rel === "payer-action"
     );

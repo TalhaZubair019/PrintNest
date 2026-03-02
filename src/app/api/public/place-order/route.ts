@@ -119,6 +119,7 @@ export async function POST(req: Request) {
     );
 
   } catch (error) {
+    console.error("Place order failed:", error);
     return NextResponse.json(
       { error: "Failed to place order." },
       { status: 500 }
