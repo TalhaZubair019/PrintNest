@@ -297,6 +297,11 @@ router.patch("/orders/:id", requireAdmin, async (req, res) => {
             .status-card { background: #f9fafb; border-radius: 8px; padding: 24px; margin: 24px 0; border: 1px solid #e5e7eb; text-align: center; }
             .status-badge { display: inline-block; padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-transform: uppercase; color: #ffffff; background-color: ${statusColor}; margin-top: 12px; }
             .order-id { font-size: 14px; color: #6b7280; margin-bottom: 4px; }
+            .section-title { font-size: 18px; font-weight: 600; color: #111827; margin-bottom: 16px; border-bottom: 2px solid #f3f4f6; padding-bottom: 8px; margin-top: 32px; }
+            .items-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+            .items-table th { text-align: left; padding: 12px; background: #f9fafb; font-size: 13px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em; }
+            .items-table td { padding: 12px; border-bottom: 1px solid #f3f4f6; font-size: 15px; text-align: left; }
+            .total-row td { padding: 20px 12px; font-weight: 700; font-size: 18px; color: #4f46e5; border-top: 2px solid #f3f4f6; }
             .footer { padding: 24px; text-align: center; background: #f9fafb; color: #9ca3af; font-size: 13px; }
           </style>
         </head>
@@ -314,6 +319,40 @@ router.patch("/orders/:id", requireAdmin, async (req, res) => {
                 <div style="font-size: 18px; font-weight: 600; color: #111827;">New Status</div>
                 <div class="status-badge">${status}</div>
               </div>
+
+              <div class="section-title">Order Summary</div>
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th style="text-align: right;">Price</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${(order.items || [])
+                    .map((i) => {
+                      const price = Number(i.price) || 0;
+                      const qty = Number(i.quantity) || 1;
+                      return `
+                    <tr>
+                      <td>${i.name || "Product"}</td>
+                      <td style="text-align: right;">$${price.toFixed(2)}</td>
+                      <td style="text-align: center;">${qty}</td>
+                      <td style="text-align: right;">$${(price * qty).toFixed(2)}</td>
+                    </tr>
+                  `;
+                    })
+                    .join("")}
+                </tbody>
+                <tfoot>
+                  <tr class="total-row">
+                    <td colspan="3" style="text-align: right;">Grand Total:</td>
+                    <td style="text-align: right;">$${Number(order.total || 0).toFixed(2)}</td>
+                  </tr>
+                </tfoot>
+              </table>
 
               <p style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 32px;">Thank you for shopping with PrintNest!</p>
             </div>

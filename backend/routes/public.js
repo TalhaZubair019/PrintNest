@@ -98,6 +98,10 @@ router.post("/place-order", async (req, res) => {
     }
 
     try {
+      console.log(
+        `Generating confirmation email for order ${orderId}. Items:`,
+        items.length,
+      );
       const emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -147,27 +151,31 @@ router.post("/place-order", async (req, res) => {
                 <thead>
                   <tr>
                     <th>Item</th>
+                    <th style="text-align: right;">Price</th>
                     <th style="text-align: center;">Qty</th>
                     <th style="text-align: right;">Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${items
-                    .map(
-                      (i) => `
+                    .map((i) => {
+                      const price = Number(i.price) || 0;
+                      const qty = Number(i.quantity) || 1;
+                      return `
                     <tr>
-                      <td>${i.name}</td>
-                      <td style="text-align: center;">${i.quantity}</td>
-                      <td style="text-align: right;">$${(i.price * i.quantity).toFixed(2)}</td>
+                      <td>${i.name || "Product"}</td>
+                      <td style="text-align: right;">$${price.toFixed(2)}</td>
+                      <td style="text-align: center;">${qty}</td>
+                      <td style="text-align: right;">$${(price * qty).toFixed(2)}</td>
                     </tr>
-                  `,
-                    )
+                  `;
+                    })
                     .join("")}
                 </tbody>
                 <tfoot>
                   <tr class="total-row">
-                    <td colspan="2" style="text-align: right;">Grand Total:</td>
-                    <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
+                    <td colspan="3" style="text-align: right;">Grand Total:</td>
+                    <td style="text-align: right;">$${Number(totalAmount).toFixed(2)}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -181,6 +189,7 @@ router.post("/place-order", async (req, res) => {
         </body>
         </html>`;
 
+      console.log(`Sending email to ${customer.email} and admin...`);
       Promise.all([
         transporter.sendMail({
           from: `"Store Orders" ${process.env.EMAIL_USER}`,
@@ -195,8 +204,12 @@ router.post("/place-order", async (req, res) => {
           subject: `Order Confirmation #${orderId}`,
           html: emailHtml,
         }),
-      ]).catch((e) => console.error("Email error:", e));
-    } catch (_) {}
+      ])
+        .then(() => console.log("Emails sent successfully."))
+        .catch((e) => console.error("Email error:", e));
+    } catch (e) {
+      console.error("Critical error generating email HTML:", e);
+    }
 
     return res.json({ message: "Order placed successfully!", orderId });
   } catch (error) {
