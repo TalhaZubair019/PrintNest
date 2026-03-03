@@ -42,13 +42,16 @@ router.get("/stats", requireAdmin, async (req, res) => {
     const { startDate: startDateParam, endDate: endDateParam } = req.query;
     let rangeStart, rangeEnd;
     if (startDateParam && endDateParam) {
-      rangeStart = new Date(startDateParam);
-      rangeEnd = new Date(endDateParam);
-      rangeEnd.setHours(23, 59, 59, 999);
+      const [sYear, sMonth, sDay] = startDateParam.split("-").map(Number);
+      const [eYear, eMonth, eDay] = endDateParam.split("-").map(Number);
+      rangeStart = new Date(sYear, sMonth - 1, sDay, 0, 0, 0, 0);
+      rangeEnd = new Date(eYear, eMonth - 1, eDay, 23, 59, 59, 999);
     } else {
       rangeEnd = new Date();
       rangeStart = new Date();
       rangeStart.setDate(rangeStart.getDate() - 6);
+      rangeStart.setHours(0, 0, 0, 0);
+      rangeEnd.setHours(23, 59, 59, 999);
     }
 
     const dayRange = [];
