@@ -7,7 +7,7 @@
 [![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.11-purple?logo=redux)](https://redux-toolkit.js.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-cyan?logo=tailwindcss)](https://tailwindcss.com)
 
-A modern, full-stack e-commerce platform for custom print-on-demand products. Features a complete admin panel, MongoDB database, AI-powered product descriptions, product reviews, and email order notifications.
+A modern, full-stack e-commerce platform for custom print-on-demand products. Built with **Next.js 16** (Frontend) and **Express** (Backend), featuring a complete admin panel, MongoDB database, AI-powered product descriptions, premium HTML email notifications, and real-time analytics.
 
 ---
 
@@ -48,7 +48,9 @@ A modern, full-stack e-commerce platform for custom print-on-demand products. Fe
 ### 📧 Order & Email
 
 - Orders saved to **MongoDB**
-- Email confirmation sent to **customer and store** via Nodemailer (Gmail SMTP)
+- **Premium HTML Email Notifications** sent to customer and store via Nodemailer
+- Emails include detailed order summaries (item names, prices, quantities)
+- Order status update notifications for customers
 - Guest and authenticated order tracking
 
 ---
@@ -76,7 +78,8 @@ A modern, full-stack e-commerce platform for custom print-on-demand products. Fe
 | **Framework**        | Next.js 16.1.6 (App Router)  |
 | **Frontend**         | React 19.2.3                 |
 | **Language**         | TypeScript 5.x               |
-| **Database**         | MongoDB via Mongoose 9.x     |
+| **Backend**          | Express.js                   |
+| **Database**         | MongoDB via Mongoose 8.x     |
 | **Styling**          | Tailwind CSS 4.x             |
 | **Animations**       | Framer Motion 12.x           |
 | **State Management** | Redux Toolkit 2.x            |
@@ -146,8 +149,8 @@ npm install tailwind-merge@^3.4.0      # Tailwind class merging
 #### Email & AI
 
 ```bash
-npm install nodemailer@^7.0.13         # Email sending (SMTP)
-npm install @google/generative-ai@^0.24.1  # Google AI SDK (installed but Groq used via fetch)
+npm install nodemailer@^6.9.13         # Email sending (SMTP)
+npm install @google/generative-ai@^0.24.1  # Google AI SDK
 ```
 
 ### Development Dependencies
@@ -209,97 +212,30 @@ npm install -D babel-plugin-react-compiler@1.0.0
 
 ```
 printnest/
-├── src/
-│   ├── app/                              # Next.js App Router
-│   │   ├── api/                          # API Routes
-│   │   │   ├── admin/                    # Admin-only endpoints
-│   │   │   │   ├── ai-description/       # POST - AI product description (Groq)
-│   │   │   │   ├── orders/               # GET/PATCH - Manage all orders
-│   │   │   │   ├── products/             # GET/POST/DELETE - Manage products
-│   │   │   │   ├── stats/                # GET - Dashboard analytics
-│   │   │   │   └── users/                # GET/DELETE/PATCH - Manage users
-│   │   │   ├── auth/                     # Authentication endpoints
-│   │   │   │   ├── login/route.ts
-│   │   │   │   ├── logout/route.ts
-│   │   │   │   ├── me/route.ts
-│   │   │   │   └── signup/route.ts
-│   │   │   ├── public/                   # Public data endpoints
-│   │   │   │   ├── content/route.ts      # db.json content
-│   │   │   │   ├── orders/route.ts       # User orders
-│   │   │   │   ├── place-order/route.ts  # Submit order + email
-│   │   │   │   └── reviews/              # GET/POST reviews
-│   │   │   └── upload/route.ts           # Image upload
-│   │   │
-│   │   ├── admin/                        # Admin pages
-│   │   │   ├── dashboard/page.tsx        # Analytics dashboard
-│   │   │   ├── products/page.tsx         # Product management
-│   │   │   ├── reviews/page.tsx          # Review moderation
-│   │   │   └── types.ts                  # Admin TypeScript types
-│   │   │
-│   │   ├── account/page.tsx              # User dashboard
-│   │   ├── blog/[slug]/page.tsx          # Blog post detail
-│   │   ├── cart/page.tsx                 # Shopping cart
-│   │   ├── category/[slug]/page.tsx      # Category products
-│   │   ├── checkout/page.tsx             # Checkout form
-│   │   ├── login/page.tsx                # Login page
-│   │   ├── product/[slug]/page.tsx       # Product detail
-│   │   ├── shop/page.tsx                 # All products
-│   │   ├── signup/page.tsx               # Registration
-│   │   ├── thank-you/page.tsx            # Order confirmation
-│   │   ├── wishlist/page.tsx             # Wishlist
-│   │   ├── layout.tsx                    # Root layout
-│   │   ├── page.tsx                      # Home page
-│   │   └── globals.css
-│   │
-│   ├── components/                       # Reusable Components
-│   │   ├── sections/                     # Home page sections
-│   │   │   ├── Hero.tsx
-│   │   │   ├── Products.tsx
-│   │   │   ├── Categories.tsx
-│   │   │   ├── Blog.tsx
-│   │   │   ├── About.tsx
-│   │   │   ├── HowItWorks.tsx
-│   │   │   ├── WhyUs.tsx
-│   │   │   ├── Packaging.tsx
-│   │   │   ├── Price.tsx
-│   │   │   ├── Testimonials.tsx
-│   │   │   └── Social.tsx
-│   │   ├── admin/                        # Admin UI components
-│   │   │   ├── charts/                   # Chart components (8)
-│   │   │   ├── tables/                   # Data tables (5)
-│   │   │   ├── modals/                   # Modal dialogs (5)
-│   │   │   ├── lists/                    # List components (2)
-│   │   │   ├── layout/                   # Admin layout (1)
-│   │   │   └── ui/                       # Admin UI elements (2)
-│   │   ├── auth/                         # Auth components
-│   │   ├── layout/                       # Navbar, Footer, etc.
-│   │   ├── products/                     # ProductCard, QuickView, etc.
-│   │   └── ui/                           # Shared UI components
-│   │
-│   ├── lib/                              # Utilities & DB
-│   │   ├── db.ts                         # DB connection + interfaces
-│   │   ├── env.ts                        # Environment variable exports
-│   │   └── models/                       # Mongoose models
-│   │       ├── User.ts
-│   │       ├── Product.ts
-│   │       ├── Order.ts
-│   │       └── Review.ts
-│   │
-│   ├── redux/                            # Redux Store
-│   │   ├── Store.tsx
-│   │   ├── CartSlice.tsx
-│   │   ├── WishListSlice.tsx
-│   │   ├── AuthSlice.tsx
-│   │   └── Provider.tsx
-│   │
-│   └── data/                             # Static data files
+├── backend/                              # Express Backend
+│   ├── lib/                              # DB connection & models
+│   ├── middleware/                       # Auth & Admin guards
+│   ├── routes/                           # API Route handlers
+│   │   ├── admin.js                      # Admin stats & management
+│   │   ├── public.js                     # Public shop APIs
+│   │   ├── auth.js                       # Login/Signup logic
+│   │   └── ...                           # Stripe/PayPal integrations
+│   └── server.js                         # Express entry point
 │
-├── public/                               # Static assets
-├── .env.local                            # Environment variables
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-└── next.config.ts
+├── frontend/                             # Next.js 16 Frontend
+│   ├── src/
+│   │   ├── app/                          # App Router pages
+│   │   ├── components/                   # UI & Section components
+│   │   ├── lib/                          # Client utilities
+│   │   └── redux/                        # Global state management
+│   ├── public/                           # Static assets
+│   ├── tailwind.config.ts
+│   └── next.config.ts
+│
+├── data/                                 # Shared static data
+├── .env                                  # Root environment variables
+├── package.json                          # Monorepo scripts
+└── README.md
 ```
 
 ---
@@ -328,7 +264,7 @@ printnest/
    npm install
    ```
 
-3. **Create `.env.local`** (see [Environment Variables](#-environment-variables))
+3. **Create `.env`** (see [Environment Variables](#-environment-variables))
 
 4. **Run development server**
 
@@ -343,18 +279,20 @@ printnest/
 
 ### Scripts
 
-| Command         | Description              |
-| --------------- | ------------------------ |
-| `npm run dev`   | Start development server |
-| `npm run build` | Build for production     |
-| `npm start`     | Start production server  |
-| `npm run lint`  | Run ESLint               |
+| Command                | Description                      |
+| ---------------------- | -------------------------------- |
+| `npm run dev`          | Start BOTH frontend and backend  |
+| `npm run dev:frontend` | Start Next.js development server |
+| `npm run dev:backend`  | Start Express (Nodemon) server   |
+| `npm run build`        | Build frontend for production    |
+| `npm start`            | Start production frontend server |
+| `npm run lint`         | Run ESLint on frontend           |
 
 ---
 
 ## 🔐 Environment Variables
 
-Create `.env.local` in the project root:
+Create `.env` in the project root:
 
 ```env
 # MongoDB
@@ -385,36 +323,35 @@ GROQ_API_KEY=your-groq-api-key
 
 ## 📡 API Routes
 
-### Auth Routes
+### Auth Routes (`/api/auth`)
 
-| Endpoint           | Method | Description                    |
-| ------------------ | ------ | ------------------------------ |
-| `/api/auth/signup` | POST   | Register new user              |
-| `/api/auth/login`  | POST   | Login and receive JWT cookie   |
-| `/api/auth/me`     | GET    | Get current authenticated user |
-| `/api/auth/logout` | POST   | Clear auth cookie              |
+| Endpoint  | Method | Description                    |
+| --------- | ------ | ------------------------------ |
+| `/signup` | POST   | Register new user              |
+| `/login`  | POST   | Login and receive JWT cookie   |
+| `/me`     | GET    | Get current authenticated user |
+| `/logout` | POST   | Clear auth cookie              |
 
-### Public Routes
+### Public Routes (`/api/public`)
 
-| Endpoint                  | Method | Description                   |
-| ------------------------- | ------ | ----------------------------- |
-| `/api/public/content`     | GET    | All site content from db.json |
-| `/api/public/place-order` | POST   | Submit order + send emails    |
-| `/api/public/orders`      | GET    | Get orders for current user   |
-| `/api/public/reviews`     | GET    | Get product reviews           |
-| `/api/public/reviews`     | POST   | Submit a new review           |
+| Endpoint       | Method | Description                   |
+| -------------- | ------ | ----------------------------- |
+| `/content`     | GET    | All site content from db.json |
+| `/place-order` | POST   | Submit order + send emails    |
+| `/orders`      | GET    | Get orders for current user   |
+| `/reviews`     | GET    | Get product reviews           |
+| `/reviews`     | POST   | Submit a new review           |
 
-### Admin Routes (🔒 Admin only)
+### Admin Routes (`/api/admin`) (🔒 Admin only)
 
-| Endpoint                    | Method          | Description                     |
-| --------------------------- | --------------- | ------------------------------- |
-| `/api/admin/stats`          | GET             | Dashboard analytics & charts    |
-| `/api/admin/products`       | GET/POST/DELETE | Manage product catalog          |
-| `/api/admin/orders`         | GET/PATCH       | View and update orders          |
-| `/api/admin/users`          | GET             | List all users                  |
-| `/api/admin/users/[id]`     | DELETE/PATCH    | Delete or promote users         |
-| `/api/admin/ai-description` | POST            | Generate AI product description |
-| `/api/upload`               | POST            | Upload product image            |
+| Endpoint          | Method          | Description                     |
+| ----------------- | --------------- | ------------------------------- |
+| `/stats`          | GET             | Dashboard analytics & charts    |
+| `/products`       | GET/POST/DELETE | Manage product catalog          |
+| `/orders`         | GET/PATCH       | View and update orders          |
+| `/users`          | GET             | List all users                  |
+| `/users/[id]`     | DELETE/PATCH    | Delete or promote users         |
+| `/ai-description` | POST            | Generate AI product description |
 
 ---
 
