@@ -36,6 +36,8 @@ const AverageOrderValueChart = ({
   setAovCustomEnd,
   aovLoading,
 }: AverageOrderValueChartProps) => {
+  const [hoveredPoint, setHoveredPoint] = React.useState<any | null>(null);
+
   return (
     <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
       <div className="flex items-start justify-between mb-6 gap-3">
@@ -178,91 +180,137 @@ const AverageOrderValueChart = ({
       ) : (
         <div className="flex flex-col justify-between">
           <div className="relative h-48 w-full">
-            <svg
-              className="w-full h-full"
-              viewBox="0 0 300 150"
-              preserveAspectRatio="none"
+            <div
+              className="w-full h-full relative"
+              onMouseLeave={() => setHoveredPoint(null)}
             >
-              <defs>
-                <linearGradient
-                  id="aovGradient"
-                  x1="0%"
-                  y1="0%"
-                  x2="0%"
-                  y2="100%"
-                >
-                  <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.05" />
-                </linearGradient>
-              </defs>
-              {(() => {
-                if (!filteredAovData) return null;
-                const aovData = filteredAovData.map((d: any) => {
-                  const ordersOnDay =
-                    stats.recentOrders.filter(
-                      (o: any) =>
-                        new Date(o.date).toDateString() ===
-                        new Date(d.date).toDateString(),
-                    ).length || 1;
-                  return {
-                    value: d.revenue / ordersOnDay,
-                    date: d.date,
-                  };
-                });
-                const maxAOV =
-                  Math.max(0, ...aovData.map((d) => d.value)) || 100;
-                if (aovData.length === 0) return null;
-                const points = aovData
-                  .map((d, i) => {
-                    const x = (i / (aovData.length - 1)) * 300;
-                    const y = 150 - (d.value / maxAOV) * 140;
-                    return `${x},${y}`;
-                  })
-                  .join(" ");
-                const areaPoints = `0,150 ${points} 300,150`;
-                return (
-                  <>
-                    <polyline
-                      points={areaPoints}
-                      fill="url(#aovGradient)"
-                      stroke="none"
+              <svg
+                className="w-full h-full"
+                viewBox="0 0 300 150"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient
+                    id="aovGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />
+                    <stop
+                      offset="100%"
+                      stopColor="#f59e0b"
+                      stopOpacity="0.05"
                     />
-                    <polyline
-                      points={points}
-                      fill="none"
-                      stroke="#f59e0b"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="drop-shadow-lg"
-                    />
-                    {aovData.map((d, i) => {
+                  </linearGradient>
+                </defs>
+                {(() => {
+                  if (!filteredAovData) return null;
+                  const aovData = filteredAovData.map((d: any) => {
+                    const ordersOnDay =
+                      stats.recentOrders.filter(
+                        (o: any) =>
+                          new Date(o.date).toDateString() ===
+                          new Date(d.date).toDateString(),
+                      ).length || 1;
+                    return {
+                      value: d.revenue / ordersOnDay,
+                      date: d.date,
+                    };
+                  });
+                  const maxAOV =
+                    Math.max(0, ...aovData.map((d) => d.value)) || 100;
+                  if (aovData.length === 0) return null;
+                  const points = aovData
+                    .map((d, i) => {
                       const x = (i / (aovData.length - 1)) * 300;
                       const y = 150 - (d.value / maxAOV) * 140;
-                      return (
-                        <g key={i}>
-                          <circle
-                            cx={x}
-                            cy={y}
-                            r="4"
-                            fill="#f59e0b"
-                            className="hover:r-6 transition-all cursor-pointer"
-                          />
-                          <circle
-                            cx={x}
-                            cy={y}
-                            r="8"
-                            fill="white"
-                            fillOpacity="0.3"
-                            className="opacity-0 hover:opacity-100 transition-opacity"
-                          />
-                        </g>
-                      );
+                      return `${x},${y}`;
+                    })
+                    .join(" ");
+                  const areaPoints = `0,150 ${points} 300,150`;
+                  return (
+                    <>
+                      <polyline
+                        points={areaPoints}
+                        fill="url(#aovGradient)"
+                        stroke="none"
+                      />
+                      <polyline
+                        points={points}
+                        fill="none"
+                        stroke="#f59e0b"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="drop-shadow-lg"
+                      />
+                      {aovData.map((d, i) => {
+                        const x = (i / (aovData.length - 1)) * 300;
+                        const y = 150 - (d.value / maxAOV) * 140;
+                        return (
+                          <g
+                            key={i}
+                            onMouseEnter={() => setHoveredPoint({ ...d, x, y })}
+                            className="cursor-pointer"
+                          >
+                            {hoveredPoint && hoveredPoint.date === d.date && (
+                              <line
+                                x1={x}
+                                y1={0}
+                                x2={x}
+                                y2={150}
+                                stroke="#f59e0b"
+                                strokeWidth="1"
+                                strokeDasharray="4 4"
+                                opacity="0.5"
+                              />
+                            )}
+                            <circle
+                              cx={x}
+                              cy={y}
+                              r={
+                                hoveredPoint && hoveredPoint.date === d.date
+                                  ? "6"
+                                  : "4"
+                              }
+                              fill="#f59e0b"
+                              className="transition-all duration-300"
+                            />
+                            <circle cx={x} cy={y} r="12" fill="transparent" />
+                          </g>
+                        );
+                      })}
+                    </>
+                  );
+                })()}
+              </svg>
+              {hoveredPoint && (
+                <div
+                  className="absolute z-50 bg-slate-900/95 backdrop-blur-md text-white text-xs py-2 px-3 rounded-xl font-bold whitespace-nowrap shadow-2xl border border-white/10 flex flex-col items-center gap-0.5 pointer-events-none transform -translate-x-1/2 -translate-y-full animate-in fade-in zoom-in-95 duration-200"
+                  style={{
+                    left: `${(hoveredPoint.x / 300) * 100}%`,
+                    top: `calc(${hoveredPoint.y}px - 10px)`, // Approximation from svg viewBox -> css px height.
+                  }}
+                >
+                  <span className="text-slate-400 text-[10px] font-medium leading-none mb-0.5">
+                    {new Date(hoveredPoint.date).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
                     })}
-                  </>
-                );
-              })()}
-            </svg>
+                  </span>
+                  <span className="text-amber-400 font-extrabold text-sm">
+                    $
+                    {hoveredPoint.value.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900/95 border-r border-b border-white/10 rotate-45" />
+                </div>
+              )}
+            </div>
           </div>
           <div
             className="grid gap-1 mt-4"

@@ -660,12 +660,10 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <TopReviewedProducts stats={stats} />
-                  <CategorySalesChart stats={stats} />
-                </div>
-                <div>
-                  <SentimentChart stats={stats} />
                   <ProductSalesChart stats={stats} />
                 </div>
+                <CategorySalesChart stats={stats} />
+                <SentimentChart stats={stats} />
               </div>
             )}
             {activeTab === "products" && (
