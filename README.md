@@ -37,13 +37,14 @@ A modern, full-stack e-commerce platform for custom print-on-demand products. Bu
 - **Order Management** — view and update order statuses
 - **User Management** — view, promote, delete users
 - **Review Moderation** — view and manage all reviews
-- **AI Description Generator** powered by Groq (Llama 3.1)
+- **AI Description Generator** powered by Groq (Llama 4 Scout)
 - **Image Upload** endpoint for products
 
 ### 🤖 AI Integration
 
-- **AI Product Descriptions** via Groq API (Llama 3.1 8B Instant)
-- Generates compelling 2–3 sentence product descriptions from a title
+- **Multimodal AI Product Descriptions** via Groq API (Llama 4 Scout 17B)
+- Analyzes uploaded product images to mention specific colors, patterns, and designs to boost SEO.
+- Generates compelling 2–3 sentence product descriptions from a title.
 
 ### 📧 Order & Email
 
@@ -86,7 +87,7 @@ A modern, full-stack e-commerce platform for custom print-on-demand products. Bu
 | **Icons**            | Lucide React                 |
 | **Authentication**   | JWT + bcryptjs               |
 | **Email**            | Nodemailer (Gmail SMTP)      |
-| **AI**               | Groq API (Llama 3.1 8B)      |
+| **AI**               | Groq API (Llama 4 Scout 17B) |
 | **Utilities**        | clsx, tailwind-merge, cookie |
 
 ---
@@ -216,10 +217,21 @@ printnest/
 │   ├── lib/                              # DB connection & models
 │   ├── middleware/                       # Auth & Admin guards
 │   ├── routes/                           # API Route handlers
-│   │   ├── admin.js                      # Admin stats & management
-│   │   ├── public.js                     # Public shop APIs
-│   │   ├── auth.js                       # Login/Signup logic
-│   │   └── ...                           # Stripe/PayPal integrations
+│   │   ├── admin/                        # Admin-only endpoints
+│   │   │   ├── ai.js                     # Multimodal AI generation
+│   │   │   ├── categories.js             # Manage categories
+│   │   │   ├── orders.js                 # Orders management
+│   │   │   ├── products.js               # Products management
+│   │   │   ├── stats.js                  # Analytics
+│   │   │   └── users.js                  # User promotion/deletion
+│   │   ├── public/                       # Open endpoints
+│   │   │   ├── content.js                # Fetch static content
+│   │   │   ├── orders.js                 # Place orders
+│   │   │   └── reviews.js                # Product reviews
+│   │   ├── auth.js                       # Login/Signup/Me
+│   │   ├── stripe.js                     # Stripe payment logic
+│   │   ├── paypal.js                     # PayPal logic
+│   │   └── upload.js                     # File uploads
 │   └── server.js                         # Express entry point
 │
 ├── frontend/                             # Next.js 16 Frontend
@@ -344,14 +356,15 @@ GROQ_API_KEY=your-groq-api-key
 
 ### Admin Routes (`/api/admin`) (🔒 Admin only)
 
-| Endpoint          | Method          | Description                     |
-| ----------------- | --------------- | ------------------------------- |
-| `/stats`          | GET             | Dashboard analytics & charts    |
-| `/products`       | GET/POST/DELETE | Manage product catalog          |
-| `/orders`         | GET/PATCH       | View and update orders          |
-| `/users`          | GET             | List all users                  |
-| `/users/[id]`     | DELETE/PATCH    | Delete or promote users         |
-| `/ai-description` | POST            | Generate AI product description |
+| Endpoint          | Method          | Description                   |
+| ----------------- | --------------- | ----------------------------- |
+| `/stats`          | GET             | Dashboard analytics & charts  |
+| `/products`       | GET/POST/DELETE | Manage product catalog        |
+| `/categories`     | GET/POST/PATCH  | Manage product categories     |
+| `/orders`         | GET/PATCH       | View and update orders        |
+| `/users`          | GET             | List all users                |
+| `/users/[id]`     | DELETE/PATCH    | Delete or promote users       |
+| `/ai-description` | POST            | Multimodal AI description gen |
 
 ---
 
@@ -503,45 +516,5 @@ Access the admin panel at `/admin/dashboard` (requires admin account).
 "Print Mug"  →  /product/print-mug
 "T-shirts"   →  /category/t-shirts
 ```
-
----
-
-## 🌐 Deployment
-
-### Vercel (Recommended)
-
-1. Push code to GitHub
-2. Import project on [vercel.com](https://vercel.com)
-3. Add all environment variables in the Vercel dashboard
-4. Deploy — Next.js detected automatically
-
-> ⚠️ Vercel's filesystem is ephemeral. All data **must** be stored in MongoDB.
-
-### Other Platforms
-
-Works on any Node.js 18+ host (Railway, Render, DigitalOcean, AWS):
-
-```bash
-npm run build
-npm start
-```
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit changes (`git commit -m 'feat: add my feature'`)
-4. Push branch (`git push origin feature/my-feature`)
-5. Open a Pull Request
-
----
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
 
 **Made with ❤️ for the printing community** 🖨️✨

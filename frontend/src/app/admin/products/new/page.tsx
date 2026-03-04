@@ -58,16 +58,29 @@ export default function NewProductPage() {
       alert("Please enter a product title first.");
       return;
     }
+
     setIsGenerating(true);
     try {
+      let imageData = "";
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        await new Promise((resolve) => (reader.onload = resolve));
+        imageData = reader.result as string;
+      } else if (productForm.image && !productForm.image.startsWith("blob:")) {
+        imageData = productForm.image;
+      }
+
       const res = await fetch("/api/admin/ai-description", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: productForm.title,
           category: productForm.category || "",
+          image: imageData,
         }),
       });
+
       const data = await res.json();
       if (data.description) {
         setProductForm((prev) => ({ ...prev, description: data.description }));
