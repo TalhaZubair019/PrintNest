@@ -27,7 +27,7 @@ app.use("/api/stripe", require("./routes/stripe"));
 app.use("/api/paypal", require("./routes/paypal"));
 
 app.get("/", (req, res) => {
-  res.json({ status: "PrintNest backend running ✅" });
+  res.json({ status: "PrintNest backend running" });
 });
 
 app.use((req, res) => {
