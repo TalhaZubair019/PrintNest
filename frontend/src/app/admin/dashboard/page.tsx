@@ -142,6 +142,15 @@ export default function AdminDashboard() {
   const [filteredRevenueData, setFilteredRevenueData] = useState<any[]>([]);
   const [revenueLoading, setRevenueLoading] = useState(false);
 
+  const [aovFilter, setAovFilter] = useState<
+    "week" | "month" | "current-month" | "custom"
+  >("week");
+  const [showAovDropdown, setShowAovDropdown] = useState(false);
+  const [aovCustomStart, setAovCustomStart] = useState("");
+  const [aovCustomEnd, setAovCustomEnd] = useState("");
+  const [filteredAovData, setFilteredAovData] = useState<any[]>([]);
+  const [aovLoading, setAovLoading] = useState(false);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -207,6 +216,7 @@ export default function AdminDashboard() {
         const data = await res.json();
         setStats(data);
         setFilteredRevenueData(data.revenueData);
+        setFilteredAovData(data.revenueData);
       }
     } catch (error) {
       console.error("Failed to fetch admin stats");
@@ -229,6 +239,23 @@ export default function AdminDashboard() {
       console.error("Failed to fetch revenue data");
     } finally {
       setRevenueLoading(false);
+    }
+  };
+
+  const fetchAovData = async (startDate: string, endDate: string) => {
+    setAovLoading(true);
+    try {
+      const res = await fetch(
+        `/api/admin/stats?startDate=${startDate}&endDate=${endDate}`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setFilteredAovData(data.revenueData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch AOV data");
+    } finally {
+      setAovLoading(false);
     }
   };
 
@@ -257,6 +284,34 @@ export default function AdminDashboard() {
       fetchRevenueData(fmt(s), fmt(today));
     } else if (filter === "custom" && start && end) {
       fetchRevenueData(start, end);
+    }
+  };
+
+  const applyAovFilter = (
+    filter: "week" | "month" | "current-month" | "custom",
+    start?: string,
+    end?: string,
+  ) => {
+    const today = new Date();
+    const fmt = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+    if (filter === "week") {
+      const s = new Date(today);
+      s.setDate(s.getDate() - 6);
+      fetchAovData(fmt(s), fmt(today));
+    } else if (filter === "month") {
+      const s = new Date(today);
+      s.setDate(s.getDate() - 29);
+      fetchAovData(fmt(s), fmt(today));
+    } else if (filter === "current-month") {
+      const s = new Date(today.getFullYear(), today.getMonth(), 1);
+      fetchAovData(fmt(s), fmt(today));
+    } else if (filter === "custom" && start && end) {
+      fetchAovData(start, end);
     }
   };
 
@@ -582,21 +637,35 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <OrderStatusChart stats={stats} />
-                  <AverageOrderValueChart stats={stats} />
+                  <AverageOrderValueChart
+                    stats={stats}
+                    filteredAovData={filteredAovData}
+                    showAovDropdown={showAovDropdown}
+                    setShowAovDropdown={setShowAovDropdown}
+                    aovFilter={aovFilter}
+                    setAovFilter={setAovFilter}
+                    applyAovFilter={applyAovFilter}
+                    aovCustomStart={aovCustomStart}
+                    setAovCustomStart={setAovCustomStart}
+                    aovCustomEnd={aovCustomEnd}
+                    setAovCustomEnd={setAovCustomEnd}
+                    aovLoading={aovLoading}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <OrderVelocityChart stats={stats} />
-                  <CategorySalesChart stats={stats} />
+                  <ReviewRatingChart stats={stats} />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <ReviewRatingChart stats={stats} />
                   <TopReviewedProducts stats={stats} />
+                  <CategorySalesChart stats={stats} />
                 </div>
-
-                <SentimentChart stats={stats} />
-                <ProductSalesChart stats={stats} />
+                <div>
+                  <SentimentChart stats={stats} />
+                  <ProductSalesChart stats={stats} />
+                </div>
               </div>
             )}
             {activeTab === "products" && (
