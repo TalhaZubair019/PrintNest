@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Search,
@@ -115,66 +116,74 @@ function Navbar() {
                 </span>
               )}
             </Link>
-            {isCartOpen && (
-              <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50">
-                <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-                  <span className="font-bold text-slate-800">
-                    My Cart ({mounted ? totalQuantity : 0})
-                  </span>
-                </div>
-                {cartItems.length === 0 ? (
-                  <p className="text-center text-slate-400 py-6 text-sm">
-                    Your cart is empty
-                  </p>
-                ) : (
-                  <div className="max-h-60 overflow-y-auto space-y-3 custom-scrollbar">
-                    {cartItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex gap-3 items-center group"
-                      >
-                        <div className="relative w-12 h-12 bg-slate-50 border border-slate-100 rounded-md overflow-hidden shrink-0">
-                          {item.image ? (
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              className="object-contain p-1"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] text-slate-400">
-                              No Img
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-slate-700 line-clamp-1">
-                            {item.name}
-                          </p>
-                          <p className="text-xs text-blue-500 font-semibold">
-                            {item.quantity} x ${item.price}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => dispatch(removeFromCart(item.id))}
-                          className="text-slate-300 hover:text-red-500 transition-colors p-1"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    ))}
+            <AnimatePresence>
+              {isCartOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50"
+                >
+                  <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+                    <span className="font-bold text-slate-800">
+                      My Cart ({mounted ? totalQuantity : 0})
+                    </span>
                   </div>
-                )}
-                <div className="mt-4 pt-3 border-t border-slate-100">
-                  <Link
-                    href="/cart"
-                    className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 rounded-lg transition-colors shadow-lg"
-                  >
-                    View Cart & Checkout
-                  </Link>
-                </div>
-              </div>
-            )}
+                  {cartItems.length === 0 ? (
+                    <p className="text-center text-slate-400 py-6 text-sm">
+                      Your cart is empty
+                    </p>
+                  ) : (
+                    <div className="max-h-60 overflow-y-auto space-y-3 custom-scrollbar">
+                      {cartItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex gap-3 items-center group"
+                        >
+                          <div className="relative w-12 h-12 bg-slate-50 border border-slate-100 rounded-md overflow-hidden shrink-0">
+                            {item.image ? (
+                              <Image
+                                src={item.image}
+                                alt={item.name}
+                                fill
+                                className="object-contain p-1"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-[10px] text-slate-400">
+                                No Img
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-slate-700 line-clamp-1">
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-blue-500 font-semibold">
+                              {item.quantity} x ${item.price}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => dispatch(removeFromCart(item.id))}
+                            className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-4 pt-3 border-t border-slate-100">
+                    <Link
+                      href="/cart"
+                      className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 rounded-lg transition-colors shadow-lg"
+                    >
+                      View Cart & Checkout
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           {mounted && isAuthenticated ? (
             <div className="relative group">
@@ -244,50 +253,60 @@ function Navbar() {
                 </span>
               )}
             </Link>
-            {isWishlistOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50">
-                <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-                  <span className="font-bold text-slate-800">
-                    Wishlist ({mounted ? wishlistItems.length : 0})
-                  </span>
-                </div>
-                {wishlistItems.length === 0 ? (
-                  <p className="text-center text-slate-400 py-6 text-sm">
-                    No favorites yet
-                  </p>
-                ) : (
-                  <div className="max-h-60 overflow-y-auto space-y-3 custom-scrollbar">
-                    {wishlistItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex gap-3 items-center group"
-                      >
-                        <div className="relative w-10 h-10 bg-slate-50 border border-slate-100 rounded overflow-hidden shrink-0">
-                          <Image
-                            src={item.image}
-                            alt={item.title}
-                            fill
-                            className="object-contain p-0.5"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-slate-700 line-clamp-1">
-                            {item.title}
-                          </p>
-                          <p className="text-xs text-slate-500">{item.price}</p>
-                        </div>
-                        <button
-                          onClick={() => dispatch(toggleWishlist(item))}
-                          className="text-slate-300 hover:text-red-500 transition-colors p-1"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ))}
+            <AnimatePresence>
+              {isWishlistOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50"
+                >
+                  <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+                    <span className="font-bold text-slate-800">
+                      Wishlist ({mounted ? wishlistItems.length : 0})
+                    </span>
                   </div>
-                )}
-              </div>
-            )}
+                  {wishlistItems.length === 0 ? (
+                    <p className="text-center text-slate-400 py-6 text-sm">
+                      No favorites yet
+                    </p>
+                  ) : (
+                    <div className="max-h-60 overflow-y-auto space-y-3 custom-scrollbar">
+                      {wishlistItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex gap-3 items-center group"
+                        >
+                          <div className="relative w-10 h-10 bg-slate-50 border border-slate-100 rounded overflow-hidden shrink-0">
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              className="object-contain p-0.5"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-slate-700 line-clamp-1">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {item.price}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => dispatch(toggleWishlist(item))}
+                            className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         <div className="flex sm:hidden items-center gap-2">

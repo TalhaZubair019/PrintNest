@@ -1,21 +1,15 @@
 "use client";
 
 import { Provider } from "react-redux";
-import { store } from "@/redux/Store";
-import { useEffect } from "react";
-import { initializeCart } from "@/redux/CartSlice";
+import { store, persistor } from "@/redux/Store";
+import { PersistGate } from "redux-persist/integration/react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    const savedCart = localStorage.getItem("cartState");
-    if (savedCart) {
-      try {
-        store.dispatch(initializeCart(JSON.parse(savedCart)));
-      } catch (error) {
-        console.error("Failed to load cart:", error);
-      }
-    }
-  }, []);
-
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        {children}
+      </PersistGate>
+    </Provider>
+  );
 }

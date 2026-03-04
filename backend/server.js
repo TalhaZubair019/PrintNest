@@ -3,6 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -10,6 +12,15 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({ origin: true, credentials: true }));
+
+app.use(helmet({ crossOriginResourcePolicy: false }));
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  message: { error: "Too many requests from this IP, please try again later." },
+});
+app.use("/api/", apiLimiter);
 
 app.use(express.json());
 app.use(cookieParser());
