@@ -76,7 +76,7 @@ function About() {
   return (
     <section
       id="about"
-      className="scroll-mt-24 py-20 lg:py-28 pl-20 pr-20 bg-[#F6F9FF] overflow-hidden"
+      className="scroll-mt-24 py-16 sm:py-20 lg:py-28 px-4 sm:px-8 lg:px-20 bg-[#F6F9FF] overflow-hidden"
     >
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -85,7 +85,7 @@ function About() {
               <BlindsImage
                 src={aboutData.mainImage}
                 alt="Main Feature"
-                className="w-full h-155 object-cover rounded-t-full rounded-bl-full shadow-lg"
+                className="w-full h-80 sm:h-110 lg:h-155 object-cover rounded-t-full rounded-bl-full shadow-lg"
                 delay={0}
               />
             </div>
@@ -94,7 +94,7 @@ function About() {
                 <BlindsImage
                   src={aboutData.secondaryImages[0]}
                   alt="Detail 1"
-                  className="w-full h-80 object-cover rounded-t-full rounded-br-full shadow-lg"
+                  className="w-full h-44 sm:h-60 lg:h-80 object-cover rounded-t-full rounded-br-full shadow-lg"
                   delay={0}
                 />
               </div>
@@ -102,7 +102,7 @@ function About() {
                 <BlindsImage
                   src={aboutData.secondaryImages[1]}
                   alt="Detail 2"
-                  className="w-full h-80 object-cover rounded-t-full rounded-bl-full shadow-lg"
+                  className="w-full h-44 sm:h-60 lg:h-80 object-cover rounded-t-full rounded-bl-full shadow-lg"
                   delay={0}
                 />
               </div>
@@ -116,7 +116,7 @@ function About() {
                 </p>
               </RevealText>
               <RevealText className="mb-6" delay={0.4}>
-                <h2 className="text-4xl lg:text-5xl font-medium text-black leading-tight">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-black leading-tight">
                   {aboutData.headingFirst}{" "}
                   <span className="text-[#FF7F7F] underline decoration-4 underline-offset-4 decoration-[#FF7F7F]">
                     {aboutData.headingHighlight}

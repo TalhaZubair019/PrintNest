@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import db from "@data/db.json";
@@ -9,35 +9,49 @@ function Testimonials() {
   const testimonialsData = db.testimonials;
   const { header, testimonials } = testimonialsData;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsToShow = 3;
-  const totalItems = testimonials.length;
-  const maxIndex = totalItems - itemsToShow;
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
-  };
+  const [itemsToShow, setItemsToShow] = useState(3);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 3000);
+    const updateItems = () => {
+      const w = window.innerWidth;
+      if (w < 640) setItemsToShow(1);
+      else if (w < 1024) setItemsToShow(2);
+      else setItemsToShow(3);
+    };
+    updateItems();
+    window.addEventListener("resize", updateItems);
+    return () => window.removeEventListener("resize", updateItems);
+  }, []);
 
+  const totalItems = testimonials.length;
+  const maxIndex = Math.max(0, totalItems - itemsToShow);
+
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+  }, [maxIndex]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
+  }, [maxIndex]);
+
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 3000);
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [nextSlide]);
+
+  useEffect(() => {
+    setCurrentIndex((prev) => Math.min(prev, maxIndex));
+  }, [maxIndex]);
 
   const progressPercentage = ((currentIndex + itemsToShow) / totalItems) * 100;
 
   return (
     <section
       id="testimonials"
-      className="scroll-mt-24 py-24 px-6 pl-20 pr-20 bg-[#f8fbff] overflow-hidden font-sans"
+      className="scroll-mt-24 py-16 sm:py-24 px-4 sm:px-8 lg:px-20 bg-[#f8fbff] overflow-hidden font-sans"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <motion.span
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -53,7 +67,7 @@ function Testimonials() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="text-5xl font-extrabold text-[#111827]"
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827]"
           >
             {header.titleMain} <br />
             <span className="text-[#ff6b6b] relative inline-block mt-2">
@@ -63,7 +77,7 @@ function Testimonials() {
           </motion.h2>
         </div>
 
-        <div className="relative mb-16 overflow-hidden">
+        <div className="relative mb-12 sm:mb-16 overflow-hidden">
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{
@@ -75,7 +89,7 @@ function Testimonials() {
               (item: (typeof testimonials)[0], index: number) => (
                 <div
                   key={index}
-                  className="px-3"
+                  className="px-2 sm:px-3"
                   style={{ width: `${100 / totalItems}%` }}
                 >
                   <TestimonialCard item={item} />
@@ -84,7 +98,7 @@ function Testimonials() {
             )}
           </div>
         </div>
-        <div className="flex flex-col md:flex-row items-center gap-8">
+        <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
           <div className="flex gap-4">
             <NavButton onClick={prevSlide} icon={<ChevronLeft size={20} />} />
             <NavButton onClick={nextSlide} icon={<ChevronRight size={20} />} />
@@ -104,9 +118,9 @@ function Testimonials() {
 
 const TestimonialCard = ({ item }: { item: any }) => {
   return (
-    <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-xl transition-all duration-300 group">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="relative w-14 h-14 rounded-full overflow-hidden shrink-0">
+    <div className="bg-white p-6 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-xl transition-all duration-300 group">
+      <div className="flex items-center gap-4 mb-6 sm:mb-8">
+        <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0">
           <Image
             src={item.image}
             alt={item.name}
@@ -119,17 +133,17 @@ const TestimonialCard = ({ item }: { item: any }) => {
           <p className="text-gray-400 text-sm mt-1">{item.role}</p>
         </div>
       </div>
-      <p className="text-gray-600 leading-relaxed mb-10 grow">
-        "{item.content}"
+      <p className="text-gray-600 leading-relaxed mb-8 sm:mb-10 grow text-sm sm:text-base">
+        &quot;{item.content}&quot;
       </p>
       <div className="flex justify-between items-center mt-auto">
         <div className="flex gap-1">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} size={18} fill="#FFB800" className="text-[#FFB800]" />
+            <Star key={i} size={16} fill="#FFB800" className="text-[#FFB800]" />
           ))}
         </div>
         <Quote
-          size={32}
+          size={28}
           className="text-[#111827] rotate-180 opacity-80 group-hover:text-[#3b82f6] transition-colors"
         />
       </div>
@@ -147,7 +161,7 @@ const NavButton = ({
   return (
     <button
       onClick={onClick}
-      className="w-12 h-12 rounded-full border border-[#1e1b4b] flex items-center justify-center text-[#1e1b4b] hover:bg-[#1e1b4b] hover:text-white transition-all active:scale-95 cursor-pointer"
+      className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-[#1e1b4b] flex items-center justify-center text-[#1e1b4b] hover:bg-[#1e1b4b] hover:text-white transition-all active:scale-95 cursor-pointer"
     >
       {icon}
     </button>

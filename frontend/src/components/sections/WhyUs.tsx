@@ -5,6 +5,13 @@ import db from "@data/db.json";
 import { Printer, Settings2, Headset, PenTool, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
+const WHYUS_COLORS = [
+  { iconBg: "#c084fc", accentBg: "#e9d5ff" },
+  { iconBg: "#2dd4bf", accentBg: "#99f6e4" },
+  { iconBg: "#f472b6", accentBg: "#fbcfe8" },
+  { iconBg: "#fbbf24", accentBg: "#fde68a" },
+];
+
 function WhyChooseUs() {
   const whyChooseUsData = db.whyus;
   const { header, features } = whyChooseUsData;
@@ -42,7 +49,7 @@ function WhyChooseUs() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature: any, index: number) => (
             <div key={index} className="relative pt-4">
-              <FeatureCard item={feature} />
+              <FeatureCard item={feature} index={index} />
             </div>
           ))}
         </div>
@@ -66,8 +73,9 @@ function resolveIcon(icon: any) {
   return icon;
 }
 
-const FeatureCard = ({ item }: { item: any }) => {
+const FeatureCard = ({ item, index }: { item: any; index?: number }) => {
   const Icon = resolveIcon(item.icon);
+  const colors = WHYUS_COLORS[index ?? 0] ?? WHYUS_COLORS[0];
   const iconVariants: any = {
     initial: { opacity: 1, rotate: 0 },
     hover: {
@@ -102,13 +110,17 @@ const FeatureCard = ({ item }: { item: any }) => {
       transition={{ duration: 0.3 }}
     >
       <motion.div
-        className={`w-full absolute top-0 left-0 rounded-t-2xl opacity-60 ${item.theme.accent}`}
-        style={{ clipPath: "ellipse(70% 80% at 50% 0%)" }}
+        className="w-full absolute top-0 left-0 rounded-t-2xl opacity-60"
+        style={{
+          clipPath: "ellipse(70% 80% at 50% 0%)",
+          backgroundColor: colors.accentBg,
+        }}
         variants={bgVariants}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       />
       <motion.div
-        className={`relative z-10 p-4 rounded-full border-6 mb-6 ${item.theme.iconBg} text-white`}
+        className="relative z-10 p-4 rounded-full border-6 mb-6 text-white"
+        style={{ backgroundColor: colors.iconBg }}
         variants={iconVariants}
       >
         <Icon size={32} strokeWidth={1.5} />

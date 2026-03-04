@@ -21,13 +21,13 @@ function Footer() {
   };
 
   return (
-    <footer className="relative bg-[#0a0a0a] mt-32 pl-20 pr-20 pt-90 pb-12 font-sans">
+    <footer className="relative bg-[#0a0a0a] mt-24 sm:mt-32 px-4 sm:px-8 lg:px-20 pt-60 sm:pt-72 lg:pt-90 pb-12 font-sans">
       <div className="absolute left-0 right-0 -top-32 px-4 md:px-6 z-30">
         <div className="max-w-6xl mx-auto">
           <div className="relative bg-linear-to-r from-[#ff6b7a] via-[#c445f5] to-[#4a90f2] rounded-4xl p-8 md:p-12 lg:px-16 lg:py-14 shadow-2xl overflow-visible">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
               <div className="max-w-lg">
-                <h2 className="text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-white mb-4 leading-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-white mb-4 leading-tight">
                   {newsletter.titlePart1}
                   {newsletter.titlePart2}
                 </h2>

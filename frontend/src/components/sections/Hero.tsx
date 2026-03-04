@@ -55,7 +55,7 @@ function Hero() {
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-slate-50 min-h-screen flex flex-col justify-between font-sans px-10 md:px-30">
+    <section className="relative w-full overflow-hidden bg-slate-50 min-h-screen flex flex-col justify-between font-sans px-4 sm:px-8 lg:px-16">
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <Image
           src={assets.background}
@@ -72,10 +72,10 @@ function Hero() {
         style={{ clipPath: "ellipse(55% 90% at 50% 100%)" }}
       ></div>
 
-      <div className="container mx-auto px-4 pt-60 relative z-20">
+      <div className="container mx-auto px-4 pt-36 sm:pt-44 lg:pt-60 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <motion.div
-            className="lg:col-span-3 flex flex-col items-center lg:items-start space-y-4 order-2 lg:order-1 lg:mt-58"
+            className="hidden lg:flex lg:col-span-3 flex-col items-center lg:items-start space-y-4 order-2 lg:order-1 lg:mt-58"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -225,7 +225,7 @@ function Hero() {
           </div>
 
           <motion.div
-            className="lg:col-span-3 flex justify-center order-3 lg:mt-60"
+            className="hidden lg:flex lg:col-span-3 justify-center order-3 lg:mt-60"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -250,7 +250,9 @@ function Hero() {
           </motion.div>
         </div>
       </div>
-      <div className="relative w-full max-w-4xl mx-auto h-85 lg:h-120 mt-4 z-30 pointer-events-none">
+
+      {/* Desktop (lg+): 3-shirt absolute layout */}
+      <div className="hidden sm:block relative w-full max-w-4xl mx-auto h-120 mt-4 z-30 pointer-events-none">
         <motion.div
           className="absolute top-16 right-[9%] w-[40%] z-10"
           initial={{ opacity: 0, x: -100, rotate: 4 }}
@@ -289,7 +291,21 @@ function Hero() {
         </motion.div>
       </div>
 
-      <div className="absolute right-6 lg:bottom-3 lg:right-[10%] z-40 hidden md:flex items-center justify-center w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#ff6b6b] border-10 border-white hover:scale-110 transition-transform cursor-pointer">
+      {/* Mobile / tablet (<lg): single centered product, sits in normal flow — no overflow */}
+      <motion.div
+        className="sm:hidden w-full max-w-[280px] mx-auto mt-6 mb-4 pointer-events-none"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, delay: 0.4 }}
+      >
+        <img
+          src={assets.products.center}
+          alt="Featured Product"
+          className="w-full drop-shadow-2xl"
+        />
+      </motion.div>
+
+      <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 lg:bottom-3 lg:right-[10%] z-40 hidden md:flex items-center justify-center w-28 h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-[#ff6b6b] border-10 border-white hover:scale-110 transition-transform cursor-pointer">
         <ChevronDown
           className="absolute text-white w-8 h-8 z-10"
           strokeWidth={3}

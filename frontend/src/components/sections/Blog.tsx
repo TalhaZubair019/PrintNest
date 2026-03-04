@@ -67,7 +67,10 @@ const LatestNews = () => {
   };
 
   return (
-    <section id="blog" className="scroll-mt-24 py-20 px-6 ml-20 mr-20 bg-white">
+    <section
+      id="blog"
+      className="scroll-mt-24 py-16 sm:py-20 px-4 sm:px-8 lg:px-20 bg-white"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12">
           <div>

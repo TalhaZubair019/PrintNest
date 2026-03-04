@@ -174,7 +174,7 @@ function FeaturedProducts() {
   return (
     <section
       id="products"
-      className="scroll-mt-24 py-20 ml-20 mr-20 lg:py-28 bg-white overflow-hidden relative"
+      className="scroll-mt-24 py-16 sm:py-20 mx-4 sm:mx-8 lg:mx-20 lg:py-28 bg-white overflow-hidden relative"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-12 gap-8">
@@ -194,7 +194,7 @@ function FeaturedProducts() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-2xl lg:text-5xl font-medium text-slate-900 leading-tight"
+              className="text-2xl sm:text-3xl lg:text-5xl font-medium text-slate-900 leading-tight"
             >
               {productsData.headingMain} <br />
               <span className="text-[#FF7F7F] border-b-4 border-[#FF7F7F] pb-1">

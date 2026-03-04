@@ -29,7 +29,7 @@ function PricingSection() {
   };
 
   return (
-    <section className="py-24 px-6 ml-20 mr-20 bg-white min-h-screen">
+    <section className="py-16 sm:py-24 px-4 sm:px-8 lg:px-20 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
         <motion.div
           className="flex flex-col items-start"

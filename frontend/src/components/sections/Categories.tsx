@@ -107,7 +107,7 @@ function Categories() {
   return (
     <section
       id="services"
-      className="py-20 lg:py-28 ml-20 mr-20 overflow-hidden scroll-mt-24"
+      className="py-16 sm:py-20 lg:py-28 mx-4 sm:mx-8 lg:mx-20 overflow-hidden scroll-mt-24"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
@@ -126,7 +126,7 @@ function Categories() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-4xl lg:text-5xl font-medium text-black leading-tight"
+              className="text-3xl sm:text-4xl lg:text-5xl font-medium text-black leading-tight"
             >
               {categoriesData.headingMain} <br />
               <span className="relative inline-block text-[#FF7F7F]">
@@ -141,7 +141,7 @@ function Categories() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-black text-xl font-light"
+              className="text-black text-base sm:text-lg lg:text-xl font-light"
             >
               {categoriesData.description}
             </motion.p>
