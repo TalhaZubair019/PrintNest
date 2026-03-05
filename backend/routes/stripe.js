@@ -12,12 +12,22 @@ router.post("/checkout", async (req, res) => {
       return res.status(400).json({ error: "Cart items are required." });
     }
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+    const ensureAbsoluteUrl = (url) => {
+      if (!url) return url;
+      if (url.startsWith("http://") || url.startsWith("https://")) return url;
+      const baseUrl = appUrl.endsWith("/") ? appUrl.slice(0, -1) : appUrl;
+      const path = url.startsWith("/") ? url : `/${url}`;
+      return `${baseUrl}${path}`;
+    };
+
     const lineItems = items.map((item) => ({
       price_data: {
         currency: "usd",
         product_data: {
           name: item.name,
-          images: item.image ? [item.image] : [],
+          images: item.image ? [ensureAbsoluteUrl(item.image)] : [],
         },
 
         unit_amount: Math.round(item.price * 100),
@@ -31,14 +41,14 @@ router.post("/checkout", async (req, res) => {
       mode: "payment",
       customer_email: customerEmail,
       client_reference_id: orderId,
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
+      success_url: `${ensureAbsoluteUrl("/thank-you")}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${ensureAbsoluteUrl("/checkout")}`,
     });
 
     return res.json({ url: session.url });
   } catch (error) {
     console.error("Stripe checkout error:", error.message);
-    return res.status(500).json({ error: error.message });
+    return res.status(error.statusCode || 500).json({ error: error.message });
   }
 });
 

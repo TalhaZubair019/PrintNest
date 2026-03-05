@@ -39,10 +39,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const { cartItems } = useSelector((state: any) => state.cart);
-  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+  const { isAuthenticated, user, isLoading } = useSelector(
+    (state: any) => state.auth,
+  );
   const [hasMounted, setHasMounted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUsingSavedAddress, setIsUsingSavedAddress] = useState(false);
   const [isEditingSavedAddress, setIsEditingSavedAddress] = useState(false);
@@ -141,14 +142,10 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsCheckingAuth(false);
-      if (!isAuthenticated) {
-        setShowAuthModal(true);
-      }
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [isAuthenticated]);
+    if (!isLoading && !isAuthenticated) {
+      setShowAuthModal(true);
+    }
+  }, [isAuthenticated, isLoading]);
 
   const updateData = (newData: Partial<CheckoutData>) =>
     setFormData((prev) => ({ ...prev, ...newData }));
@@ -282,7 +279,7 @@ export default function CheckoutPage() {
         <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
           <div
             className={`transition-all duration-300 ${
-              showAuthModal || isCheckingAuth
+              showAuthModal || isLoading
                 ? "opacity-50 blur-sm pointer-events-none"
                 : "opacity-100"
             }`}
