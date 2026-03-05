@@ -50,23 +50,23 @@ const PageHeader = ({ title, breadcrumb }: any) => (
         src={db.shop.backgroundImage}
         alt="Background"
         fill
-        className="object-cover opacity-80"
+        className="object-fill opacity-80"
         priority
         unoptimized
       />
-      <div className="absolute bottom-0 w-full h-24 bg-linear-to-t from-white to-transparent z-20" />
+      <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
     </div>
 
-    <div className="relative z-10 pt-32 flex flex-col items-center justify-center pb-10">
-      <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
+    <div className="relative z-10 pt-80 flex flex-col items-center justify-center pb-10">
+      <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
         {title}
       </h1>
-      <div className="h-1 w-16 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-4"></div>
-      <div className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 bg-white px-4 py-1.5 rounded-full shadow-sm border border-slate-100">
+      <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
+      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
         <Link href="/" className="hover:text-purple-600 transition-colors">
           Home
         </Link>
-        <ChevronRight size={12} />
+        <ChevronRight size={14} />
         <span className="text-slate-900">{breadcrumb}</span>
       </div>
     </div>
