@@ -18,6 +18,7 @@ interface Review {
   rating: number;
   comment: string;
   date: string;
+  isEdited?: boolean;
 }
 
 interface Product {
@@ -193,7 +194,7 @@ export default function ProductPage() {
         response = await fetch(`/api/public/reviews/${editingReviewId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ review: reviewData }),
+          body: JSON.stringify({ review: { ...reviewData, isEdited: true } }),
         });
       } else {
         response = await fetch("/api/public/reviews", {
@@ -540,7 +541,12 @@ export default function ProductPage() {
                           <div className="font-semibold text-slate-900">
                             {review.userName}
                           </div>
-                          <div className="text-sm text-gray-400">
+                          <div className="text-sm text-slate-400 tracking-wide font-medium flex items-center gap-2">
+                            {review.isEdited && (
+                              <span className="text-[10px] uppercase bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">
+                                Edited
+                              </span>
+                            )}
                             {review.date}
                           </div>
                         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Fragment } from "react";
 import {
   Star,
   Trash2,
@@ -22,6 +22,12 @@ interface Review {
   comment: string;
   date: string;
   productId: number;
+  isEdited?: boolean;
+  previousReview?: {
+    rating: number;
+    comment: string;
+    date: string;
+  };
 }
 
 interface Product {
@@ -58,6 +64,7 @@ export default function AdminReviewList({
   const [selectedDateRange, setSelectedDateRange] = useState<string>("all");
   const [customStart, setCustomStart] = useState<string>("");
   const [customEnd, setCustomEnd] = useState<string>("");
+  const [expandedEditId, setExpandedEditId] = useState<string | null>(null);
 
   const filteredReviews = useMemo(() => {
     return reviews.filter((review) => {
@@ -288,76 +295,120 @@ export default function AdminReviewList({
             {filteredReviews.map((review) => {
               const product = getProductDetails(review.productId);
               return (
-                <tr
-                  key={review.id}
-                  className="hover:bg-slate-50/50 transition-colors group"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-bold">
-                        {review.userName?.[0]?.toUpperCase()}
-                      </div>
-                      <div className="font-bold text-slate-900">
-                        {review.userName}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {product ? (
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-slate-100">
-                          <Image
-                            src={product.image}
-                            alt={product.title}
-                            fill
-                            className="object-cover"
-                          />
+                <Fragment key={review.id}>
+                  <tr className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-bold">
+                          {review.userName?.[0]?.toUpperCase()}
                         </div>
-                        <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">
-                          {product.title}
-                        </span>
+                        <div className="font-bold text-slate-900">
+                          {review.userName}
+                        </div>
                       </div>
-                    ) : (
-                      <span className="text-slate-400 italic text-xs">
-                        Unknown Product
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex text-amber-400 gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={12}
-                          className={
-                            i < review.rating
-                              ? "fill-current"
-                              : "text-slate-200"
+                    </td>
+                    <td className="px-6 py-4">
+                      {product ? (
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-slate-100">
+                            <Image
+                              src={product.image}
+                              alt={product.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">
+                            {product.title}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 italic text-xs">
+                          Unknown Product
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex text-amber-400 gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={12}
+                            className={
+                              i < review.rating
+                                ? "fill-current"
+                                : "text-slate-200"
+                            }
+                          />
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-slate-600 line-clamp-2 max-w-[200px]">
+                        {review.comment}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 text-xs font-medium text-slate-500">
+                      {review.date}
+                      {review.isEdited && (
+                        <button
+                          onClick={() =>
+                            setExpandedEditId(
+                              expandedEditId === review.id ? null : review.id,
+                            )
                           }
-                        />
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm text-slate-600 line-clamp-2 max-w-[200px]">
-                      {review.comment}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-medium text-slate-500">
-                    {review.date}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-1">
-                      <button
-                        onClick={() => handleDelete(review.id)}
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                        title="Delete Review"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                          className="block mt-1 text-[10px] uppercase text-blue-500 hover:text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 transition-colors w-max px-1.5 py-0.5 rounded cursor-pointer"
+                          title="View previous version"
+                        >
+                          Edited
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => handleDelete(review.id)}
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          title="Delete Review"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedEditId === review.id && review.previousReview && (
+                    <tr className="bg-slate-50/50">
+                      <td colSpan={6} className="px-6 py-4">
+                        <div className="flex flex-col gap-2 p-4 bg-white rounded-xl border border-dashed border-slate-200 ml-12 animate-in fade-in slide-in-from-top-1">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            Original Version Before Edit
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="flex text-amber-400 gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={`prev-${i}`}
+                                  size={12}
+                                  className={
+                                    i < review.previousReview!.rating
+                                      ? "fill-current"
+                                      : "text-slate-200"
+                                  }
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs font-medium text-slate-400">
+                              {review.previousReview.date}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-500 italic bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+                            "{review.previousReview.comment}"
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               );
             })}
           </tbody>

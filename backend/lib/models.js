@@ -58,6 +58,8 @@ const reviewSchema = new mongoose.Schema(
     rating: { type: Number, required: true },
     comment: { type: String },
     date: { type: String },
+    isEdited: { type: Boolean, default: false },
+    previousReview: { type: Object, default: null },
   },
   { timestamps: true },
 );

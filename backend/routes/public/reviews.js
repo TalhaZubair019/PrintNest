@@ -40,10 +40,28 @@ router.put("/:id", async (req, res) => {
   try {
     const { review } = req.body;
     await connectDB();
+
+    const existing = await ReviewModel.findOne({ id: req.params.id }).lean();
+    if (!existing) return res.status(404).json({ message: "Review not found" });
+
+    const previousReview = {
+      rating: existing.rating,
+      comment: existing.comment,
+      date: existing.date,
+    };
+
+    const reviewToUpdate = {
+      ...review,
+      previousReview:
+        existing.isEdited && existing.previousReview
+          ? existing.previousReview
+          : previousReview,
+    };
+
     const updated = await ReviewModel.findOneAndUpdate(
       { id: req.params.id },
-      { $set: review },
-      { returnDocument: "after" },
+      { $set: reviewToUpdate },
+      { returnDocument: "after", new: true },
     );
     if (!updated) return res.status(404).json({ message: "Review not found" });
     return res.json(updated);
