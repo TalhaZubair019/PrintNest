@@ -668,11 +668,11 @@ export default function AdminDashboard() {
             )}
             {activeTab === "products" && (
               <ProductsTable
-                paginatedProducts={paginatedProducts || []}
+                allProducts={filteredProducts || []}
+                categories={stats.categories || []}
                 setProductDeleteConfirm={setProductDeleteConfirm}
                 productPage={productPage}
                 setProductPage={setProductPage}
-                totalProductPages={totalProductPages}
               />
             )}
             {activeTab === "reviews" && (

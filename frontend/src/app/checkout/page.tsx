@@ -46,6 +46,7 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUsingSavedAddress, setIsUsingSavedAddress] = useState(false);
   const [isEditingSavedAddress, setIsEditingSavedAddress] = useState(false);
+  const [saveAddressToProfile, setSaveAddressToProfile] = useState(false);
 
   const subtotal = cartItems.reduce(
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
@@ -85,7 +86,6 @@ export default function CheckoutPage() {
   }, [formData, hasMounted]);
 
   useEffect(() => {
-
     if (user) {
       const hasSavedAddress = !!(user.address && user.city);
       setIsUsingSavedAddress(hasSavedAddress);
@@ -128,7 +128,6 @@ export default function CheckoutPage() {
         postcode: user.postcode || prev.postcode,
       }));
     } else {
-
       setFormData((prev) => ({
         ...prev,
         address: "",
@@ -184,8 +183,27 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      if (formData.paymentMethod === "stripe") {
+      if (saveAddressToProfile && isAuthenticated) {
+        try {
+          await fetch("/api/auth/me", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: `${formData.firstName} ${formData.lastName}`,
+              address: formData.address,
+              apartment: formData.apartment,
+              city: formData.city,
+              province: formData.province,
+              postcode: formData.postcode,
+              phone: formData.phone,
+            }),
+          });
+        } catch (e) {
+          console.error("Failed to save address to profile", e);
+        }
+      }
 
+      if (formData.paymentMethod === "stripe") {
         localStorage.setItem("pendingCheckoutData", JSON.stringify(formData));
         const orderId = Date.now().toString();
 
@@ -284,10 +302,13 @@ export default function CheckoutPage() {
                   data={formData}
                   update={updateData}
                   user={user}
+                  isAuthenticated={isAuthenticated}
                   isUsingSavedAddress={isUsingSavedAddress}
                   isEditingSavedAddress={isEditingSavedAddress}
                   setIsEditingSavedAddress={setIsEditingSavedAddress}
                   onAddressModeChange={handleAddressModeChange}
+                  saveAddressToProfile={saveAddressToProfile}
+                  setSaveAddressToProfile={setSaveAddressToProfile}
                 />
                 <PaymentSection data={formData} update={updateData} />
                 <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
@@ -384,10 +405,13 @@ function BillingSection({
   data,
   update,
   user,
+  isAuthenticated,
   isUsingSavedAddress,
   isEditingSavedAddress,
   setIsEditingSavedAddress,
   onAddressModeChange,
+  saveAddressToProfile,
+  setSaveAddressToProfile,
 }: any) {
   const InputClass =
     "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400";
@@ -400,24 +424,29 @@ function BillingSection({
     <section>
       <h2 className="text-lg font-bold text-slate-700 mb-4">Billing address</h2>
 
-      {hasProfileAddress && (
+      {isAuthenticated && (
         <div className="mb-6 space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer p-3 border rounded-lg border-slate-200 hover:border-blue-300 transition-colors bg-white">
+          <label
+            className={`flex items-center gap-3 cursor-pointer p-3 border rounded-lg transition-colors bg-white ${!hasProfileAddress ? "opacity-60 cursor-not-allowed border-slate-200" : "border-slate-200 hover:border-blue-300"}`}
+          >
             <input
               type="radio"
               name="addressMode"
+              disabled={!hasProfileAddress}
               checked={isUsingSavedAddress}
               onChange={() => onAddressModeChange(true)}
               className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
             />
-            <div>
+            <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
                   <span className="block text-sm font-bold text-slate-700">
                     Use saved address
                   </span>
                   <span className="block text-xs text-slate-500 mt-1">
-                    {user.address}, {user.city}
+                    {hasProfileAddress
+                      ? `${user.address}, ${user.city}`
+                      : "No address saved in your profile yet"}
                   </span>
                 </div>
                 {isUsingSavedAddress && !isEditingSavedAddress && (
@@ -576,6 +605,22 @@ function BillingSection({
               onChange={(e) => update({ phone: e.target.value })}
             />
           </div>
+          {isAuthenticated &&
+            (!isUsingSavedAddress || isEditingSavedAddress) && (
+              <div className="pt-2">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={saveAddressToProfile}
+                    onChange={(e) => setSaveAddressToProfile(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">
+                    Save this address to my profile for next time
+                  </span>
+                </label>
+              </div>
+            )}
         </div>
       )}
     </section>

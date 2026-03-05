@@ -1,36 +1,117 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Package, Edit, Trash2 } from "lucide-react";
+import { Plus, Package, Edit, Trash2, Filter, FilterX } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 
 interface ProductsTableProps {
-  paginatedProducts: any[];
+  allProducts: any[];
+  categories: any[];
   setProductDeleteConfirm: (product: any) => void;
   productPage: number;
   setProductPage: React.Dispatch<React.SetStateAction<number>>;
-  totalProductPages: number;
 }
 
 const ProductsTable = ({
-  paginatedProducts,
+  allProducts,
+  categories,
   setProductDeleteConfirm,
   productPage,
   setProductPage,
-  totalProductPages,
 }: ProductsTableProps) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const ITEMS_PER_PAGE = 10;
+
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((product) => {
+      let categoryMatch = false;
+      if (selectedCategory === "all") {
+        categoryMatch = true;
+      } else if (selectedCategory === "uncategorized") {
+        categoryMatch = !product.category;
+      } else {
+        categoryMatch = product.category === selectedCategory;
+      }
+      return categoryMatch;
+    });
+  }, [allProducts, selectedCategory]);
+
+  const totalProductPages =
+    Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+  const paginatedProducts = filteredProducts.slice(
+    (productPage - 1) * ITEMS_PER_PAGE,
+    productPage * ITEMS_PER_PAGE,
+  );
+
+  useEffect(() => {
+    setProductPage(1);
+  }, [selectedCategory, setProductPage]);
   return (
     <div
       key="products"
       className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-300"
     >
-      <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <h3 className="text-xl font-bold">Product Management</h3>
-        <Link
-          href="/admin/products/new"
-          className="flex items-center gap-2 bg-slate-900 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
-        >
-          <Plus size={16} /> Add Product
-        </Link>
+      <div className="p-6 border-b border-slate-100 space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900">
+              Product Management
+            </h3>
+            <p className="text-sm text-slate-500 mt-1">
+              Manage your store inventory
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/products/new"
+              className="flex items-center gap-2 bg-slate-900 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
+            >
+              <Plus size={16} /> Add Product
+            </Link>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-purple-100">
+              {filteredProducts.length} Showing
+            </span>
+            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold">
+              {allProducts.length} Total
+            </span>
+          </div>
+
+          <div className="relative flex-1 min-w-[200px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <Filter size={16} />
+            </div>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+            >
+              <option value="all">All Categories</option>
+              {categories?.map((c) => (
+                <option key={c._id || c.name} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+              <option value="uncategorized" className="italic text-slate-500">
+                Uncategorized
+              </option>
+            </select>
+          </div>
+
+          {selectedCategory !== "all" && (
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
+            >
+              <FilterX size={16} />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">

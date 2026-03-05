@@ -6,6 +6,7 @@ import {
   Filter,
   FilterX,
   ClipboardList,
+  Calendar,
 } from "lucide-react";
 import { Order } from "@/app/admin/types";
 
@@ -32,6 +33,9 @@ const OrdersTable = ({
 }: OrdersTableProps) => {
   const [selectedUserId, setSelectedUserId] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedDateRange, setSelectedDateRange] = useState<string>("all");
+  const [customStart, setCustomStart] = useState<string>("");
+  const [customEnd, setCustomEnd] = useState<string>("");
   const ITEMS_PER_PAGE = 5;
 
   const hasDeletedAccounts = useMemo(() => {
@@ -53,9 +57,48 @@ const OrdersTable = ({
 
       const statusMatch =
         selectedStatus === "all" || order.status === selectedStatus;
-      return userMatch && statusMatch;
+
+      let dateMatch = true;
+      if (selectedDateRange !== "all") {
+        const orderDate = new Date(order.date);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+
+        if (selectedDateRange === "week") {
+          const lastWeek = new Date(today);
+          lastWeek.setDate(today.getDate() - 7);
+          dateMatch = orderDate >= lastWeek && orderDate <= today;
+        } else if (selectedDateRange === "month") {
+          const lastMonth = new Date(today);
+          lastMonth.setDate(today.getDate() - 30);
+          dateMatch = orderDate >= lastMonth && orderDate <= today;
+        } else if (selectedDateRange === "current-month") {
+          const startOfMonth = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1,
+          );
+          dateMatch = orderDate >= startOfMonth && orderDate <= today;
+        } else if (selectedDateRange === "custom" && customStart && customEnd) {
+          const start = new Date(customStart);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(customEnd);
+          end.setHours(23, 59, 59, 999);
+          dateMatch = orderDate >= start && orderDate <= end;
+        }
+      }
+
+      return userMatch && statusMatch && dateMatch;
     });
-  }, [allOrders, selectedUserId, selectedStatus, users]);
+  }, [
+    allOrders,
+    selectedUserId,
+    selectedStatus,
+    selectedDateRange,
+    customStart,
+    customEnd,
+    users,
+  ]);
 
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE) || 1;
   const paginatedOrders = filteredOrders.slice(
@@ -65,7 +108,14 @@ const OrdersTable = ({
 
   useEffect(() => {
     setOrderPage(1);
-  }, [selectedUserId, selectedStatus, setOrderPage]);
+  }, [
+    selectedUserId,
+    selectedStatus,
+    selectedDateRange,
+    customStart,
+    customEnd,
+    setOrderPage,
+  ]);
 
   return (
     <div
@@ -133,19 +183,70 @@ const OrdersTable = ({
             </select>
           </div>
 
-          {(selectedUserId !== "all" || selectedStatus !== "all") && (
+          <div className="relative flex-1 min-w-[200px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <Calendar size={16} />
+            </div>
+            <select
+              value={selectedDateRange}
+              onChange={(e) => setSelectedDateRange(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+            >
+              <option value="all">Total Timeline</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+              <option value="current-month">Current Month</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+
+          {(selectedUserId !== "all" ||
+            selectedStatus !== "all" ||
+            selectedDateRange !== "all") && (
             <button
               onClick={() => {
                 setSelectedUserId("all");
                 setSelectedStatus("all");
+                setSelectedDateRange("all");
+                setCustomStart("");
+                setCustomEnd("");
               }}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
             >
               <FilterX size={16} />
               Clear
             </button>
           )}
         </div>
+
+        {selectedDateRange === "custom" && (
+          <div className="flex flex-wrap items-center gap-3 pt-2 bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                From
+              </label>
+              <input
+                type="date"
+                value={customStart}
+                max={customEnd || undefined}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                To
+              </label>
+              <input
+                type="date"
+                value={customEnd}
+                min={customStart || undefined}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+              />
+            </div>
+          </div>
+        )}
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">

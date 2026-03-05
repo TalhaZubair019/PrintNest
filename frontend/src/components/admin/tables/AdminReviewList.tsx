@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Star, Trash2, User, Package, Filter, FilterX } from "lucide-react";
+import {
+  Star,
+  Trash2,
+  User,
+  Package,
+  Filter,
+  FilterX,
+  Calendar,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Toast from "@/components/products/Toast";
@@ -47,6 +55,9 @@ export default function AdminReviewList({
 
   const [selectedUserId, setSelectedUserId] = useState<string>("all");
   const [selectedProductId, setSelectedProductId] = useState<string>("all");
+  const [selectedDateRange, setSelectedDateRange] = useState<string>("all");
+  const [customStart, setCustomStart] = useState<string>("");
+  const [customEnd, setCustomEnd] = useState<string>("");
 
   const filteredReviews = useMemo(() => {
     return reviews.filter((review) => {
@@ -55,9 +66,47 @@ export default function AdminReviewList({
       const productMatch =
         selectedProductId === "all" ||
         review.productId.toString() === selectedProductId;
-      return userMatch && productMatch;
+
+      let dateMatch = true;
+      if (selectedDateRange !== "all") {
+        const reviewDate = new Date(review.date);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+
+        if (selectedDateRange === "week") {
+          const lastWeek = new Date(today);
+          lastWeek.setDate(today.getDate() - 7);
+          dateMatch = reviewDate >= lastWeek && reviewDate <= today;
+        } else if (selectedDateRange === "month") {
+          const lastMonth = new Date(today);
+          lastMonth.setDate(today.getDate() - 30);
+          dateMatch = reviewDate >= lastMonth && reviewDate <= today;
+        } else if (selectedDateRange === "current-month") {
+          const startOfMonth = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1,
+          );
+          dateMatch = reviewDate >= startOfMonth && reviewDate <= today;
+        } else if (selectedDateRange === "custom" && customStart && customEnd) {
+          const start = new Date(customStart);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(customEnd);
+          end.setHours(23, 59, 59, 999);
+          dateMatch = reviewDate >= start && reviewDate <= end;
+        }
+      }
+
+      return userMatch && productMatch && dateMatch;
     });
-  }, [reviews, selectedUserId, selectedProductId]);
+  }, [
+    reviews,
+    selectedUserId,
+    selectedProductId,
+    selectedDateRange,
+    customStart,
+    customEnd,
+  ]);
 
   const uniqueUsersInReviews = useMemo(() => {
     const userMap = new Map();
@@ -157,19 +206,70 @@ export default function AdminReviewList({
             </select>
           </div>
 
-          {(selectedUserId !== "all" || selectedProductId !== "all") && (
+          <div className="relative flex-1 min-w-[200px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <Calendar size={16} />
+            </div>
+            <select
+              value={selectedDateRange}
+              onChange={(e) => setSelectedDateRange(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+            >
+              <option value="all">Total Timeline</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+              <option value="current-month">Current Month</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+
+          {(selectedUserId !== "all" ||
+            selectedProductId !== "all" ||
+            selectedDateRange !== "all") && (
             <button
               onClick={() => {
                 setSelectedUserId("all");
                 setSelectedProductId("all");
+                setSelectedDateRange("all");
+                setCustomStart("");
+                setCustomEnd("");
               }}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
             >
               <FilterX size={16} />
               Clear
             </button>
           )}
         </div>
+
+        {selectedDateRange === "custom" && (
+          <div className="flex flex-wrap items-center gap-3 pt-2 bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                From
+              </label>
+              <input
+                type="date"
+                value={customStart}
+                max={customEnd || undefined}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                To
+              </label>
+              <input
+                type="date"
+                value={customEnd}
+                min={customStart || undefined}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="overflow-x-auto">
@@ -278,6 +378,9 @@ export default function AdminReviewList({
               onClick={() => {
                 setSelectedUserId("all");
                 setSelectedProductId("all");
+                setSelectedDateRange("all");
+                setCustomStart("");
+                setCustomEnd("");
               }}
               className="mt-6 text-sm font-bold text-purple-600 hover:text-purple-700"
             >
