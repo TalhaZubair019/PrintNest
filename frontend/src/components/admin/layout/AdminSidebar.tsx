@@ -70,7 +70,6 @@ const AdminSidebar = ({
 }: AdminSidebarProps) => {
   return (
     <div className="transition-all duration-300 ease-in-out shrink-0 sticky top-6 h-[calc(100vh-48px)] bg-[#0f172a] rounded-3xl shadow-2xl border border-slate-800 flex-col overflow-hidden scrollbar-hide z-40 w-64 hidden lg:flex">
-      {/* Top Profile Area (Replacing Logo) */}
       <div className="p-6 flex items-center gap-3 border-b border-slate-800/50 mb-4 h-24">
         <div className="h-10 w-10 min-w-[40px] rounded-full bg-purple-600 border border-purple-500/20 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-purple-600/20">
           {user?.name?.[0]?.toUpperCase() || "A"}
@@ -85,7 +84,6 @@ const AdminSidebar = ({
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-2 space-y-1 scrollbar-hide overflow-y-auto overflow-x-hidden">
         <NavButton
           active={activeTab === "overview"}
@@ -130,8 +128,6 @@ const AdminSidebar = ({
           label={`Categories (${stats?.categories?.length ?? 0})`}
         />
       </nav>
-
-      {/* Bottom Actions Only */}
       <div className="p-4 border-t border-slate-800/50 mt-auto">
         <div className="space-y-1">
           <Link
