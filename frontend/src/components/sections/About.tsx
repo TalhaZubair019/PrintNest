@@ -17,7 +17,7 @@ const BlindsImage = ({
   imageClassName?: string;
   delay?: number;
 }) => {
-  const bars = Array.from({ length: 31 }, (_, i) => i);
+  const bars = Array.from({ length: 15 }, (_, i) => i);
   return (
     <div className={`relative overflow-hidden shadow-2xl ${className}`}>
       <Image src={src} alt={alt} fill priority />

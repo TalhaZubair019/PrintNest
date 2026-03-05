@@ -27,7 +27,7 @@ const BlindsImage = ({
   imgClassName?: string;
   delay?: number;
 }) => {
-  const bars = Array.from({ length: 31 }, (_, i) => i);
+  const bars = Array.from({ length: 15 }, (_, i) => i);
   return (
     <div className={`relative overflow-hidden h-full w-full ${className}`}>
       <Image

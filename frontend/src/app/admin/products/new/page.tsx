@@ -326,8 +326,7 @@ export default function NewProductPage() {
                     (optional)
                   </span>
                 </label>
-                <input
-                  type="text"
+                <select
                   value={productForm.badge}
                   onChange={(e) =>
                     setProductForm((prev) => ({
@@ -335,9 +334,16 @@ export default function NewProductPage() {
                       badge: e.target.value,
                     }))
                   }
-                  placeholder="e.g., Sale, New, Hot"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
-                />
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 bg-white transition-all"
+                >
+                  <option value="">No Badge</option>
+                  <option value="New">New</option>
+                  <option value="Sale">Sale</option>
+                  <option value="Hot">Hot</option>
+                  <option value="Best Seller">Best Seller</option>
+                  <option value="Limited">Limited</option>
+                  <option value="Trending">Trending</option>
+                </select>
               </div>
             </div>
             <div className="lg:col-span-2 space-y-5">
