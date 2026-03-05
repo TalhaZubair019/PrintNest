@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
     const usermessageContent = [
       {
         type: "text",
-        text: `Write a highly SEO-optimized, compelling product description (2-3 sentences) for a print-on-demand product titled: "${title}"${category ? ` in the category: "${category}"` : ""}. 
+        text: `Write a highly SEO-optimized, compelling product description (2-3 sentences) for a product titled: "${title}"${category ? ` in the category: "${category}"` : ""}. 
 
 Instructions:
 1. Identify 2-3 high-traffic SEO keywords naturally related to this title/category.
