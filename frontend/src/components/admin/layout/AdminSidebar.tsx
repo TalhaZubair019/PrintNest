@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import {
@@ -11,7 +12,6 @@ import {
   Shield,
   Tag,
 } from "lucide-react";
-import { UserData } from "@/app/admin/types";
 
 interface AdminSidebarProps {
   user: { name: string; email?: string } | null | any;
@@ -40,23 +40,24 @@ interface AdminSidebarProps {
 const NavButton = ({ active, onClick, icon, label }: any) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all mb-1 relative overflow-hidden group ${
+    className={`w-full flex items-center gap-3 px-4 py-3.5 text-sm font-semibold transition-all mb-1 relative group ${
       active
-        ? "bg-linear-to-r from-purple-600 to-blue-600 text-white shadow-xl shadow-purple-300/50"
-        : "text-slate-600 hover:bg-linear-to-r hover:from-slate-50 hover:to-purple-50/30"
+        ? "text-purple-400"
+        : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
     }`}
   >
-    {!active && (
-      <span className="absolute inset-0 bg-linear-to-r from-purple-400/0 via-purple-400/10 to-purple-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+    {active && (
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500 rounded-r" />
     )}
     <span
-      className={active ? "" : "group-hover:scale-110 transition-transform"}
+      className={`${active ? "text-purple-400" : "group-hover:scale-110 transition-transform"}`}
     >
-      {icon}
+      {React.cloneElement(icon, { size: 20 })}
     </span>
-    <span className="relative z-10">{label}</span>
+    <span className="truncate transition-opacity duration-300">{label}</span>
+
     {active && (
-      <span className="absolute right-3 w-1.5 h-1.5 bg-white rounded-full" />
+      <span className="absolute right-4 w-1.5 h-1.5 bg-purple-400 rounded-full" />
     )}
   </button>
 );
@@ -68,75 +69,92 @@ const AdminSidebar = ({
   stats,
 }: AdminSidebarProps) => {
   return (
-    <div className="lg:w-1/4 shrink-0">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden sticky top-24">
-        <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50">
-          <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xl">
-            {user?.name?.[0]?.toUpperCase() || "A"}
-          </div>
-          <div className="overflow-hidden">
-            <h3 className="font-bold text-slate-900 line-clamp-1">
-              {user?.name}
-            </h3>
-            <p className="text-xs text-slate-500 line-clamp-1">Administrator</p>
-          </div>
+    <div className="transition-all duration-300 ease-in-out shrink-0 sticky top-6 h-[calc(100vh-48px)] bg-[#0f172a] rounded-3xl shadow-2xl border border-slate-800 flex-col overflow-hidden scrollbar-hide z-40 w-64 hidden lg:flex">
+      {/* Top Profile Area (Replacing Logo) */}
+      <div className="p-6 flex items-center gap-3 border-b border-slate-800/50 mb-4 h-24">
+        <div className="h-10 w-10 min-w-[40px] rounded-full bg-purple-600 border border-purple-500/20 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-purple-600/20">
+          {user?.name?.[0]?.toUpperCase() || "A"}
         </div>
-        <nav className="p-2">
-          <NavButton
-            active={activeTab === "overview"}
-            onClick={() => setActiveTab("overview")}
-            icon={<LayoutDashboard size={18} />}
-            label="Overview"
-          />
-          <NavButton
-            active={activeTab === "products"}
-            onClick={() => setActiveTab("products")}
-            icon={<Package size={18} />}
-            label={`Products (${stats.products.length})`}
-          />
-          <NavButton
-            active={activeTab === "reviews"}
-            onClick={() => setActiveTab("reviews")}
-            icon={<MessageSquare size={18} />}
-            label={`Reviews (${stats.totalReviews})`}
-          />
-          <NavButton
-            active={activeTab === "users"}
-            onClick={() => setActiveTab("users")}
-            icon={<Users size={18} />}
-            label={`Users (${stats.users?.filter((u: any) => !u.isAdmin).length ?? 0})`}
-          />
-          <NavButton
-            active={activeTab === "admins"}
-            onClick={() => setActiveTab("admins")}
-            icon={<Shield size={18} />}
-            label={`Admins (${stats.users?.filter((u: any) => u.isAdmin).length ?? 0})`}
-          />
-          <NavButton
-            active={activeTab === "orders"}
-            onClick={() => setActiveTab("orders")}
-            icon={<ClipboardList size={18} />}
-            label={`Orders (${stats.totalOrders})`}
-          />
-          <NavButton
-            active={activeTab === "categories"}
-            onClick={() => setActiveTab("categories")}
-            icon={<Tag size={18} />}
-            label={`Categories (${stats.categories?.length ?? 0})`}
-          />
+        <div className="overflow-hidden">
+          <p className="text-sm font-bold text-white truncate">
+            {user?.name || "Admin User"}
+          </p>
+          <p className="text-[10px] text-purple-400 uppercase tracking-widest font-bold">
+            Administrator
+          </p>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-2 space-y-1 scrollbar-hide overflow-y-auto overflow-x-hidden">
+        <NavButton
+          active={activeTab === "overview"}
+          onClick={() => setActiveTab("overview")}
+          icon={<LayoutDashboard />}
+          label="Overview"
+        />
+        <NavButton
+          active={activeTab === "products"}
+          onClick={() => setActiveTab("products")}
+          icon={<Package />}
+          label={`Products (${stats?.products?.length ?? 0})`}
+        />
+        <NavButton
+          active={activeTab === "reviews"}
+          onClick={() => setActiveTab("reviews")}
+          icon={<MessageSquare />}
+          label={`Reviews (${stats?.totalReviews ?? 0})`}
+        />
+        <NavButton
+          active={activeTab === "users"}
+          onClick={() => setActiveTab("users")}
+          icon={<Users />}
+          label={`Users (${stats?.users?.filter((u: any) => !u.isAdmin).length ?? 0})`}
+        />
+        <NavButton
+          active={activeTab === "admins"}
+          onClick={() => setActiveTab("admins")}
+          icon={<Shield />}
+          label={`Admins (${stats?.users?.filter((u: any) => u.isAdmin).length ?? 0})`}
+        />
+        <NavButton
+          active={activeTab === "orders"}
+          onClick={() => setActiveTab("orders")}
+          icon={<ClipboardList />}
+          label={`Orders (${stats?.totalOrders ?? 0})`}
+        />
+        <NavButton
+          active={activeTab === "categories"}
+          onClick={() => setActiveTab("categories")}
+          icon={<Tag />}
+          label={`Categories (${stats?.categories?.length ?? 0})`}
+        />
+      </nav>
+
+      {/* Bottom Actions Only */}
+      <div className="p-4 border-t border-slate-800/50 mt-auto">
+        <div className="space-y-1">
           <Link
             href="/account"
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-xl mb-1 transition-colors"
+            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-purple-400 hover:bg-purple-500/10 rounded-lg transition-colors w-full"
+            title="Switch to User View"
           >
-            <UserIcon size={18} /> Switch to User View
+            <UserIcon size={16} />
+            <span>Switch to User View</span>
           </Link>
-          <Link
-            href="/api/auth/logout"
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl mt-2 transition-colors"
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.location.href = "/api/auth/logout";
+              }
+            }}
+            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-500/10 rounded-lg transition-colors w-full"
+            title="Logout"
           >
-            <LogOut size={18} /> Logout
-          </Link>
-        </nav>
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
+        </div>
       </div>
     </div>
   );

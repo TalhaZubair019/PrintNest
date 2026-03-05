@@ -13,6 +13,7 @@ import {
   Search,
   X,
   CheckCircle,
+  UserIcon,
 } from "lucide-react";
 import AdminReviewList from "@/components/admin/tables/AdminReviewList";
 import db from "@data/db.json";
@@ -49,23 +50,23 @@ const PageHeader = ({ title, breadcrumb }: any) => (
         src={db.shop.backgroundImage}
         alt="Background"
         fill
-        className="object-fill opacity-80"
+        className="object-cover opacity-80"
         priority
         unoptimized
       />
-      <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
+      <div className="absolute bottom-0 w-full h-24 bg-linear-to-t from-white to-transparent z-20" />
     </div>
 
-    <div className="relative z-10 pt-80 flex flex-col items-center justify-center pb-10">
-      <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
+    <div className="relative z-10 pt-32 flex flex-col items-center justify-center pb-10">
+      <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
         {title}
       </h1>
-      <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
-      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
+      <div className="h-1 w-16 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-4"></div>
+      <div className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 bg-white px-4 py-1.5 rounded-full shadow-sm border border-slate-100">
         <Link href="/" className="hover:text-purple-600 transition-colors">
           Home
         </Link>
-        <ChevronRight size={14} />
+        <ChevronRight size={12} />
         <span className="text-slate-900">{breadcrumb}</span>
       </div>
     </div>
@@ -81,6 +82,11 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [activeTab, setActiveTab] = useState<
     | "overview"
     | "users"
@@ -540,7 +546,10 @@ export default function AdminDashboard() {
   if (isAuthLoading || loading || !stats) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans">
-        <PageHeader title="Admin Panel" breadcrumb="Dashboard" />
+        <PageHeader
+          title={mounted ? `Welcome, ${user?.name || "Admin"}` : "Admin Panel"}
+          breadcrumb="Dashboard"
+        />
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-32 flex justify-center items-center">
           <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin shadow-lg"></div>
         </div>
@@ -550,9 +559,47 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans text-slate-800">
-      <PageHeader title="Admin Panel" breadcrumb="Dashboard" />
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <PageHeader
+        title={mounted ? `Welcome, ${user?.name || "Admin"}` : "Admin Panel"}
+        breadcrumb="Dashboard"
+      />
+      <div className="max-w-full mx-auto px-4 lg:px-6 pt-2 pb-12">
+        <div className="lg:hidden mb-6 flex items-center justify-between bg-[#0f172a] p-4 rounded-2xl shadow-lg border border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-purple-600 border border-purple-500/20 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-purple-600/20">
+              {user?.name?.[0]?.toUpperCase() || "A"}
+            </div>
+            <div className="overflow-hidden">
+              <span className="text-xl font-bold text-white tracking-tight truncate block">
+                {user?.name || "Admin User"}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/account"
+              className="text-purple-400 hover:text-purple-300 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700 transition-colors"
+              title="Switch to User View"
+            >
+              <UserIcon size={18} />
+            </Link>
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as any)}
+              className="bg-slate-800 text-purple-400 text-xs font-bold py-2 px-3 rounded-lg border border-slate-700 outline-none"
+            >
+              <option value="overview">Overview</option>
+              <option value="products">Products</option>
+              <option value="reviews">Reviews</option>
+              <option value="users">Users</option>
+              <option value="admins">Admins</option>
+              <option value="orders">Orders</option>
+              <option value="categories">Categories</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-0 lg:gap-8">
           <AdminSidebar
             user={user}
             activeTab={activeTab}
@@ -560,7 +607,7 @@ export default function AdminDashboard() {
             stats={stats}
           />
 
-          <div id="admin-content-area" className="lg:flex-1">
+          <div id="admin-content-area" className="flex-1 w-full lg:min-w-0">
             {["users", "admins", "orders", "products", "reviews"].includes(
               activeTab,
             ) && (
