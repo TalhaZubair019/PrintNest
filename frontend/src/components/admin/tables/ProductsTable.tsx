@@ -1,7 +1,15 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Package, Edit, Trash2, Filter, FilterX } from "lucide-react";
+import {
+  Plus,
+  Package,
+  Edit,
+  Trash2,
+  Filter,
+  FilterX,
+  Tag,
+} from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
 interface ProductsTableProps {
@@ -20,6 +28,7 @@ const ProductsTable = ({
   setProductPage,
 }: ProductsTableProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedBadge, setSelectedBadge] = useState<string>("all");
   const ITEMS_PER_PAGE = 10;
 
   const filteredProducts = useMemo(() => {
@@ -32,9 +41,26 @@ const ProductsTable = ({
       } else {
         categoryMatch = product.category === selectedCategory;
       }
-      return categoryMatch;
+      let badgeMatch = false;
+      if (selectedBadge === "all") {
+        badgeMatch = true;
+      } else if (selectedBadge === "none") {
+        badgeMatch = !product.badge;
+      } else {
+        badgeMatch = product.badge === selectedBadge;
+      }
+
+      return categoryMatch && badgeMatch;
     });
-  }, [allProducts, selectedCategory]);
+  }, [allProducts, selectedCategory, selectedBadge]);
+
+  const uniqueBadges = useMemo(() => {
+    const badges = new Set<string>();
+    allProducts.forEach((p) => {
+      if (p.badge) badges.add(p.badge);
+    });
+    return Array.from(badges);
+  }, [allProducts]);
 
   const totalProductPages =
     Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
@@ -45,7 +71,7 @@ const ProductsTable = ({
 
   useEffect(() => {
     setProductPage(1);
-  }, [selectedCategory, setProductPage]);
+  }, [selectedCategory, selectedBadge, setProductPage]);
   return (
     <div
       key="products"
@@ -81,30 +107,56 @@ const ProductsTable = ({
             </span>
           </div>
 
-          <div className="relative flex-1 min-w-[200px]">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-              <Filter size={16} />
-            </div>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
-            >
-              <option value="all">All Categories</option>
-              {categories?.map((c) => (
-                <option key={c._id || c.name} value={c.name}>
-                  {c.name}
+          <div className="flex flex-wrap items-center gap-3 flex-1">
+            <div className="relative flex-1 min-w-[150px]">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <Filter size={16} />
+              </div>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+              >
+                <option value="all">All Categories</option>
+                {categories?.map((c) => (
+                  <option key={c._id || c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+                <option value="uncategorized" className="italic text-slate-500">
+                  Uncategorized
                 </option>
-              ))}
-              <option value="uncategorized" className="italic text-slate-500">
-                Uncategorized
-              </option>
-            </select>
+              </select>
+            </div>
+
+            <div className="relative flex-1 min-w-[150px]">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <Tag size={16} />
+              </div>
+              <select
+                value={selectedBadge}
+                onChange={(e) => setSelectedBadge(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+              >
+                <option value="all">All Badges</option>
+                {uniqueBadges.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+                <option value="none" className="italic text-slate-500">
+                  No Badge
+                </option>
+              </select>
+            </div>
           </div>
 
-          {selectedCategory !== "all" && (
+          {(selectedCategory !== "all" || selectedBadge !== "all") && (
             <button
-              onClick={() => setSelectedCategory("all")}
+              onClick={() => {
+                setSelectedCategory("all");
+                setSelectedBadge("all");
+              }}
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
             >
               <FilterX size={16} />

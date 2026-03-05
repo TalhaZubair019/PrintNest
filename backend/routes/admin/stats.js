@@ -77,7 +77,7 @@ router.get("/", requireAdmin, async (req, res) => {
       }),
     );
     const topProducts = Object.values(productSales)
-      .sort((a, b) => b.quantity - a.quantity)
+      .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
     const recentOrders = [...orders]

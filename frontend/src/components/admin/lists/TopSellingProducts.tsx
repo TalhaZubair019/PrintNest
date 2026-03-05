@@ -10,7 +10,9 @@ interface TopSellingProductsProps {
 const TopSellingProducts = ({ stats }: TopSellingProductsProps) => {
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-      <h3 className="font-bold text-slate-800 mb-6">Top Selling Products</h3>
+      <h3 className="font-bold text-slate-800 mb-6">
+        Highest Grossing Products
+      </h3>
       <div className="space-y-4">
         {stats.topProducts.length === 0 ? (
           <p className="text-sm text-slate-400 italic">No sales data yet.</p>
@@ -36,7 +38,7 @@ const TopSellingProducts = ({ stats }: TopSellingProductsProps) => {
                     {p.name}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {p.quantity} items sold
+                    {p.quantity} {p.quantity === 1 ? "item" : "items"} sold
                   </p>
                 </div>
               </div>

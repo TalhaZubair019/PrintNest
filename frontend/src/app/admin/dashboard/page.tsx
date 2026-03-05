@@ -637,6 +637,11 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <OrderStatusChart stats={stats} />
+                  <ReviewRatingChart stats={stats} />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <OrderVelocityChart stats={stats} />
                   <AverageOrderValueChart
                     stats={stats}
                     filteredAovData={filteredAovData}
@@ -651,11 +656,6 @@ export default function AdminDashboard() {
                     setAovCustomEnd={setAovCustomEnd}
                     aovLoading={aovLoading}
                   />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <OrderVelocityChart stats={stats} />
-                  <ReviewRatingChart stats={stats} />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

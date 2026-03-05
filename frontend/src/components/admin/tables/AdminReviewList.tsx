@@ -62,6 +62,7 @@ export default function AdminReviewList({
   const [selectedUserId, setSelectedUserId] = useState<string>("all");
   const [selectedProductId, setSelectedProductId] = useState<string>("all");
   const [selectedDateRange, setSelectedDateRange] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [customStart, setCustomStart] = useState<string>("");
   const [customEnd, setCustomEnd] = useState<string>("");
   const [expandedEditId, setExpandedEditId] = useState<string | null>(null);
@@ -104,13 +105,19 @@ export default function AdminReviewList({
         }
       }
 
-      return userMatch && productMatch && dateMatch;
+      const statusMatch =
+        selectedStatus === "all" ||
+        (selectedStatus === "edited" && review.isEdited) ||
+        (selectedStatus === "unedited" && !review.isEdited);
+
+      return userMatch && productMatch && dateMatch && statusMatch;
     });
   }, [
     reviews,
     selectedUserId,
     selectedProductId,
     selectedDateRange,
+    selectedStatus,
     customStart,
     customEnd,
   ]);
@@ -230,14 +237,31 @@ export default function AdminReviewList({
             </select>
           </div>
 
+          <div className="relative flex-1 min-w-[200px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <Filter size={16} />
+            </div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+            >
+              <option value="all">Any Status</option>
+              <option value="edited">Edited Reviews</option>
+              <option value="unedited">Unedited Reviews</option>
+            </select>
+          </div>
+
           {(selectedUserId !== "all" ||
             selectedProductId !== "all" ||
-            selectedDateRange !== "all") && (
+            selectedDateRange !== "all" ||
+            selectedStatus !== "all") && (
             <button
               onClick={() => {
                 setSelectedUserId("all");
                 setSelectedProductId("all");
                 setSelectedDateRange("all");
+                setSelectedStatus("all");
                 setCustomStart("");
                 setCustomEnd("");
               }}
