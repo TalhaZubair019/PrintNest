@@ -4,208 +4,196 @@
 [![React](https://img.shields.io/badge/React-19.2.3-blue?logo=react)](https://reactjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://typescriptlang.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-green?logo=mongodb)](https://mongoosejs.com)
+[![Express](https://img.shields.io/badge/Express-4.x-lightgrey?logo=express)](https://expressjs.com)
+[![Stripe](https://img.shields.io/badge/Stripe-Payment-blue?logo=stripe)](https://stripe.com)
+[![PayPal](https://img.shields.io/badge/PayPal-Payment-blue?logo=paypal)](https://paypal.com)
 [![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.11-purple?logo=redux)](https://redux-toolkit.js.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-cyan?logo=tailwindcss)](https://tailwindcss.com)
 
-A modern, full-stack e-commerce platform for custom print-on-demand products. Built with **Next.js 16** (Frontend) and **Express** (Backend), featuring a complete admin panel, MongoDB database, AI-powered product descriptions, premium HTML email notifications, and real-time analytics.
+A professional, full-stack monorepo e-commerce platform for custom print-on-demand products. Featuring a hybrid architecture with a **Next.js 16** frontend and a dedicated **Express.js** backend, integrated with Stripe/PayPal, advanced AI (Llama 4 Scout), and comprehensive admin tools.
 
 ---
 
 ## ✨ Key Features
 
-### 🛒 E-Commerce
+### 🛒 E-Commerce & Payments
 
-- **Product Catalog** with quick view, comparison, and wishlist
-- **Shopping Cart** with quantity controls and localStorage persistence
-- **Wishlist** with Redux state management
-- **Dynamic Product Categories** (T-shirts, Business Cards, Hoodies, Packaging)
-- **Product Review System** with ratings and comments
-- **Checkout** with billing, payment selection, and order confirmation
+- **Multi-Gateway Checkout**: Secure payments via **Stripe** (Cards) and **PayPal** (Express Checkout).
+- **Product Catalog**: Advanced quick view, comparison tools, and persistent wishlist.
+- **Smart Shopping Cart**: Real-time quantity management with **Redux Persist** (LocalStorage sync).
+- **Dynamic Categories**: Tailored experiences for T-shirts, Business Cards, Hoodies, and Packaging.
+- **Review System**: User-generated ratings and verified purchase comments.
 
-### 🔐 Authentication & Users
+### 🔐 Security & User Management
 
-- **Sign Up / Login** with bcrypt password hashing
-- **JWT Authentication** via HTTP-only cookies
-- **User Dashboard** with order history
-- **Guest Checkout** support
-- **Role-based Access** — admin vs standard user
+- **Monorepo Backend**: Dedicated Express server with **Helmet** security, **CORS** protection, and **Express Rate Limiting**.
+- **Secure Auth**: JWT-based authentication with HTTP-only cookies and bcrypt password hashing.
+- **Role-based Access**: Differentiated views for Admin and Customer accounts.
+- **Guest Experience**: Full support for guest checkout with optional account creation.
 
-### 🛠️ Admin Panel (`/admin`)
+### 🛠️ High-Performance Admin Panel (`/admin`)
 
-- **Dashboard** with charts: revenue, orders, top products, user stats
-- **Product Management** — add, edit, delete products
-- **Order Management** — view and update order statuses
-- **User Management** — view, promote, delete users
-- **Review Moderation** — view and manage all reviews
-- **AI Description Generator** powered by Groq (Llama 4 Scout)
-- **Image Upload** endpoint for products
+- **Real-time Analytics**: Interactive charts for revenue, order velocity, and top-selling products.
+- **Inventory Control**: Comprehensive CRUD operations for products and categories.
+- **Order Lifecycle**: End-to-end management from "Processing" to "Delivered".
+- **AI Tooling**: Auto-generate SEO-rich descriptions in seconds.
+- **Media Center**: Integrated file uploads via **Multer**.
 
-### 🤖 AI Integration
+### 🤖 Advanced AI Integration (Groq)
 
-- **Multimodal AI Product Descriptions** via Groq API (Llama 4 Scout 17B)
-- Analyzes uploaded product images to mention specific colors, patterns, and designs to boost SEO.
-- Generates compelling 2–3 sentence product descriptions from a title.
+- **Multimodal SEO Generation**: Uses **Meta Llama 4 Scout (17B)** to analyze product images and generate detailed, visual-first descriptions.
+- **Semantic SEO**: Default fallback to **Llama 3.3 (70B)** for text-based semantic description generation.
+- **Conversion-Focused**: Descriptions follow Google's "Helpful Content" guidelines, focusing on search intent and user benefit.
 
-### 📧 Order & Email
+### 📧 Premium Communication
 
-- Orders saved to **MongoDB**
-- **Premium HTML Email Notifications** sent to customer and store via Nodemailer
-- Emails include detailed order summaries (item names, prices, quantities)
-- Order status update notifications for customers
-- Guest and authenticated order tracking
+- **Automated Emails**: HTML-rich order confirmations and status updates via **Nodemailer**.
+- **Admin Alerts**: Instant notifications for new orders and low stock alerts.
 
 ---
 
 ## 📋 Table of Contents
 
 - [Tech Stack](#-tech-stack)
+- [Detailed Technical Deep Dive](#-detailed-technical-deep-dive)
 - [Package Installation](#-package-installation-commands)
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
-- [API Routes](#-api-routes)
+- [API Architecture](#-api-architecture)
 - [Database & Models](#-database--models)
-- [Redux Store](#-redux-store)
-- [Admin Panel](#-admin-panel)
-- [Pages & Routes](#-pages--routes)
+- [Redux State](#-redux-state)
+- [Development Workflow](#-development-workflow)
 - [Deployment](#-deployment)
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Category             | Technology                   |
-| -------------------- | ---------------------------- |
-| **Framework**        | Next.js 16.1.6 (App Router)  |
-| **Frontend**         | React 19.2.3                 |
-| **Language**         | TypeScript 5.x               |
-| **Backend**          | Express.js                   |
-| **Database**         | MongoDB via Mongoose 8.x     |
-| **Styling**          | Tailwind CSS 4.x             |
-| **Animations**       | Framer Motion 12.x           |
-| **State Management** | Redux Toolkit 2.x            |
-| **Icons**            | Lucide React                 |
-| **Authentication**   | JWT + bcryptjs               |
-| **Email**            | Nodemailer (Gmail SMTP)      |
-| **AI**               | Groq API (Llama 4 Scout 17B) |
-| **Utilities**        | clsx, tailwind-merge, cookie |
+| Category       | Technology                                        |
+| -------------- | ------------------------------------------------- |
+| **Frontend**   | Next.js 16.1.6 (App Router), React 19.2.3         |
+| **Backend**    | Express.js 4.x (Node.js)                          |
+| **Language**   | TypeScript 5.x                                    |
+| **Database**   | MongoDB via Mongoose 8.x                          |
+| **Payments**   | Stripe API, PayPal API                            |
+| **Styling**    | Tailwind CSS 4.x, clsx, tailwind-merge            |
+| **Animations** | Framer Motion 12.x                                |
+| **State**      | Redux Toolkit, Redux Persist                      |
+| **AI Models**  | Llama 4 Scout (Vision), Llama 3.3 (Text) via Groq |
+| **Security**   | Helmet, Express Rate Limit, JWT, Bcrypt           |
+
+---
+
+## 🔍 Detailed Technical Deep Dive
+
+### 🏗️ 1. Hybrid Monorepo Architecture
+
+PrintNest has evolved from a unified Next.js app into a sophisticated **full-stack monorepo**, separating concerns for maximum scalability.
+
+- **Frontend (`/frontend`)**: A **Next.js 16** (App Router) powerhouse. It handles the complete user journey, dynamic SEO rendering, and complex client-side interactions.
+- **Backend (`/backend`)**: A robust **Express.js** engine. This dedicated server manages the "heavy lifting"—database transactions, payment gateway handshakes, AI orchestration, and secure authentication.
+- **Parallel Execution**: Using root-level orchestration, both layers launch concurrently with a single `npm run dev` command, providing a seamless DX (Developer Experience).
+
+### 💳 2. Enterprise-Grade Payment Integrations
+
+The platform integrates the world's leading financial gateways with a "Security-First" approach:
+
+- **Stripe**: Handles global card payments by generating encrypted **Checkout Sessions**. This ensures that sensitive PCI data never touches our servers, drastically reducing security overhead.
+- **PayPal**: Integrated via the **Express Checkout API**, offering users a familiar, one-click payment experience using their PayPal balance or linked accounts.
+- **Integrity**: Every transaction undergoes server-side validation to prevent price manipulation and ensure order consistency.
+
+### 🤖 3. Next-Gen AI Integration (Llama 4 Scout)
+
+PrintNest leverages state-of-the-art multimodal AI to transform product management:
+
+- **Llama 4 Scout (17B)**: When an image is uploaded, this vision-capable model analyzes the visual data. It identifies specific colors, checkered/floral patterns, and material textures (e.g., "matte finish" vs "glossy").
+- **Llama 3.3 (70B)**: Serves as a high-parameter fallback for deep semantic text generation.
+- **SEO Powerhouse**: Descriptions aren't just fluff; they are semantically optimized for Google’s **Helpful Content** guidelines, naturally incorporating LSI keywords based on real visual attributes.
+
+### 🔐 4. Hardened Backend Security
+
+Our Express.js backend is guarded by an industry-standard security stack:
+
+- **Helmet.js**: Automatically sets security-related HTTP headers to block XSS, clickjacking, and other common attack vectors.
+- **Rate Limiting**: Protects against Brute Force and DDoS attacks by capping the number of requests per IP in a sliding 15-minute window.
+- **CORS & CSRF Protection**: Strict origin-sharing policies and **HTTP-only cookies** ensure that user sessions are immune to client-side script theft.
+
+### 🏪 5. Durable State with Redux Persist
+
+We believe shopping should be uninterrupted. By integrating **Redux Persist**:
+
+- **Durability**: The entire Redux state (Cart, Wishlist, Auth) is automatically mirrored to the browser's **LocalStorage**.
+- **User Continuity**: A user can add items to their cart on Monday, close their browser, and return on Friday to find their shopping session exactly as they left it.
+
+### 📊 6. Professional Admin Intelligence
+
+The `/admin` dashboard is more than a control panel—it's a business intelligence tool:
+
+- **Real-time Analytics**: Interactive charts (Recharts/Chart.js) visualize daily revenue trends, order velocity (peak shopping hours), and category performance.
+- **Sentiment Logic**: The system doesn't just store reviews; it categorizes product sentiment (Good vs. Bad) to help admins make data-driven decisions on inventory.
+
+### 📧 7. Premium Communication Stack
+
+Communication is a cornerstone of the PrintNest experience:
+
+- **Nodemailer (SMTP)**: Configured for high-deliverability via Gmail.
+- **Rich HTML Receipts**: Customers receive pixel-perfect receipts featuring product thumbnails, itemized pricing tables, and dynamic tracking links.
+- **Admin Alerts**: Instant, automated notifications for every new order to ensure rapid fulfillment.
+
+### 🗄️ 8. Optimized Database Schema (MongoDB)
+
+Our data architecture is built on a high-availability MongoDB cluster using Mongoose:
+
+- **User Model**: Manages secure credentials, saved cards, and administrative privileges.
+- **Order Model**: Tracks the full lifecycle of an order, including multi-gateway payment metadata.
+- **Product & Review Models**: Linked via relational-style object IDs to provide instant feedback loops between customer reviews and product ratings.
 
 ---
 
 ## 📦 Package Installation Commands
 
-### Install All at Once
+### Monorepo Setup (Root)
 
 ```bash
 npm install
 ```
 
-### Production Dependencies
+### Key Production Dependencies
+
+#### Frontend & UI
 
 ```bash
-# Install all production deps at once
-npm install @google/generative-ai @reduxjs/toolkit bcryptjs clsx cookie framer-motion jsonwebtoken lucide-react mongoose next nodemailer react react-dom react-redux tailwind-merge
+# Core
+npm install next@16.1.6 react@19.2.3 react-dom@19.2.3
+# State & Animations
+npm install @reduxjs/toolkit react-redux redux-persist framer-motion
+# Styling
+npm install lucide-react clsx tailwind-merge
 ```
 
-Or install individually:
-
-#### Framework & Core
+#### Backend & API
 
 ```bash
-npm install next@16.1.6          # Next.js framework
-npm install react@19.2.3         # React library
-npm install react-dom@19.2.3     # React DOM renderer
+# Core Server
+npm install express mongoose cors dotenv helmet cookie-parser express-rate-limit
+# Payments & Auth
+npm install stripe jsonwebtoken bcryptjs node-fetch@2
+# Utilities
+npm install nodemailer multer
 ```
 
-#### Database
+#### AI SDK
 
 ```bash
-npm install mongoose@^9.2.1      # MongoDB ODM
+npm install @google/generative-ai   # Optional: Google AI integration
 ```
 
-#### State Management
+### Development Tools
 
 ```bash
-npm install @reduxjs/toolkit@^2.11.2   # Redux Toolkit
-npm install react-redux@^9.2.0         # React bindings for Redux
+npm install -D nodemon typescript tailwindcss @tailwindcss/postcss eslint
 ```
-
-#### Authentication & Security
-
-```bash
-npm install bcryptjs@^3.0.3            # Password hashing
-npm install jsonwebtoken@^9.0.3        # JWT tokens
-npm install cookie@^1.1.1              # Cookie parsing
-```
-
-#### UI & Styling
-
-```bash
-npm install framer-motion@^12.30.0     # Animations
-npm install lucide-react@^0.563.0      # Icons
-npm install clsx@^2.1.1                # Conditional classNames
-npm install tailwind-merge@^3.4.0      # Tailwind class merging
-```
-
-#### Email & AI
-
-```bash
-npm install nodemailer@^6.9.13         # Email sending (SMTP)
-npm install @google/generative-ai@^0.24.1  # Google AI SDK
-```
-
-### Development Dependencies
-
-```bash
-# Install all dev deps at once
-npm install -D @tailwindcss/postcss @types/bcryptjs @types/cookie @types/jsonwebtoken @types/node @types/nodemailer @types/react @types/react-dom babel-plugin-react-compiler eslint eslint-config-next tailwindcss typescript
-```
-
-Or install individually:
-
-#### TypeScript & Types
-
-```bash
-npm install -D typescript@^5
-npm install -D @types/node@^20
-npm install -D @types/react@^19
-npm install -D @types/react-dom@^19
-npm install -D @types/bcryptjs@^2.4.6
-npm install -D @types/cookie@^0.6.0
-npm install -D @types/jsonwebtoken@^9.0.10
-npm install -D @types/nodemailer@^7.0.9
-```
-
-#### CSS & Build Tools
-
-```bash
-npm install -D tailwindcss@^4
-npm install -D @tailwindcss/postcss@^4
-npm install -D eslint@^9
-npm install -D eslint-config-next@16.1.6
-npm install -D babel-plugin-react-compiler@1.0.0
-```
-
-### Package Purposes
-
-| Package                 | Purpose                                           |
-| ----------------------- | ------------------------------------------------- |
-| `@google/generative-ai` | Google AI SDK (installed alongside Groq)          |
-| `@reduxjs/toolkit`      | Simplified Redux with createSlice, configureStore |
-| `bcryptjs`              | Secure password hashing                           |
-| `clsx`                  | Conditional className utility                     |
-| `cookie`                | HTTP cookie parsing                               |
-| `framer-motion`         | Page and component animations                     |
-| `jsonwebtoken`          | JWT creation and verification                     |
-| `lucide-react`          | Icon component library                            |
-| `mongoose`              | MongoDB ODM for data modeling                     |
-| `next`                  | React framework (SSR, routing, API)               |
-| `nodemailer`            | Send order confirmation emails                    |
-| `react` / `react-dom`   | UI library and DOM renderer                       |
-| `react-redux`           | Redux bindings for React                          |
-| `tailwind-merge`        | Merge Tailwind classes without conflicts          |
-| `tailwindcss`           | Utility-first CSS framework                       |
-| `typescript`            | Static typing for JavaScript                      |
 
 ---
 
@@ -213,40 +201,31 @@ npm install -D babel-plugin-react-compiler@1.0.0
 
 ```
 printnest/
-├── backend/                              # Express Backend
-│   ├── lib/                              # DB connection & models
-│   ├── middleware/                       # Auth & Admin guards
-│   ├── routes/                           # API Route handlers
-│   │   ├── admin/                        # Admin-only endpoints
-│   │   │   ├── ai.js                     # Multimodal AI generation
-│   │   │   ├── categories.js             # Manage categories
-│   │   │   ├── orders.js                 # Orders management
-│   │   │   ├── products.js               # Products management
-│   │   │   ├── stats.js                  # Analytics
-│   │   │   └── users.js                  # User promotion/deletion
-│   │   ├── public/                       # Open endpoints
-│   │   │   ├── content.js                # Fetch static content
-│   │   │   ├── orders.js                 # Place orders
-│   │   │   └── reviews.js                # Product reviews
-│   │   ├── auth.js                       # Login/Signup/Me
-│   │   ├── stripe.js                     # Stripe payment logic
-│   │   ├── paypal.js                     # PayPal logic
-│   │   └── upload.js                     # File uploads
-│   └── server.js                         # Express entry point
+├── backend/                              # Express.js Server
+│   ├── lib/                              # DB Connection & Mongoose Models
+│   │   ├── models/                       # User, Product, Order, Review
+│   ├── middleware/                       # Auth, Admin, and Upload guards
+│   ├── routes/                           # API Modules
+│   │   ├── admin/                        # Stats, AI, and management
+│   │   ├── public/                       # Storefront data & reviews
+│   │   ├── auth.js                       # JWT session handling
+│   │   ├── stripe.js                     # Card payments
+│   │   ├── paypal.js                     # PayPal Express
+│   │   └── upload.js                     # Media handling
+│   └── server.js                         # Entry point (Port 5000)
 │
-├── frontend/                             # Next.js 16 Frontend
+├── frontend/                             # Next.js 16 Client
 │   ├── src/
-│   │   ├── app/                          # App Router pages
-│   │   ├── components/                   # UI & Section components
-│   │   ├── lib/                          # Client utilities
-│   │   └── redux/                        # Global state management
-│   ├── public/                           # Static assets
-│   ├── tailwind.config.ts
-│   └── next.config.ts
+│   │   ├── app/                          # App Router (Pages & API Handlers)
+│   │   ├── components/                   # Sections (Hero, Blog) & UI Library
+│   │   ├── lib/                          # Client-side env & utils
+│   │   └── redux/                        # Store, Persistor, and Slices
+│   ├── public/                           # Optimized images & assets
+│   └── tailwind.config.ts                # Modern styling configuration
 │
-├── data/                                 # Shared static data
-├── .env                                  # Root environment variables
-├── package.json                          # Monorepo scripts
+├── data/                                 # Shared schemas & seed data
+├── .env                                  # Unified environment file
+├── package.json                          # Orchestration scripts
 └── README.md
 ```
 
@@ -254,267 +233,127 @@ printnest/
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- **Node.js** 18.0 or higher
-- **MongoDB** database (Atlas or local)
-- **Groq API key** (for AI descriptions)
-- **Gmail** account (for email notifications)
-
 ### Installation
 
-1. **Clone the repository**
+1. **Clone & Setup**
 
    ```bash
-   git clone <your-repo-url>
+   git clone <repo-url>
    cd printnest
-   ```
-
-2. **Install dependencies**
-
-   ```bash
    npm install
    ```
 
-3. **Create `.env`** (see [Environment Variables](#-environment-variables))
+2. **Environment Configuration**
+   Populate the root `.env` (see below).
 
-4. **Run development server**
+3. **Launch Monorepo**
 
    ```bash
    npm run dev
    ```
 
-5. **Open browser**
-   ```
-   http://localhost:3000
-   ```
+   - **Frontend**: `http://localhost:3000`
+   - **Backend**: `http://localhost:5000`
 
-### Scripts
+### Monorepo Scripts
 
-| Command                | Description                      |
-| ---------------------- | -------------------------------- |
-| `npm run dev`          | Start BOTH frontend and backend  |
-| `npm run dev:frontend` | Start Next.js development server |
-| `npm run dev:backend`  | Start Express (Nodemon) server   |
-| `npm run build`        | Build frontend for production    |
-| `npm start`            | Start production frontend server |
-| `npm run lint`         | Run ESLint on frontend           |
+| Command                | Description                            |
+| ---------------------- | -------------------------------------- |
+| `npm run dev`          | Runs frontend and backend concurrently |
+| `npm run dev:frontend` | Runs Next.js only                      |
+| `npm run dev:backend`  | Runs Express with Nodemon              |
+| `npm run build`        | Compiles Next.js for production        |
 
 ---
 
 ## 🔐 Environment Variables
 
-Create `.env` in the project root:
+One `.env` file in the root directory manages both layers:
 
 ```env
-# MongoDB
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/printnest
+# Database
+MONGODB_URI=mongodb+srv://...
 
-# JWT Authentication
-JWT_SECRET=your-secret-key-minimum-32-characters
+# Security
+JWT_SECRET=your_32_char_secret
 
-# Email (Gmail SMTP)
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-gmail-app-password
+# Payments
+STRIPE_SECRET_KEY=sk_test_...
+PAYPAL_CLIENT_ID=...
+PAYPAL_SECRET=...
 
-# AI Descriptions (Groq)
-GROQ_API_KEY=your-groq-api-key
+# AI & Third-Party
+GROQ_API_KEY=gsk_...
+EMAIL_USER=...
+EMAIL_PASS=...
+
+# App Config
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
-
-### Getting API Keys
-
-| Service                | URL                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------ |
-| **MongoDB Atlas**      | [cloud.mongodb.com](https://cloud.mongodb.com)                                 |
-| **Groq API**           | [console.groq.com](https://console.groq.com)                                   |
-| **Gmail App Password** | [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) |
-
-> **Note**: `MONGODB_URI` and `JWT_SECRET` are **required** — the app will throw on startup if missing.
 
 ---
 
-## 📡 API Routes
+## 📡 API Architecture
 
-### Auth Routes (`/api/auth`)
+### Unified Backend Endpoints (`/api`)
 
-| Endpoint  | Method | Description                    |
-| --------- | ------ | ------------------------------ |
-| `/signup` | POST   | Register new user              |
-| `/login`  | POST   | Login and receive JWT cookie   |
-| `/me`     | GET    | Get current authenticated user |
-| `/logout` | POST   | Clear auth cookie              |
-
-### Public Routes (`/api/public`)
-
-| Endpoint       | Method | Description                   |
-| -------------- | ------ | ----------------------------- |
-| `/content`     | GET    | All site content from db.json |
-| `/place-order` | POST   | Submit order + send emails    |
-| `/orders`      | GET    | Get orders for current user   |
-| `/reviews`     | GET    | Get product reviews           |
-| `/reviews`     | POST   | Submit a new review           |
-
-### Admin Routes (`/api/admin`) (🔒 Admin only)
-
-| Endpoint          | Method          | Description                   |
-| ----------------- | --------------- | ----------------------------- |
-| `/stats`          | GET             | Dashboard analytics & charts  |
-| `/products`       | GET/POST/DELETE | Manage product catalog        |
-| `/categories`     | GET/POST/PATCH  | Manage product categories     |
-| `/orders`         | GET/PATCH       | View and update orders        |
-| `/users`          | GET             | List all users                |
-| `/users/[id]`     | DELETE/PATCH    | Delete or promote users       |
-| `/ai-description` | POST            | Multimodal AI description gen |
+| Prefix    | Scope          | Key Features                            |
+| --------- | -------------- | --------------------------------------- |
+| `/auth`   | Authentication | Signup, Login, Password Hashing         |
+| `/public` | Storefront     | Categories, Reviews, Ordering           |
+| `/admin`  | Dashboard      | Charts, User Promotion, AI Descriptions |
+| `/stripe` | Payments       | Checkout Session Creation               |
+| `/paypal` | Payments       | Order Capture & Auth                    |
+| `/upload` | Assets         | Product Image Processing                |
 
 ---
 
 ## 🗄️ Database & Models
 
-The app uses **MongoDB** with Mongoose. Connection is cached globally for serverless efficiency.
+### Mongoose Schemas (`backend/lib/models`)
 
-### Models
-
-#### User
-
-```typescript
-{ name, email, password, phone, address, city, country, cart[], wishlist[], isAdmin }
-```
-
-#### Product
-
-```typescript
-{
-  (id, title, price, oldPrice, image, badge, printText, createdAt, updatedAt);
-}
-```
-
-#### Order
-
-```typescript
-{ id, userId, date, status, total, items[], customer }
-```
-
-#### Review
-
-```typescript
-{
-  (productId, userId, userName, userImage, rating, comment, date, createdAt);
-}
-```
-
-### Admin Promotion
-
-The user matching `EMAIL_USER` env var is automatically granted admin on each DB connection.
+- **User**: Profiles with `isAdmin` flags and `savedCards`.
+- **Product**: Catalog items with legacy `id` mapping for frontend compatibility.
+- **Order**: Detailed history with `PaymentGateway` metadata.
+- **Review**: Star ratings with associated `productId`.
 
 ---
 
-## 🏪 Redux Store
+## 🏪 Redux State
 
-### Slices
+The frontend uses **Redux Persist** to ensure the shopping experience remains uninterrupted across sessions.
 
-#### Cart (`CartSlice.tsx`)
-
-```typescript
-// State
-{ cartItems: CartItem[], totalQuantity: number, totalAmount: number }
-
-// Actions
-addToCart(item)         // Add or increment
-removeFromCart(id)      // Decrement by 1
-deleteItem(id)          // Remove entirely
-initializeCart(state)   // Restore from localStorage
-```
-
-#### Wishlist (`WishListSlice.tsx`)
-
-```typescript
-// State
-{ items: WishlistItem[] }
-
-// Actions
-toggleWishlist(item)    // Add or remove
-```
-
-#### Auth (`AuthSlice.tsx`)
-
-```typescript
-// State
-{ isAuthenticated: boolean, user: User | null, token: string | null }
-
-// Actions
-loginSuccess({ user, token })
-logout()
-```
-
----
-
-## 🛠️ Admin Panel
-
-Access the admin panel at `/admin/dashboard` (requires admin account).
-
-### Dashboard Analytics
-
-- **KPI Cards** — Total users, orders, revenue, reviews
-- **Revenue Chart** — Daily revenue over a date range
-- **Order Trend** — Orders per day
-- **Top Products** — Best-selling items
-- **Category Sales** — Revenue breakdown by category
-- **Order Velocity** — Orders by hour of day
-- **Review Stats** — Rating distribution and sentiment analysis
-
-### Product Management
-
-- Add products with title, price, image, badge
-- **AI description generator** — click to auto-generate from title using Groq
-- Edit and delete existing products
-- Image upload support
-
-### User & Order Management
-
-- View all users with order counts
-- Promote/demote admin status
-- Delete users
-- Update order statuses
+- **Cart Slice**: Handles atomic quantity updates and total calculations.
+- **Wishlist Slice**: Manages product IDs with optimized lookups.
+- **Auth Slice**: Persists user session state and JWT availability.
 
 ---
 
 ## 📄 Pages & Routes
 
-### Public Pages
+### Storefront
 
-| Route              | Description                                   |
-| ------------------ | --------------------------------------------- |
-| `/`                | Home (Hero, Products, Categories, Blog, etc.) |
-| `/shop`            | All products grid                             |
-| `/product/[slug]`  | Product detail with reviews                   |
-| `/category/[slug]` | Category-filtered products                    |
-| `/blog/[slug]`     | Blog post                                     |
-| `/cart`            | Shopping cart                                 |
-| `/wishlist`        | Saved products                                |
-| `/login`           | Login                                         |
-| `/signup`          | Registration                                  |
-| `/thank-you`       | Order confirmation                            |
+- `/` - Dynamic Landing Page
+- `/shop` - Infinite-scroll Product Grid
+- `/product/[slug]` - Detail + AI Proofing + Reviews
+- `/cart` & `/checkout` - Step-based fulfillment flow
 
-### Protected Pages
+### User & Admin
 
-| Route       | Description                        |
-| ----------- | ---------------------------------- |
-| `/account`  | User dashboard + order history     |
-| `/checkout` | Checkout (login prompt for guests) |
+- `/account` - Dashboard, Order tracking, Saved Cards
+- `/admin/dashboard` - Visual data via Chart.js/Recharts
+- `/admin/products` - AI-assisted Inventory Manager
 
-### Admin Pages (Admin only)
+---
 
-| Route              | Description             |
-| ------------------ | ----------------------- |
-| `/admin/dashboard` | Analytics & data charts |
-| `/admin/products`  | Product management      |
-| `/admin/reviews`   | Review moderation       |
+## 🌐 Deployment
 
-### Dynamic Route Slugs
+### Recommended: Vercel + Railway
 
-```
-"Print Mug"  →  /product/print-mug
-"T-shirts"   →  /category/t-shirts
-```
+- **Frontend**: Deploy `frontend/` to Vercel. Set `NEXT_PUBLIC_API_URL` to your backend.
+- **Backend**: Deploy `backend/` to Railway/Render. Ensure CORS allows your Vercel URL.
+- **Database**: MongoDB Atlas.
 
-**Made with ❤️ for the printing community** 🖨️✨
+---
+
+**Happy printing!** 🖨️✨
