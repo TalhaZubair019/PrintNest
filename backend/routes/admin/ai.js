@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
 Instructions:
 1. Identify 2-3 high-traffic SEO keywords naturally related to this title/category.
 2. Seamlessly integrate these keywords into the description.
-3. IMPORTANT: If an image is provided, you MUST explicitly mention the specific colors, patterns, graphics, or design styles visible in the image. Prove you have analyzed the image by describing what is on it.
+3. IMPORTANT: If an image is provided, you MUST explicitly mention the product's colors, patterns, graphics, or design styles visible in the image. Prove you have analyzed the image by describing what is on it.
 4. Focus on search intent, product quality, appeal, and key benefits. 
 5. Do not use bullet points. 
 6. Return ONLY the description text, nothing else.`,
