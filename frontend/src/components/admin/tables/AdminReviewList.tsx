@@ -40,7 +40,7 @@ interface AdminReviewListProps {
   onReviewDeleted?: () => void;
   reviews: Review[];
   products: Product[];
-  users?: { id: string; name: string }[];
+  users?: { id: string; name: string; email?: string }[];
 }
 
 export default function AdminReviewList({
@@ -66,6 +66,14 @@ export default function AdminReviewList({
   const [customStart, setCustomStart] = useState<string>("");
   const [customEnd, setCustomEnd] = useState<string>("");
   const [expandedEditId, setExpandedEditId] = useState<string | null>(null);
+
+  const nameFrequencies = useMemo(() => {
+    const freqs: Record<string, number> = {};
+    users.forEach((u) => {
+      freqs[u.name] = (freqs[u.name] || 0) + 1;
+    });
+    return freqs;
+  }, [users]);
 
   const filteredReviews = useMemo(() => {
     return reviews.filter((review) => {
@@ -123,13 +131,17 @@ export default function AdminReviewList({
   ]);
 
   const uniqueUsersInReviews = useMemo(() => {
-    const userMap = new Map();
+    const userMap = new Map<string, string>();
     reviews.forEach((r) => {
       if (!userMap.has(r.userId)) {
         userMap.set(r.userId, r.userName);
       }
     });
-    return Array.from(userMap.entries()).map(([id, name]) => ({ id, name }));
+    return Array.from(userMap.entries()).map(([id, name]) => ({
+      id,
+      name,
+      email: undefined as string | undefined,
+    }));
   }, [reviews]);
 
   const getProductDetails = (productId: number) => {
@@ -197,6 +209,9 @@ export default function AdminReviewList({
               {(users.length > 0 ? users : uniqueUsersInReviews).map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.name}
+                  {u.name && nameFrequencies[u.name] > 1 && u.email
+                    ? ` (${u.email})`
+                    : ""}
                 </option>
               ))}
             </select>

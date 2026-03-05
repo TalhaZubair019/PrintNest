@@ -17,7 +17,7 @@ interface OrdersTableProps {
   setOrderDeleteConfirm: React.Dispatch<React.SetStateAction<Order | null>>;
   orderPage: number;
   setOrderPage: React.Dispatch<React.SetStateAction<number>>;
-  users?: { id: string; name: string }[];
+  users?: { id: string; name: string; email?: string }[];
   updatingOrderId?: string | null;
 }
 
@@ -37,6 +37,14 @@ const OrdersTable = ({
   const [customStart, setCustomStart] = useState<string>("");
   const [customEnd, setCustomEnd] = useState<string>("");
   const ITEMS_PER_PAGE = 5;
+
+  const nameFrequencies = useMemo(() => {
+    const freqs: Record<string, number> = {};
+    users.forEach((u) => {
+      freqs[u.name] = (freqs[u.name] || 0) + 1;
+    });
+    return freqs;
+  }, [users]);
 
   const hasDeletedAccounts = useMemo(() => {
     const userIds = new Set(users.map((u) => u.id));
@@ -156,6 +164,9 @@ const OrdersTable = ({
               {users.map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.name}
+                  {u.name && nameFrequencies[u.name] > 1 && u.email
+                    ? ` (${u.email})`
+                    : ""}
                 </option>
               ))}
               {hasDeletedAccounts && (
