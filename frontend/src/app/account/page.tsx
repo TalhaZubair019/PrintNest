@@ -25,6 +25,7 @@ import { addToCart } from "@/redux/CartSlice";
 import { useRouter } from "next/navigation";
 import db from "@data/db.json";
 import QuickViewModal from "@/components/products/QuickViewModal";
+import UserSidebar from "@/components/layout/UserSidebar";
 
 interface Order {
   id: string;
@@ -361,69 +362,15 @@ export default function MyAccountPage() {
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-1/4 shrink-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden sticky top-24">
-              <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xl">
-                  {user?.name?.[0]?.toUpperCase() || "U"}
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 line-clamp-1">
-                    {user?.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 line-clamp-1">
-                    {user?.email}
-                  </p>
-                </div>
-              </div>
-              <nav className="p-2">
-                <NavButton
-                  active={activeTab === "dashboard"}
-                  onClick={() => setActiveTab("dashboard")}
-                  icon={<LayoutDashboard size={18} />}
-                  label="Dashboard"
-                />
-                <NavButton
-                  active={activeTab === "profile"}
-                  onClick={() => setActiveTab("profile")}
-                  icon={<UserIcon size={18} />}
-                  label="Edit Profile"
-                />
-                <NavButton
-                  active={activeTab === "orders"}
-                  onClick={() => setActiveTab("orders")}
-                  icon={<Package size={18} />}
-                  label={`Orders (${orders.length})`}
-                />
-                <NavButton
-                  active={activeTab === "wishlist"}
-                  onClick={() => setActiveTab("wishlist")}
-                  icon={<Heart size={18} />}
-                  label={`Wishlist (${wishlistItems.length})`}
-                />
-                <NavButton
-                  active={activeTab === "cart"}
-                  onClick={() => setActiveTab("cart")}
-                  icon={<ShoppingCart size={18} />}
-                  label={`Cart (${cartItems.length})`}
-                />
-                {user?.isAdmin && (
-                  <Link
-                    href="/admin/dashboard"
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-purple-600 hover:bg-purple-50 rounded-xl mb-1 transition-colors"
-                  >
-                    <LayoutDashboard size={18} /> Switch to Admin View
-                  </Link>
-                )}
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors mt-2"
-                >
-                  <LogOut size={18} /> Logout
-                </button>
-              </nav>
-            </div>
-          </div>
+          <UserSidebar
+            user={user}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            ordersCount={orders.length}
+            wishlistCount={wishlistItems.length}
+            cartCount={cartItems.length}
+            handleLogout={handleLogout}
+          />
           <div id="user-content-area" className="lg:flex-1">
             {activeTab === "dashboard" && (
               <div className="space-y-6">
@@ -767,24 +714,6 @@ export default function MyAccountPage() {
     </div>
   );
 }
-
-const NavButton = ({ active, onClick, icon, label }: any) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all mb-1 ${active ? "bg-purple-600 text-white shadow-lg shadow-purple-200" : "text-slate-600 hover:bg-slate-50"}`}
-    >
-      <span
-        className={
-          active ? "text-white" : "text-slate-400 group-hover:text-purple-500"
-        }
-      >
-        {icon}
-      </span>
-      {label}
-    </button>
-  );
-};
 
 const StatCard = ({
   label,
