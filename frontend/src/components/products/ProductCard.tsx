@@ -21,7 +21,7 @@ function ProductCard({
   const activeWishlist = isMounted && isWishlisted;
 
   return (
-    <Link href={`/product/${slug}`}>
+    <Link href={`/product/${encodeURIComponent(slug)}`}>
       <motion.div
         whileHover={{ y: -8, transition: { duration: 0.2 } }}
         className="relative min-w-70 md:min-w-75 bg-white hover:bg-[#F9FAFF] border border-slate-100 rounded-4xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 snap-center group overflow-hidden"

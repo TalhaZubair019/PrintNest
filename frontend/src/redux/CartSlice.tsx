@@ -111,6 +111,27 @@ export const cartSlice = createSlice({
         localStorage.setItem("cartState", JSON.stringify(state));
       }
     },
+    syncCart: (state, action: PayloadAction<any[]>) => {
+      const activeProducts = action.payload;
+      const activeProductIds = activeProducts.map((p) => p.id);
+
+      state.cartItems = state.cartItems.filter((item) =>
+        activeProductIds.includes(item.id),
+      );
+
+      state.totalQuantity = state.cartItems.reduce(
+        (acc, item) => acc + item.quantity,
+        0,
+      );
+      state.totalAmount = state.cartItems.reduce(
+        (acc, item) => acc + item.totalPrice,
+        0,
+      );
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cartState", JSON.stringify(state));
+      }
+    },
     clearCart: (state) => {
       state.cartItems = [];
       state.totalQuantity = 0;
@@ -127,6 +148,7 @@ export const {
   removeFromCart,
   deleteItem,
   initializeCart,
+  syncCart,
   clearCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;

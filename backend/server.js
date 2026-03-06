@@ -16,8 +16,8 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(helmet({ crossOriginResourcePolicy: false }));
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
   message: { error: "Too many requests from this IP, please try again later." },
 });
 app.use("/api/", apiLimiter);

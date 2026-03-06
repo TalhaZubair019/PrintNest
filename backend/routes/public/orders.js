@@ -1,9 +1,10 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { connectDB } = require("../../lib/db");
-const { OrderModel, UserModel } = require("../../lib/models");
+const { OrderModel, UserModel, ProductModel } = require("../../lib/models");
 const { requireAuth, JWT_SECRET } = require("../../middleware/auth");
 const { transporter } = require("../../lib/mailer");
+const db = require("../../../data/db.json");
 
 const router = express.Router();
 
@@ -20,6 +21,20 @@ router.get("/", requireAuth, async (req, res) => {
 router.post("/place-order", async (req, res) => {
   try {
     const { customer, items, totalAmount } = req.body;
+
+    await connectDB();
+    const shopProducts = await ProductModel.find({}).lean();
+    const dbProducts = db.products?.products || [];
+    const allValidProducts = [...shopProducts, ...dbProducts];
+    const validProductIds = allValidProducts.map((p) => p.id);
+
+    for (const item of items) {
+      if (!validProductIds.includes(item.id)) {
+        return res.status(400).json({
+          error: `Product "${item.name}" is no longer available. Please remove it from your cart.`,
+        });
+      }
+    }
 
     let userId = "guest";
     const authHeader = req.headers["authorization"];
