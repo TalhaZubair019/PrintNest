@@ -38,6 +38,11 @@ router.post("/checkout", async (req, res) => {
         .json({ error: "totalAmount and orderId are required." });
     }
 
+    const clientUrl =
+      req.headers.origin ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      "http://localhost:3000";
+
     const accessToken = await getPayPalAccessToken();
 
     const orderResponse = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
@@ -64,8 +69,8 @@ router.post("/checkout", async (req, res) => {
               payment_method_preference: "IMMEDIATE_PAYMENT_REQUIRED",
               brand_name: "PrintNest",
               user_action: "PAY_NOW",
-              return_url: `${process.env.NEXT_PUBLIC_APP_URL}/thank-you?order=${orderId}`,
-              cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout?error=paypal_cancelled`,
+              return_url: `${clientUrl}/thank-you?order=${orderId}`,
+              cancel_url: `${clientUrl}/checkout?error=paypal_cancelled`,
             },
           },
         },
