@@ -12,9 +12,11 @@ import Toast from "@/components/products/Toast";
 import {
   ChevronRight,
   ChevronDown,
+  CreditCard,
   Banknote,
   ChevronLeft,
   Wallet,
+  Smartphone,
 } from "lucide-react";
 import db from "@data/db.json";
 
@@ -47,7 +49,6 @@ export default function CheckoutPage() {
   const [isUsingSavedAddress, setIsUsingSavedAddress] = useState(false);
   const [isEditingSavedAddress, setIsEditingSavedAddress] = useState(false);
   const [saveAddressToProfile, setSaveAddressToProfile] = useState(false);
-  const hasSynced = useRef(false);
 
   const subtotal = cartItems.reduce(
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
@@ -86,31 +87,20 @@ export default function CheckoutPage() {
     setHasMounted(true);
 
     const checkAndSyncCart = async () => {
-      if (hasSynced.current) return;
-      hasSynced.current = true;
       try {
         const response = await fetch("/api/public/content?section=products");
         if (response.ok) {
           const data = await response.json();
           if (data && data.products) {
             const activeProductIds = data.products.map((p: any) => p.id);
-            const remainingItems = cartItems.filter((item: any) =>
-              activeProductIds.includes(item.id),
+            const removedItems = cartItems.filter(
+              (item: any) => !activeProductIds.includes(item.id),
             );
 
-            if (remainingItems.length < cartItems.length) {
+            if (removedItems.length > 0) {
               dispatch(syncCart(data.products));
-
-              if (remainingItems.length === 0) {
-                alert(
-                  "All items in your cart are no longer available. Redirecting to cart...",
-                );
-                router.push("/cart");
-                return;
-              }
-
               showToast(
-                `${cartItems.length - remainingItems.length} item(s) were removed from your cart as they are no longer available.`,
+                `${removedItems.length} item(s) were removed from your cart as they are no longer available.`,
                 "remove",
               );
             } else {
@@ -123,11 +113,6 @@ export default function CheckoutPage() {
       }
     };
 
-    if (cartItems.length === 0) {
-      router.push("/cart");
-      return;
-    }
-
     const savedForm = localStorage.getItem("checkoutFormData");
     if (savedForm) {
       try {
@@ -137,7 +122,9 @@ export default function CheckoutPage() {
       }
     }
 
-    checkAndSyncCart();
+    if (cartItems.length > 0) {
+      checkAndSyncCart();
+    }
   }, []);
 
   useEffect(() => {
