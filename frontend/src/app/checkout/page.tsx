@@ -39,6 +39,7 @@ export default function CheckoutPage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const hasSynced = useRef(false);
   const { cartItems } = useSelector((state: any) => state.cart);
   const { isAuthenticated, user, isLoading } = useSelector(
     (state: any) => state.auth,
@@ -85,6 +86,18 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setHasMounted(true);
+    const savedForm = localStorage.getItem("checkoutFormData");
+    if (savedForm) {
+      try {
+        setFormData((prev) => ({ ...prev, ...JSON.parse(savedForm) }));
+      } catch (e) {
+        console.error("Could not parse saved form data", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasMounted || hasSynced.current || cartItems.length === 0) return;
 
     const checkAndSyncCart = async () => {
       try {
@@ -92,9 +105,12 @@ export default function CheckoutPage() {
         if (response.ok) {
           const data = await response.json();
           if (data && data.products) {
-            const activeProductIds = data.products.map((p: any) => p.id);
+            hasSynced.current = true;
+            const activeProductIds = data.products.map((p: any) =>
+              String(p.id),
+            );
             const removedItems = cartItems.filter(
-              (item: any) => !activeProductIds.includes(item.id),
+              (item: any) => !activeProductIds.includes(String(item.id)),
             );
 
             if (removedItems.length > 0) {
@@ -113,19 +129,8 @@ export default function CheckoutPage() {
       }
     };
 
-    const savedForm = localStorage.getItem("checkoutFormData");
-    if (savedForm) {
-      try {
-        setFormData((prev) => ({ ...prev, ...JSON.parse(savedForm) }));
-      } catch (e) {
-        console.error("Could not parse saved form data", e);
-      }
-    }
-
-    if (cartItems.length > 0) {
-      checkAndSyncCart();
-    }
-  }, []);
+    checkAndSyncCart();
+  }, [hasMounted, cartItems.length]);
 
   useEffect(() => {
     if (hasMounted) {

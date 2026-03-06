@@ -201,7 +201,7 @@ function WishlistItemComponent({
 
     dispatch(
       addToCart({
-        id: item.id.toString(),
+        id: item.id,
         name: item.title,
         price: priceVal,
         image: item.image,
@@ -244,10 +244,11 @@ function WishlistItemComponent({
         <div className="w-full md:w-1/6 flex justify-between md:block">
           <span className="md:hidden text-slate-500 font-medium">Price: </span>
           <span className="text-slate-900 font-bold text-lg">
-            $
             {typeof item.price === "number"
-              ? item.price.toFixed(2)
-              : item.price}
+              ? `$${item.price.toFixed(2)}`
+              : item.price.startsWith("$")
+                ? item.price
+                : `$${item.price}`}
           </span>
         </div>
         <div className="w-full md:w-1/6 flex justify-between md:block">

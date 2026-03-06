@@ -115,8 +115,8 @@ export const cartSlice = createSlice({
       const activeProducts = action.payload;
       const activeProductIds = activeProducts.map((p) => p.id);
 
-      state.cartItems = state.cartItems.filter((item) =>
-        activeProductIds.includes(item.id),
+      state.cartItems = state.cartItems.filter((item: any) =>
+        activeProducts.some((p: any) => String(p.id) === String(item.id)),
       );
 
       state.totalQuantity = state.cartItems.reduce(
