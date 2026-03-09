@@ -15,12 +15,20 @@ export interface Order {
   items: OrderItem[];
   customer?: {
     name?: string;
+    firstName?: string;
+    lastName?: string;
     email?: string;
     address?: string;
     city?: string;
+    province?: string;
     country?: string;
+    postcode?: string;
+    phone?: string;
   };
   paymentMethod?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+  trackingHistory?: { status: string; message: string; timestamp: string }[];
 }
 
 export interface UserData {

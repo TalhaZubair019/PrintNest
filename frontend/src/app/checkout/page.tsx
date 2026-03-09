@@ -12,13 +12,12 @@ import Toast from "@/components/products/Toast";
 import {
   ChevronRight,
   ChevronDown,
-  CreditCard,
   Banknote,
   ChevronLeft,
   Wallet,
-  Smartphone,
 } from "lucide-react";
 import db from "@data/db.json";
+import { Country, State, City } from "country-state-city";
 
 const checkoutConfig = db.checkout;
 
@@ -32,6 +31,9 @@ interface CheckoutData {
   province: string;
   postcode: string;
   phone: string;
+  country: string;
+  countryCode: string;
+  stateCode: string;
   paymentMethod: "cod" | "stripe" | "paypal";
 }
 
@@ -66,8 +68,28 @@ export default function CheckoutPage() {
     province: "",
     postcode: "",
     phone: "",
+    country: "Pakistan",
+    countryCode: "PK",
+    stateCode: "",
     paymentMethod: "cod",
   });
+
+  const [countries] = useState(Country.getAllCountries());
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (formData.countryCode) {
+      const countryStates = State.getStatesOfCountry(formData.countryCode);
+      setStates(countryStates);
+
+      if (formData.stateCode) {
+        setCities(
+          City.getCitiesOfState(formData.countryCode, formData.stateCode),
+        );
+      }
+    }
+  }, [formData.countryCode, formData.stateCode]);
 
   const [toast, setToast] = useState<{
     show: boolean;
@@ -153,6 +175,9 @@ export default function CheckoutPage() {
           address: prev.address || user.address || "",
           city: prev.city || user.city || "",
           province: prev.province || user.province || "",
+          country: prev.country || user.country || "Pakistan",
+          countryCode: prev.countryCode || user.countryCode || "PK",
+          stateCode: prev.stateCode || user.stateCode || "",
           postcode: prev.postcode || user.postcode || "",
         }));
       } else {
@@ -178,6 +203,9 @@ export default function CheckoutPage() {
         address: user.address || prev.address,
         city: user.city || prev.city,
         province: user.province || prev.province,
+        country: user.country || prev.country,
+        countryCode: user.countryCode || prev.countryCode,
+        stateCode: user.stateCode || prev.stateCode,
         postcode: user.postcode || prev.postcode,
       }));
     } else {
@@ -187,6 +215,9 @@ export default function CheckoutPage() {
         apartment: "",
         city: "",
         province: "",
+        country: "Pakistan",
+        countryCode: "PK",
+        stateCode: "",
         postcode: "",
         phone: "",
       }));
@@ -296,6 +327,7 @@ export default function CheckoutPage() {
 
       if (formData.paymentMethod === "cod") {
         await saveOrderToDB("Pending");
+        localStorage.removeItem("pendingCheckoutData");
         dispatch(clearCart());
         router.push("/thank-you");
       }
@@ -331,7 +363,7 @@ export default function CheckoutPage() {
         <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
           <div
             className={`transition-all duration-300 ${
-              showAuthModal || isLoading
+              hasMounted && (showAuthModal || isLoading)
                 ? "opacity-50 blur-sm pointer-events-none"
                 : "opacity-100"
             }`}
@@ -358,6 +390,10 @@ export default function CheckoutPage() {
                   onAddressModeChange={handleAddressModeChange}
                   saveAddressToProfile={saveAddressToProfile}
                   setSaveAddressToProfile={setSaveAddressToProfile}
+                  countries={countries}
+                  states={states}
+                  cities={cities}
+                  hasMounted={hasMounted}
                 />
                 <PaymentSection data={formData} update={updateData} />
                 <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
@@ -467,6 +503,10 @@ function BillingSection({
   onAddressModeChange,
   saveAddressToProfile,
   setSaveAddressToProfile,
+  countries,
+  states,
+  cities,
+  hasMounted,
 }: any) {
   const InputClass =
     "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400";
@@ -479,7 +519,7 @@ function BillingSection({
     <section>
       <h2 className="text-lg font-bold text-slate-700 mb-4">Billing address</h2>
 
-      {isAuthenticated && (
+      {hasMounted && isAuthenticated && (
         <div className="mb-6 space-y-3">
           <label
             className={`flex items-center gap-3 cursor-pointer p-3 border rounded-lg transition-colors bg-white ${!hasProfileAddress ? "opacity-60 cursor-not-allowed border-slate-200" : "border-slate-200 hover:border-blue-300"}`}
@@ -536,97 +576,159 @@ function BillingSection({
         </div>
       )}
 
-      {(!hasProfileAddress ||
-        !isUsingSavedAddress ||
-        isEditingSavedAddress) && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="relative">
-            <label className={LabelClass}>
-              Country / Region <span className="text-red-500">*</span>
-            </label>
-            <select
-              className={`${InputClass} appearance-none bg-slate-50 cursor-pointer`}
-            >
-              <option value="PK">Pakistan</option>
-            </select>
-            <ChevronDown
-              className="absolute right-4 top-9 text-slate-400 pointer-events-none"
-              size={16}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={LabelClass}>
-                First Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                className={InputClass}
-                value={data.firstName}
-                onChange={(e) => update({ firstName: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className={LabelClass}>
-                Last Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                className={InputClass}
-                value={data.lastName}
-                onChange={(e) => update({ lastName: e.target.value })}
-              />
-            </div>
-          </div>
-          <div>
-            <label className={LabelClass}>
-              Address <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="House number and street name"
-              className={`${InputClass} mb-3`}
-              value={data.address}
-              onChange={(e) => update({ address: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Apartment, suite, unit, etc. (optional)"
-              className={InputClass}
-              value={data.apartment}
-              onChange={(e) => update({ apartment: e.target.value })}
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className={LabelClass}>
-                City <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                className={InputClass}
-                value={data.city}
-                onChange={(e) => update({ city: e.target.value })}
-              />
-            </div>
-            <div className="relative">
-              <label className={LabelClass}>
-                Province <span className="text-red-500">*</span>
-              </label>
+      {hasMounted &&
+        (!hasProfileAddress ||
+          !isUsingSavedAddress ||
+          isEditingSavedAddress) && (
+          <AddressForm
+            data={data}
+            update={update}
+            countries={countries}
+            states={states}
+            cities={cities}
+          />
+        )}
+    </section>
+  );
+}
+
+function AddressForm({ data, update, countries, states, cities }: any) {
+  const InputClass =
+    "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400";
+  const LabelClass =
+    "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block";
+
+  return (
+    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="relative">
+        <label className={LabelClass}>
+          Country / Region <span className="text-red-500">*</span>
+        </label>
+        <select
+          required
+          className={`${InputClass} appearance-none bg-slate-50 cursor-pointer`}
+          value={data.countryCode}
+          onChange={(e) => {
+            const country = countries.find(
+              (c: any) => c.isoCode === e.target.value,
+            );
+            update({
+              countryCode: e.target.value,
+              country: country?.name || "",
+              stateCode: "",
+              province: "",
+              city: "",
+            });
+          }}
+        >
+          <option value="">Select Country...</option>
+          {countries.map((c: any) => (
+            <option key={c.isoCode} value={c.isoCode}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          className="absolute right-4 top-9 text-slate-400 pointer-events-none"
+          size={16}
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={LabelClass}>
+            First Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            required
+            className={InputClass}
+            value={data.firstName}
+            onChange={(e) => update({ firstName: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className={LabelClass}>
+            Last Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            required
+            className={InputClass}
+            value={data.lastName}
+            onChange={(e) => update({ lastName: e.target.value })}
+          />
+        </div>
+      </div>
+      <div>
+        <label className={LabelClass}>
+          Address <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          required
+          placeholder="House number and street name"
+          className={`${InputClass} mb-3`}
+          value={data.address}
+          onChange={(e) => update({ address: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Apartment, suite, unit, etc. (optional)"
+          className={InputClass}
+          value={data.apartment}
+          onChange={(e) => update({ apartment: e.target.value })}
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="relative">
+          <label className={LabelClass}>
+            Province / State <span className="text-red-500">*</span>
+          </label>
+          <select
+            required
+            className={`${InputClass} appearance-none bg-transparent cursor-pointer`}
+            value={data.stateCode}
+            onChange={(e) => {
+              const state = states.find(
+                (s: any) => s.isoCode === e.target.value,
+              );
+              update({
+                stateCode: e.target.value,
+                province: state?.name || "",
+                city: "",
+              });
+            }}
+            disabled={!data.countryCode}
+          >
+            <option value="">Select...</option>
+            {states.map((s: any) => (
+              <option key={s.isoCode} value={s.isoCode}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className="absolute right-4 top-9 text-slate-400 pointer-events-none"
+            size={16}
+          />
+        </div>
+        <div className="relative">
+          <label className={LabelClass}>
+            City <span className="text-red-500">*</span>
+          </label>
+          {cities.length > 0 ? (
+            <>
               <select
                 required
                 className={`${InputClass} appearance-none bg-transparent cursor-pointer`}
-                value={data.province}
-                onChange={(e) => update({ province: e.target.value })}
+                value={data.city}
+                onChange={(e) => update({ city: e.target.value })}
+                disabled={!data.stateCode}
               >
                 <option value="">Select...</option>
-                {checkoutConfig.provinces.map((p: any) => (
-                  <option key={p.code} value={p.code}>
-                    {p.name}
+                {cities.map((c: any) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
                   </option>
                 ))}
               </select>
@@ -634,51 +736,45 @@ function BillingSection({
                 className="absolute right-4 top-9 text-slate-400 pointer-events-none"
                 size={16}
               />
-            </div>
-            <div>
-              <label className={LabelClass}>
-                Postcode <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                className={InputClass}
-                value={data.postcode}
-                onChange={(e) => update({ postcode: e.target.value })}
-              />
-            </div>
-          </div>
-          <div>
-            <label className={LabelClass}>
-              Phone <span className="text-red-500">*</span>
-            </label>
+            </>
+          ) : (
             <input
-              type="tel"
+              type="text"
               required
+              placeholder="Enter city"
               className={InputClass}
-              value={data.phone}
-              onChange={(e) => update({ phone: e.target.value })}
+              value={data.city}
+              onChange={(e) => update({ city: e.target.value })}
+              disabled={!data.stateCode}
             />
-          </div>
-          {isAuthenticated &&
-            (!isUsingSavedAddress || isEditingSavedAddress) && (
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={saveAddressToProfile}
-                    onChange={(e) => setSaveAddressToProfile(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">
-                    Save this address to my profile for next time
-                  </span>
-                </label>
-              </div>
-            )}
+          )}
         </div>
-      )}
-    </section>
+        <div>
+          <label className={LabelClass}>
+            Postcode <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            required
+            className={InputClass}
+            value={data.postcode}
+            onChange={(e) => update({ postcode: e.target.value })}
+          />
+        </div>
+      </div>
+      <div>
+        <label className={LabelClass}>
+          Phone <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          required
+          className={InputClass}
+          value={data.phone}
+          onChange={(e) => update({ phone: e.target.value })}
+        />
+      </div>
+    </div>
   );
 }
 

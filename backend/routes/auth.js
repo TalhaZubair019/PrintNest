@@ -100,6 +100,8 @@ router.put("/me", requireAuth, async (req, res) => {
       "province",
       "postcode",
       "country",
+      "countryCode",
+      "stateCode",
       "savedCards",
       "cart",
       "wishlist",

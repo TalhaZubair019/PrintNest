@@ -6,116 +6,218 @@ const { transporter } = require("../../lib/mailer");
 
 const router = express.Router();
 
+const TRACKING_STEPS = [
+  "Pending",
+  "Accepted",
+  "Shipped",
+  "Arrived in Country",
+  "Arrived in City",
+  "Out for Delivery",
+  "Delivered",
+];
+
+function getStatusContent(status, order) {
+  let country = order.customer?.country || "your country";
+  if (country === "PK") country = "Pakistan";
+  const city = order.customer?.city || "your city";
+  const firstName = order.customer?.firstName || "Customer";
+
+  const map = {
+    Pending: {
+      subject: `Order #${order.id.slice(-8).toUpperCase()} Received`,
+      headline: "Order Received! 📦",
+      message: `Hi ${firstName},<br><br>We've received your order and it's now being processed. We'll notify you as it progresses.`,
+      color: "#f59e0b",
+    },
+    Accepted: {
+      subject: `Order #${order.id.slice(-8).toUpperCase()} Accepted ✅`,
+      headline: "Order Accepted! ✅",
+      message: `Hi ${firstName},<br><br>Great news! Your order has been confirmed and our team is now preparing it for shipment.`,
+      color: "#10b981",
+    },
+    Shipped: {
+      subject: `Your Order Has Been Shipped! 🚚`,
+      headline: "Your Order Is On Its Way! 🚚",
+      message: `Hi ${firstName},<br><br>Your package has been handed over to the courier and is on its way to you. You'll receive further updates as it travels.`,
+      color: "#6366f1",
+    },
+    "Arrived in Country": {
+      subject: `Package Arrived in ${country} 🌍`,
+      headline: `Package Landed in ${country}! 🌍`,
+      message: `Hi ${firstName},<br><br>Great news — your package has arrived in <strong>${country}</strong> and is now being processed by local customs/logistics.`,
+      color: "#8b5cf6",
+    },
+    "Arrived in City": {
+      subject: `Package Arrived in ${city} 📍`,
+      headline: `Package Arrived in ${city}! 📍`,
+      message: `Hi ${firstName},<br><br>Your package has arrived in <strong>${city}</strong> and is now at a local sorting facility. Delivery is very close!`,
+      color: "#ec4899",
+    },
+    "Out for Delivery": {
+      subject: `Out for Delivery — Expect It Today! 🏠`,
+      headline: "Out for Delivery! 🏠",
+      message: `Hi ${firstName},<br><br>Your package is out for delivery today! Our courier is on the way to your address. Please make sure someone is available to receive it.`,
+      color: "#f97316",
+    },
+    Delivered: {
+      subject: `Order Delivered Successfully! 🎉`,
+      headline: "Order Delivered! 🎉",
+      message: `Hi ${firstName},<br><br>Your order has been delivered successfully. We hope you love what you ordered! Thank you for shopping with PrintNest.`,
+      color: "#10b981",
+    },
+    Cancelled: {
+      subject: `Order #${order.id.slice(-8).toUpperCase()} Cancelled`,
+      headline: "Order Cancelled",
+      message: `Hi ${firstName},<br><br>We're sorry to inform you that your order has been cancelled. If you have any questions, please contact our support team.`,
+      color: "#ef4444",
+    },
+  };
+
+  return (
+    map[status] || {
+      subject: `Order Status Updated — ${status}`,
+      headline: `Order Status: ${status}`,
+      message: `Hi ${firstName},<br><br>Your order status has been updated to <strong>${status}</strong>.`,
+      color: "#64748b",
+    }
+  );
+}
+
+function buildEmailHtml(order, status, trackingHistory) {
+  const content = getStatusContent(status, order);
+  const trackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account?tab=orders&orderId=${order.id}`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${content.subject} - PrintNest</title>
+</head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;">
+  <div style="width:100%;padding:40px 16px;box-sizing:border-box;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.08);">
+      
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#6366f1 0%,#a855f7 50%,#ec4899 100%);padding:48px 40px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">📦</div>
+        <h1 style="margin:0;font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.5px;">${content.headline}</h1>
+        <p style="margin:10px 0 0;font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;">PrintNest Studio Order Update</p>
+      </div>
+
+      <!-- Body -->
+      <div style="padding:40px;">
+        <!-- Message -->
+        <p style="font-size:15px;line-height:1.7;color:#475569;margin:0 0 32px;">${content.message}</p>
+
+        <!-- Order ID badge -->
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;margin-bottom:32px;display:flex;align-items:center;gap:12px;">
+          <div style="background:${content.color};border-radius:8px;padding:8px;display:inline-block;">
+            <span style="color:#fff;font-size:16px;">🧾</span>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:2px;">Order ID</div>
+            <div style="font-size:16px;font-weight:800;color:#1e293b;">#${order.id.slice(-8).toUpperCase()}</div>
+          </div>
+          <div style="margin-left:auto;">
+            <span style="display:inline-block;padding:6px 14px;background:${content.color};color:#fff;border-radius:999px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">${status}</span>
+          </div>
+        </div>
+
+        <!-- Track Order Button -->
+        <div style="text-align:center;margin:32px 0;">
+          <a href="${trackUrl}" style="background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%);color:#ffffff;padding:16px 36px;border-radius:14px;text-decoration:none;font-size:15px;font-weight:800;display:inline-block;box-shadow:0 10px 20px rgba(99,102,241,0.2);">
+            Track Your Order 📍
+          </a>
+          <p style="font-size:12px;color:#94a3b8;margin-top:14px;">View live updates and delivery history in your dashboard</p>
+        </div>
+
+        <!-- Order Summary -->
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #f1f5f9;">Order Summary</div>
+          <table cellpadding="0" cellspacing="0" style="width:100%;">
+            <tbody>
+              ${(order.items || [])
+                .map((i) => {
+                  const price = Number(i.price) || 0;
+                  const qty = Number(i.quantity) || 1;
+                  return `<tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #f8fafc;font-size:14px;color:#374151;font-weight:600;">${i.name || "Custom Product"}<br><span style="font-size:12px;font-weight:400;color:#94a3b8;">Qty: ${qty} × $${price.toFixed(2)}</span></td>
+                  <td style="padding:12px 0;border-bottom:1px solid #f8fafc;text-align:right;font-size:14px;font-weight:700;color:#1e293b;">$${(price * qty).toFixed(2)}</td>
+                </tr>`;
+                })
+                .join("")}
+              <tr>
+                <td style="padding-top:16px;font-size:16px;font-weight:800;color:#6366f1;">Grand Total</td>
+                <td style="padding-top:16px;text-align:right;font-size:16px;font-weight:800;color:#6366f1;">$${Number(order.total || 0).toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="text-align:center;font-size:13px;color:#94a3b8;margin-top:40px;font-weight:500;">Thank you for shopping with PrintNest Studio!</p>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:24px 40px;background:#f8fafc;text-align:center;border-top:1px solid #f1f5f9;">
+        <p style="margin:0;font-size:12px;color:#94a3b8;">© ${new Date().getFullYear()} PrintNest Studio. All rights reserved.</p>
+        <p style="margin:6px 0 0;font-size:12px;color:#94a3b8;">Questions? Reply to this email or contact support.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     const { status } = req.body;
     await connectDB();
+
+    const existingOrder = await OrderModel.findOne({
+      id: req.params.id,
+    }).lean();
+    if (!existingOrder)
+      return res.status(404).json({ message: "Order not found" });
+
+    const historyEntry = {
+      status,
+      message: getStatusContent(status, existingOrder).headline || status,
+      timestamp: new Date(),
+    };
+
     const order = await OrderModel.findOneAndUpdate(
       { id: req.params.id },
-      { status },
+      {
+        status,
+        $push: { trackingHistory: historyEntry },
+      },
       { returnDocument: "after" },
     ).lean();
+
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     try {
-      const statusColor =
-        status === "Accepted"
-          ? "#10b981"
-          : status === "Cancelled"
-            ? "#ef4444"
-            : "#f59e0b";
-      const emailHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1f2937; margin: 0; padding: 0; background-color: #f3f4f6; }
-            .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-            .header { background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 40px 20px; text-align: center; color: #ffffff; }
-            .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.025em; }
-            .content { padding: 32px; }
-            .status-card { background: #f9fafb; border-radius: 8px; padding: 24px; margin: 24px 0; border: 1px solid #e5e7eb; text-align: center; }
-            .status-badge { display: inline-block; padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-transform: uppercase; color: #ffffff; background-color: ${statusColor}; margin-top: 12px; }
-            .order-id { font-size: 14px; color: #6b7280; margin-bottom: 4px; }
-            .section-title { font-size: 18px; font-weight: 600; color: #111827; margin-bottom: 16px; border-bottom: 2px solid #f3f4f6; padding-bottom: 8px; margin-top: 32px; }
-            .items-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-            .items-table th { text-align: left; padding: 12px; background: #f9fafb; font-size: 13px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em; }
-            .items-table td { padding: 12px; border-bottom: 1px solid #f3f4f6; font-size: 15px; text-align: left; }
-            .total-row td { padding: 20px 12px; font-weight: 700; font-size: 18px; color: #4f46e5; border-top: 2px solid #f3f4f6; }
-            .footer { padding: 24px; text-align: center; background: #f9fafb; color: #9ca3af; font-size: 13px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Order Update</h1>
-            </div>
-            <div class="content">
-              <p style="font-size: 16px; color: #4b5563; margin-top: 0;">Hello,</p>
-              <p style="font-size: 16px; color: #4b5563;">Your order status has been updated. Here are the latest details:</p>
-              
-              <div class="status-card">
-                <div class="order-id">Order ID: #${order.id.slice(-8).toUpperCase()}</div>
-                <div style="font-size: 18px; font-weight: 600; color: #111827;">New Status</div>
-                <div class="status-badge">${status}</div>
-              </div>
+      const emailHtml = buildEmailHtml(
+        order,
+        status,
+        order.trackingHistory || [],
+      );
+      const content = getStatusContent(status, order);
 
-              <div class="section-title">Order Summary</div>
-              <table class="items-table">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th style="text-align: right;">Price</th>
-                    <th style="text-align: center;">Qty</th>
-                    <th style="text-align: right;">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${(order.items || [])
-                    .map((i) => {
-                      const price = Number(i.price) || 0;
-                      const qty = Number(i.quantity) || 1;
-                      return `
-                    <tr>
-                      <td>${i.name || "Product"}</td>
-                      <td style="text-align: right;">$${price.toFixed(2)}</td>
-                      <td style="text-align: center;">${qty}</td>
-                      <td style="text-align: right;">$${(price * qty).toFixed(2)}</td>
-                    </tr>
-                  `;
-                    })
-                    .join("")}
-                </tbody>
-                <tfoot>
-                  <tr class="total-row">
-                    <td colspan="3" style="text-align: right;">Grand Total:</td>
-                    <td style="text-align: right;">$${Number(order.total || 0).toFixed(2)}</td>
-                  </tr>
-                </tfoot>
-              </table>
-
-              <p style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 32px;">Thank you for shopping with PrintNest!</p>
-            </div>
-            <div class="footer">
-              &copy; ${new Date().getFullYear()} PrintNest. All rights reserved.
-            </div>
-          </div>
-        </body>
-        </html>`;
       transporter
         .sendMail({
           from: `"PrintNest" <${process.env.EMAIL_USER}>`,
           to: order.customer?.email,
-          subject: `Order Status Update - ${status}`,
+          subject: content.subject,
           html: emailHtml,
         })
-        .catch((e) => console.error("Email error:", e));
+        .catch((e) => console.error("Tracking email error:", e));
     } catch (_) {}
 
     return res.json({ message: "Order status updated", order });
   } catch (error) {
+    console.error("Admin order patch error:", error);
     return res.status(500).json({ message: "Internal Error" });
   }
 });

@@ -189,7 +189,11 @@ const OrdersTable = ({
               <option value="all">All Statuses</option>
               <option value="Pending">Pending</option>
               <option value="Accepted">Accepted</option>
-              <option value="Completed">Completed</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Arrived in Country">Arrived in Country</option>
+              <option value="Arrived in City">Arrived in City</option>
+              <option value="Out for Delivery">Out for Delivery</option>
+              <option value="Delivered">Delivered</option>
               <option value="Cancelled">Cancelled</option>
             </select>
           </div>
@@ -311,14 +315,28 @@ const OrdersTable = ({
                           ? "bg-amber-50 text-amber-600 border-amber-200 focus:ring-amber-500/20"
                           : o.status === "Accepted"
                             ? "bg-blue-50 text-blue-600 border-blue-200 focus:ring-blue-500/20"
-                            : o.status === "Completed"
-                              ? "bg-emerald-50 text-emerald-600 border-emerald-200 focus:ring-emerald-500/20"
-                              : "bg-red-50 text-red-600 border-red-200 focus:ring-red-500/20"
+                            : o.status === "Shipped"
+                              ? "bg-indigo-50 text-indigo-600 border-indigo-200 focus:ring-indigo-500/20"
+                              : o.status === "Arrived in Country"
+                                ? "bg-violet-50 text-violet-600 border-violet-200 focus:ring-violet-500/20"
+                                : o.status === "Arrived in City"
+                                  ? "bg-pink-50 text-pink-600 border-pink-200 focus:ring-pink-500/20"
+                                  : o.status === "Out for Delivery"
+                                    ? "bg-orange-50 text-orange-600 border-orange-200 focus:ring-orange-500/20"
+                                    : o.status === "Delivered"
+                                      ? "bg-emerald-50 text-emerald-600 border-emerald-200 focus:ring-emerald-500/20"
+                                      : "bg-red-50 text-red-600 border-red-200 focus:ring-red-500/20"
                       } ${updatingOrderId === o.id ? "animate-pulse" : ""}`}
                     >
                       <option value="Pending">Pending</option>
                       <option value="Accepted">Accepted</option>
-                      <option value="Completed">Completed</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Arrived in Country">
+                        Arrived in Country
+                      </option>
+                      <option value="Arrived in City">Arrived in City</option>
+                      <option value="Out for Delivery">Out for Delivery</option>
+                      <option value="Delivered">Delivered</option>
                       <option value="Cancelled">Cancelled</option>
                     </select>
                     {updatingOrderId === o.id && (

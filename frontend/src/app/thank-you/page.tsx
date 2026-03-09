@@ -11,7 +11,10 @@ export default function ThankYouPage() {
   const { cartItems } = useSelector((state: any) => state.cart);
   const [isProcessing, setIsProcessing] = useState(true);
 
+  const hasProcessed = React.useRef(false);
   useEffect(() => {
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
     const processPendingOrder = async () => {
       try {
         const pendingDataStr = localStorage.getItem("pendingCheckoutData");
@@ -36,7 +39,6 @@ export default function ThankYouPage() {
           });
 
           if (response.ok) {
-
             localStorage.removeItem("pendingCheckoutData");
             dispatch(clearCart());
           }

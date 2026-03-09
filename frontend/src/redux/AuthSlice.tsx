@@ -7,6 +7,10 @@ export interface User {
   address?: string;
   city?: string;
   country?: string;
+  countryCode?: string;
+  stateCode?: string;
+  province?: string;
+  postcode?: string;
   cart?: any[];
   wishlist?: any[];
   isAdmin?: boolean;

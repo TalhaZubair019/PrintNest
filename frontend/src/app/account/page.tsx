@@ -14,18 +14,24 @@ import {
   LayoutDashboard,
   ArrowLeft,
   Calendar,
-  CheckCircle,
-  Clock,
   User as UserIcon,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/Store";
 import { loginSuccess, logout } from "@/redux/AuthSlice";
 import { addToCart } from "@/redux/CartSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import db from "@data/db.json";
+import { Country, State, City } from "country-state-city";
 import QuickViewModal from "@/components/products/QuickViewModal";
 import UserSidebar from "@/components/layout/UserSidebar";
+
+interface TrackingEntry {
+  status: string;
+  message: string;
+  timestamp: string;
+}
 
 interface Order {
   id: string;
@@ -39,9 +45,38 @@ interface Order {
     quantity: number;
     image?: string;
   }[];
+  customer?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    city?: string;
+    country?: string;
+    address?: string;
+    countryCode?: string;
+    stateCode?: string;
+    postcode?: string;
+    phone?: string;
+  };
+  trackingNumber?: string;
+  trackingUrl?: string;
+  trackingHistory?: TrackingEntry[];
 }
 
 export default function MyAccountPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+        </div>
+      }
+    >
+      <AccountContent />
+    </Suspense>
+  );
+}
+
+function AccountContent() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isAuthenticated, user } = useSelector(
@@ -58,13 +93,50 @@ export default function MyAccountPage() {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
   const [profileForm, setProfileForm] = useState({
     name: "",
     phone: "",
     address: "",
     city: "",
     country: "Pakistan",
+    countryCode: "PK",
+    stateCode: "",
+    province: "",
+    postcode: "",
   });
+
+  const [countries] = useState(Country.getAllCountries());
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (profileForm.countryCode) {
+      setStates(State.getStatesOfCountry(profileForm.countryCode));
+      if (profileForm.stateCode) {
+        setCities(
+          City.getCitiesOfState(profileForm.countryCode, profileForm.stateCode),
+        );
+      }
+    }
+  }, [profileForm.countryCode, profileForm.stateCode]);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && ["dashboard", "orders", "wishlist", "profile"].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const orderId = searchParams.get("orderId");
+    if (orderId && orders.length > 0) {
+      const order = orders.find((o) => o.id === orderId);
+      if (order) {
+        setSelectedOrder(order);
+      }
+    }
+  }, [searchParams, orders]);
 
   useEffect(() => {
     setMounted(true);
@@ -84,6 +156,10 @@ export default function MyAccountPage() {
         address: user.address || "",
         city: user.city || "",
         country: user.country || "Pakistan",
+        countryCode: user.countryCode || "PK",
+        stateCode: user.stateCode || "",
+        province: user.province || "",
+        postcode: user.postcode || "",
       });
     }
   }, [user]);
@@ -93,7 +169,10 @@ export default function MyAccountPage() {
       const res = await fetch("/api/public/orders");
       if (res.ok) {
         const data = await res.json();
-        setOrders(data.orders || []);
+        const sortedOrders = (data.orders || []).sort((a: Order, b: Order) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+        setOrders(sortedOrders);
       }
     } catch (err) {
       console.error("Failed to fetch orders");
@@ -265,7 +344,7 @@ export default function MyAccountPage() {
     return (
       <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
         <PageHeader
-          title={`Order ${selectedOrder.id}`}
+          title={`Order #${selectedOrder.id.slice(-8).toUpperCase()}`}
           breadcrumb="Order Details"
         />
         <div className="max-w-5xl mx-auto px-4 lg:px-8 py-16">
@@ -275,8 +354,8 @@ export default function MyAccountPage() {
           >
             <ArrowLeft size={18} /> Back to Dashboard
           </button>
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+            <div className="p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-linear-to-r from-purple-50 to-pink-50 border-b border-slate-100">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">
                   Order Details
@@ -285,61 +364,80 @@ export default function MyAccountPage() {
                   <span className="flex items-center gap-1">
                     <Calendar size={14} /> {selectedOrder.date}
                   </span>
-                  <span className="flex items-center gap-1">
-                    {selectedOrder.status === "Completed" ? (
-                      <CheckCircle size={14} className="text-green-500" />
-                    ) : (
-                      <Clock size={14} className="text-orange-500" />
-                    )}
-                    {selectedOrder.status}
-                  </span>
+                  <OrderStatusBadge status={selectedOrder.status} />
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-sm text-slate-500">Order Total</p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-purple-600">
                   ${selectedOrder.total.toFixed(2)}
                 </p>
               </div>
             </div>
-            <div className="p-8">
-              <h3 className="font-bold text-slate-900 mb-4">Items Ordered</h3>
-              <div className="space-y-4">
-                {selectedOrder.items.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-4 py-4 border-b border-slate-50 last:border-0"
-                  >
-                    <div className="h-20 w-20 bg-slate-50 rounded-lg relative overflow-hidden shrink-0 border border-slate-100">
-                      {item.image ? (
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-contain p-2"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-slate-300">
-                          No Img
-                        </div>
-                      )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div className="md:col-span-2">
+              <OrderTrackingTimeline
+                status={selectedOrder.status}
+                trackingHistory={selectedOrder.trackingHistory || []}
+                order={selectedOrder}
+              />
+            </div>
+            <div className="md:col-span-3 space-y-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="p-6 border-b border-slate-50">
+                  <h3 className="font-bold text-slate-900 text-lg">
+                    Items Ordered
+                  </h3>
+                </div>
+                <div className="p-6 space-y-4">
+                  {selectedOrder.items.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-4 py-3 border-b border-slate-50 last:border-0"
+                    >
+                      <div className="h-16 w-16 bg-slate-50 rounded-xl relative overflow-hidden shrink-0 border border-slate-100">
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-contain p-2"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-slate-300">
+                            No Img
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-slate-800">
+                          {item.name}
+                        </h4>
+                        <p className="text-slate-500 text-sm">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-slate-900">
+                          ${(item.price * item.quantity).toFixed(2)}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          ${item.price} each
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-slate-800 text-lg">
-                        {item.name}
-                      </h4>
-                      <p className="text-slate-500 text-sm">
-                        Quantity: {item.quantity}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-slate-900">${item.price}</p>
-                      <p className="text-xs text-purple-600 font-medium">
-                        Total: ${item.price * item.quantity}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="p-6 border-t border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                  <span className="text-slate-500 font-medium text-sm">
+                    Grand Total
+                  </span>
+                  <span className="text-xl font-bold text-purple-600">
+                    ${selectedOrder.total.toFixed(2)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -492,31 +590,116 @@ export default function MyAccountPage() {
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        City
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 outline-none transition-all"
-                        value={profileForm.city}
-                        onChange={(e) =>
-                          setProfileForm({
-                            ...profileForm,
-                            city: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
+                    <div className="relative">
                       <label className="block text-sm font-medium text-slate-700 mb-2">
                         Country
                       </label>
+                      <select
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all appearance-none cursor-pointer"
+                        value={profileForm.countryCode}
+                        onChange={(e) => {
+                          const country = countries.find(
+                            (c: any) => c.isoCode === e.target.value,
+                          );
+                          setProfileForm({
+                            ...profileForm,
+                            countryCode: e.target.value,
+                            country: country?.name || "",
+                            stateCode: "",
+                            city: "",
+                          });
+                        }}
+                      >
+                        <option value="">Select Country...</option>
+                        {countries.map((c: any) => (
+                          <option key={c.isoCode} value={c.isoCode}>
+                            {c.flag} {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Province / State
+                      </label>
+                      <select
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all appearance-none cursor-pointer"
+                        value={profileForm.stateCode}
+                        onChange={(e) => {
+                          const state = states.find(
+                            (s: any) => s.isoCode === e.target.value,
+                          );
+                          setProfileForm({
+                            ...profileForm,
+                            stateCode: e.target.value,
+                            province: state?.name || "",
+                            city: "",
+                          });
+                        }}
+                        disabled={!profileForm.countryCode}
+                      >
+                        <option value="">Select...</option>
+                        {states.map((s: any) => (
+                          <option key={s.isoCode} value={s.isoCode}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        City
+                      </label>
+                      {cities.length > 0 ? (
+                        <select
+                          className="w-full border border-slate-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all appearance-none cursor-pointer"
+                          value={profileForm.city}
+                          onChange={(e) =>
+                            setProfileForm({
+                              ...profileForm,
+                              city: e.target.value,
+                            })
+                          }
+                          disabled={!profileForm.stateCode}
+                        >
+                          <option value="">Select...</option>
+                          {cities.map((c: any) => (
+                            <option key={c.name} value={c.name}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          className="w-full border border-slate-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all"
+                          value={profileForm.city}
+                          onChange={(e) =>
+                            setProfileForm({
+                              ...profileForm,
+                              city: e.target.value,
+                            })
+                          }
+                          disabled={!profileForm.stateCode}
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Postcode
+                      </label>
                       <input
                         type="text"
-                        disabled
-                        className="w-full border border-slate-200 bg-slate-50 rounded-lg px-4 py-2.5 text-slate-500"
-                        value={profileForm.country}
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all"
+                        value={profileForm.postcode}
+                        onChange={(e) =>
+                          setProfileForm({
+                            ...profileForm,
+                            postcode: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -779,17 +962,162 @@ const PageHeader = ({
   );
 };
 
+const STATUS_STEPS = [
+  { key: "Pending", label: "Order Placed", icon: "📦" },
+  { key: "Accepted", label: "Order Accepted", icon: "✅" },
+  { key: "Shipped", label: "Shipped", icon: "🚚" },
+  { key: "Arrived in Country", label: "Arrived in Country", icon: "🌍" },
+  { key: "Arrived in City", label: "Arrived in City", icon: "📍" },
+  { key: "Out for Delivery", label: "Out for Delivery", icon: "🏠" },
+  { key: "Delivered", label: "Delivered", icon: "🎉" },
+];
+
+const OrderTrackingTimeline = ({
+  status,
+  trackingHistory,
+  order,
+}: {
+  status: string;
+  trackingHistory: { status: string; message: string; timestamp: string }[];
+  order: Order;
+}) => {
+  const isCancelled = status === "Cancelled";
+
+  const getStepLabel = (step: any) => {
+    if (step.key === "Arrived in Country") {
+      return `Arrived in ${order.customer?.country || "Country"}`;
+    }
+    if (step.key === "Arrived in City") {
+      return `Arrived in ${order.customer?.city || "City"}`;
+    }
+    return step.label;
+  };
+
+  const steps = isCancelled
+    ? [{ key: "Cancelled", label: "Order Cancelled", icon: "❌" }]
+    : STATUS_STEPS;
+
+  const completedKeys = new Set(trackingHistory.map((h) => h.status));
+  const currentStatusIdx = STATUS_STEPS.findIndex((s) => s.key === status);
+
+  const formatDate = (ts: string) => {
+    try {
+      return new Date(ts).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return ts;
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full">
+      <h3 className="font-bold text-slate-900 text-lg mb-6 flex items-center gap-2">
+        <span className="text-xl">📍</span> Tracking Status
+      </h3>
+      <div className="space-y-0">
+        {steps.map((step, idx) => {
+          const isCompleted =
+            completedKeys.has(step.key) ||
+            (currentStatusIdx !== -1 && idx < currentStatusIdx);
+          const isCurrent = step.key === status;
+          const isLast = idx === steps.length - 1;
+          const historyEntry = trackingHistory.find(
+            (h) => h.status === step.key,
+          );
+          const label = getStepLabel(step);
+
+          return (
+            <div key={step.key} className="flex gap-4">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 border-2 transition-all ${
+                    isCurrent
+                      ? "bg-purple-600 border-purple-600 shadow-lg shadow-purple-200 ring-4 ring-purple-100"
+                      : isCompleted
+                        ? "bg-emerald-500 border-emerald-500"
+                        : "bg-white border-slate-200"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <span className="text-white text-xs font-black">✓</span>
+                  ) : (
+                    <span
+                      className={isCurrent ? "text-white" : "text-slate-300"}
+                    >
+                      {step.icon}
+                    </span>
+                  )}
+                </div>
+                {!isLast && (
+                  <div
+                    className={`w-0.5 flex-1 my-1 min-h-[32px] rounded-full ${
+                      isCompleted ? "bg-emerald-400" : "bg-slate-100"
+                    }`}
+                  />
+                )}
+              </div>
+              <div className={`pb-6 ${isLast ? "pb-0" : ""} flex-1 pt-0.5`}>
+                <p
+                  className={`text-sm font-bold leading-tight ${
+                    isCurrent
+                      ? "text-purple-700"
+                      : isCompleted
+                        ? "text-slate-800"
+                        : "text-slate-400"
+                  }`}
+                >
+                  {label}
+                  {isCurrent && (
+                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">
+                      Current
+                    </span>
+                  )}
+                </p>
+                {historyEntry && (
+                  <div className="mt-1">
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                      {historyEntry.message}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">
+                      {formatDate(historyEntry.timestamp)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {isCancelled && (
+        <div className="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 text-xs text-red-600 font-medium">
+          Your order was cancelled. Contact support for help.
+        </div>
+      )}
+    </div>
+  );
+};
+
 const OrderStatusBadge = ({ status }: { status: string }) => {
   const colors: { [key: string]: string } = {
     Pending: "bg-yellow-100 text-yellow-700",
-    Accepted: "bg-green-100 text-green-700",
-    Completed: "bg-blue-100 text-blue-700",
+    Accepted: "bg-blue-100 text-blue-700",
+    Shipped: "bg-indigo-100 text-indigo-700",
+    "Arrived in Country": "bg-violet-100 text-violet-700",
+    "Arrived in City": "bg-pink-100 text-pink-700",
+    "Out for Delivery": "bg-orange-100 text-orange-700",
+    Delivered: "bg-emerald-100 text-emerald-700",
     Cancelled: "bg-red-100 text-red-700",
   };
 
   return (
     <span
-      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${colors[status] || "bg-slate-100 text-slate-700"}`}
+      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+        colors[status] || "bg-slate-100 text-slate-700"
+      }`}
     >
       {status}
     </span>

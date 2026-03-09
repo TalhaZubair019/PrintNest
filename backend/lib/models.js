@@ -29,6 +29,18 @@ const orderSchema = new mongoose.Schema(
     total: { type: Number, required: true },
     items: { type: Array, required: true },
     customer: { type: Object },
+    trackingNumber: { type: String, default: "Pending" },
+    trackingUrl: { type: String, default: "" },
+    trackingHistory: {
+      type: [
+        {
+          status: { type: String, required: true },
+          message: { type: String, required: true },
+          timestamp: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true },
 );

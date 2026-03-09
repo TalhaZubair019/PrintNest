@@ -15,24 +15,57 @@ const OrderStatusChart = ({ stats }: OrderStatusChartProps) => {
       <div className="flex flex-col items-center">
         <div className="relative w-48 h-48 mb-6">
           {(() => {
-            const pending = stats.recentOrders.filter(
-              (o) => o.status === "Pending",
-            ).length;
-            const accepted = stats.recentOrders.filter(
-              (o) => o.status === "Accepted",
-            ).length;
-            const completed = stats.recentOrders.filter(
-              (o) => o.status === "Completed",
-            ).length;
-            const cancelled = stats.recentOrders.filter(
-              (o) => o.status === "Cancelled",
-            ).length;
-            const total = pending + accepted + completed + cancelled || 1;
+            const getCount = (status: string) =>
+              stats.recentOrders.filter((o) => o.status === status).length;
+
+            const data = [
+              {
+                label: "Pending",
+                count: getCount("Pending"),
+                color: "#fbbf24",
+              },
+              {
+                label: "Accepted",
+                count: getCount("Accepted"),
+                color: "#3b82f6",
+              },
+              {
+                label: "Shipped",
+                count: getCount("Shipped"),
+                color: "#6366f1",
+              },
+              {
+                label: "Arrived in Country",
+                count: getCount("Arrived in Country"),
+                color: "#8b5cf6",
+              },
+              {
+                label: "Arrived in City",
+                count: getCount("Arrived in City"),
+                color: "#ec4899",
+              },
+              {
+                label: "Out for Delivery",
+                count: getCount("Out for Delivery"),
+                color: "#f97316",
+              },
+              {
+                label: "Delivered",
+                count: getCount("Delivered") || getCount("Completed"),
+                color: "#10b981",
+              },
+              {
+                label: "Cancelled",
+                count: getCount("Cancelled"),
+                color: "#ef4444",
+              },
+            ].filter((d) => d.count > 0);
+
+            const total = data.reduce((acc, d) => acc + d.count, 0) || 1;
             const CIRC = 502.4;
-            const pPending = (pending / total) * CIRC;
-            const pAccepted = (accepted / total) * CIRC;
-            const pCompleted = (completed / total) * CIRC;
-            const pCancelled = (cancelled / total) * CIRC;
+
+            let currentOffset = 0;
+
             return (
               <svg viewBox="0 0 200 200" className="w-full h-full -rotate-90">
                 <circle
@@ -43,54 +76,24 @@ const OrderStatusChart = ({ stats }: OrderStatusChartProps) => {
                   stroke="#e2e8f0"
                   strokeWidth="40"
                 />
-                {pending > 0 && (
-                  <circle
-                    cx="100"
-                    cy="100"
-                    r="80"
-                    fill="none"
-                    stroke="#fbbf24"
-                    strokeWidth="40"
-                    strokeDasharray={`${pPending} ${CIRC}`}
-                    strokeDashoffset="0"
-                  />
-                )}
-                {accepted > 0 && (
-                  <circle
-                    cx="100"
-                    cy="100"
-                    r="80"
-                    fill="none"
-                    stroke="#3b82f6"
-                    strokeWidth="40"
-                    strokeDasharray={`${pAccepted} ${CIRC}`}
-                    strokeDashoffset={`-${pPending}`}
-                  />
-                )}
-                {completed > 0 && (
-                  <circle
-                    cx="100"
-                    cy="100"
-                    r="80"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="40"
-                    strokeDasharray={`${pCompleted} ${CIRC}`}
-                    strokeDashoffset={`-${pPending + pAccepted}`}
-                  />
-                )}
-                {cancelled > 0 && (
-                  <circle
-                    cx="100"
-                    cy="100"
-                    r="80"
-                    fill="none"
-                    stroke="#ef4444"
-                    strokeWidth="40"
-                    strokeDasharray={`${pCancelled} ${CIRC}`}
-                    strokeDashoffset={`-${pPending + pAccepted + pCompleted}`}
-                  />
-                )}
+                {data.map((item, i) => {
+                  const pRatio = (item.count / total) * CIRC;
+                  const offset = currentOffset;
+                  currentOffset += pRatio;
+                  return (
+                    <circle
+                      key={i}
+                      cx="100"
+                      cy="100"
+                      r="80"
+                      fill="none"
+                      stroke={item.color}
+                      strokeWidth="40"
+                      strokeDasharray={`${pRatio} ${CIRC}`}
+                      strokeDashoffset={`-${offset}`}
+                    />
+                  );
+                })}
               </svg>
             );
           })()}
@@ -103,44 +106,50 @@ const OrderStatusChart = ({ stats }: OrderStatusChartProps) => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 w-full text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-amber-400" />
-            <span className="text-slate-600">
-              Pending (
-              {stats.recentOrders.filter((o) => o.status === "Pending").length})
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500" />
-            <span className="text-slate-600">
-              Accepted (
-              {stats.recentOrders.filter((o) => o.status === "Accepted").length}
-              )
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500" />
-            <span className="text-slate-600">
-              Completed (
-              {
-                stats.recentOrders.filter((o) => o.status === "Completed")
-                  .length
-              }
-              )
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-rose-500" />
-            <span className="text-slate-600">
-              Cancelled (
-              {
-                stats.recentOrders.filter((o) => o.status === "Cancelled")
-                  .length
-              }
-              )
-            </span>
-          </div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3 w-full text-[10px]">
+          {[
+            { label: "Pending", status: "Pending", color: "bg-amber-400" },
+            { label: "Accepted", status: "Accepted", color: "bg-blue-500" },
+            { label: "Shipped", status: "Shipped", color: "bg-indigo-500" },
+            {
+              label: "In Country",
+              status: "Arrived in Country",
+              color: "bg-violet-500",
+            },
+            {
+              label: "In City",
+              status: "Arrived in City",
+              color: "bg-pink-500",
+            },
+            {
+              label: "Out for Delivery",
+              status: "Out for Delivery",
+              color: "bg-orange-500",
+            },
+            {
+              label: "Delivered",
+              status: "Delivered",
+              color: "bg-emerald-500",
+            },
+            { label: "Cancelled", status: "Cancelled", color: "bg-rose-500" },
+          ].map((item, idx) => {
+            const count =
+              stats.recentOrders.filter((o) => o.status === item.status)
+                .length +
+              (item.status === "Delivered"
+                ? stats.recentOrders.filter((o) => o.status === "Completed")
+                    .length
+                : 0);
+
+            return (
+              <div key={idx} className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                <span className="text-slate-600 truncate">
+                  {item.label} ({count})
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
