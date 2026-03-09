@@ -13,7 +13,9 @@ router.post("/checkout", async (req, res) => {
     }
 
     const appUrl = (
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+      req.headers.origin ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      "http://localhost:3000"
     ).replace(/\/$/, "");
 
     const ensureAbsoluteUrl = (url) => {

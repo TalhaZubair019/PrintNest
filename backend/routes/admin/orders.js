@@ -83,10 +83,12 @@ function getStatusContent(status, order) {
   );
 }
 
-function buildEmailHtml(order, status, trackingHistory) {
+function buildEmailHtml(order, status, trackingHistory, baseUrl) {
   const content = getStatusContent(status, order);
   const appUrl = (
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    baseUrl ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000"
   ).replace(/\/$/, "");
   const trackUrl = `${appUrl}/account?tab=orders&orderId=${order.id}`;
 
@@ -205,6 +207,7 @@ router.patch("/:id", requireAdmin, async (req, res) => {
         order,
         status,
         order.trackingHistory || [],
+        req.headers.origin,
       );
       const content = getStatusContent(status, order);
 
