@@ -38,10 +38,9 @@ router.post("/checkout", async (req, res) => {
         .json({ error: "totalAmount and orderId are required." });
     }
 
-    const clientUrl =
-      req.headers.origin ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      "http://localhost:3000";
+    const clientUrl = (
+      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    ).replace(/\/$/, "");
 
     const accessToken = await getPayPalAccessToken();
 

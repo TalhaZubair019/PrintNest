@@ -12,10 +12,9 @@ router.post("/checkout", async (req, res) => {
       return res.status(400).json({ error: "Cart items are required." });
     }
 
-    const appUrl =
-      req.headers.origin ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      "http://localhost:3000";
+    const appUrl = (
+      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    ).replace(/\/$/, "");
 
     const ensureAbsoluteUrl = (url) => {
       if (!url) return url;

@@ -85,7 +85,10 @@ function getStatusContent(status, order) {
 
 function buildEmailHtml(order, status, trackingHistory) {
   const content = getStatusContent(status, order);
-  const trackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/account?tab=orders&orderId=${order.id}`;
+  const appUrl = (
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  ).replace(/\/$/, "");
+  const trackUrl = `${appUrl}/account?tab=orders&orderId=${order.id}`;
 
   return `<!DOCTYPE html>
 <html lang="en">
