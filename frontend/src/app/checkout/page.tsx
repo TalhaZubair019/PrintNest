@@ -168,7 +168,7 @@ export default function CheckoutPage() {
       if (hasSavedAddress) {
         setFormData((prev) => ({
           ...prev,
-          email: prev.email || user.email || "",
+          email: user.email || prev.email || "",
           firstName: prev.firstName || user.name?.split(" ")[0] || "",
           lastName: prev.lastName || user.name?.split(" ")[1] || "",
           phone: prev.phone || user.phone || "",
@@ -183,7 +183,7 @@ export default function CheckoutPage() {
       } else {
         setFormData((prev) => ({
           ...prev,
-          email: prev.email || user.email || "",
+          email: user.email || prev.email || "",
           firstName: prev.firstName || user.name?.split(" ")[0] || "",
           lastName: prev.lastName || user.name?.split(" ")[1] || "",
         }));
