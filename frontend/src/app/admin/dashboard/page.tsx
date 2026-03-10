@@ -34,6 +34,7 @@ import CategoriesTable from "@/components/admin/tables/CategoriesTable";
 import UsersTable from "@/components/admin/tables/UsersTable";
 import AdminsTable from "@/components/admin/tables/AdminsTable";
 import OrdersTable from "@/components/admin/tables/OrdersTable";
+import ActivityLogsTable from "@/components/admin/tables/ActivityLogsTable";
 
 import CategoryModal from "@/components/admin/modals/CategoryModal";
 import UserModal from "@/components/admin/modals/UserModal";
@@ -95,6 +96,7 @@ export default function AdminDashboard() {
     | "products"
     | "reviews"
     | "categories"
+    | "logs"
   >("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
@@ -169,6 +171,7 @@ export default function AdminDashboard() {
         "products",
         "reviews",
         "categories",
+        "logs",
       ];
       if (tab && validTabs.includes(tab)) {
         setActiveTab(tab as any);
@@ -190,6 +193,16 @@ export default function AdminDashboard() {
       fetchStats();
     }
   }, [user, isAuthenticated, isAuthLoading]);
+
+  useEffect(() => {
+    if (!user?.isAdmin) return;
+
+    const interval = setInterval(() => {
+      fetchStats();
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   useEffect(() => {
     setSearchTerm("");
@@ -595,6 +608,9 @@ export default function AdminDashboard() {
               <option value="admins">Admins</option>
               <option value="orders">Orders</option>
               <option value="categories">Categories</option>
+              {user?.adminRole === "super_admin" && (
+                <option value="logs">Activity Logs</option>
+              )}
             </select>
           </div>
         </div>
@@ -740,6 +756,7 @@ export default function AdminDashboard() {
                 userPage={userPage}
                 setUserPage={setUserPage}
                 totalUserPages={totalUserPages}
+                isSuperAdmin={user?.adminRole === "super_admin"}
               />
             )}
             {activeTab === "admins" && (
@@ -751,6 +768,7 @@ export default function AdminDashboard() {
                 setAdminPage={setAdminPage}
                 totalAdminPages={totalAdminPages}
                 onAddAdmin={() => setIsAddAdminModalOpen(true)}
+                isSuperAdmin={user?.adminRole === "super_admin"}
               />
             )}
             {activeTab === "orders" && (
@@ -778,6 +796,9 @@ export default function AdminDashboard() {
                 }}
                 onDelete={(cat) => setCategoryDeleteConfirm(cat)}
               />
+            )}
+            {activeTab === "logs" && user?.adminRole === "super_admin" && (
+              <ActivityLogsTable />
             )}
           </div>
         </div>

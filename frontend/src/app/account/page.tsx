@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   Calendar,
   User as UserIcon,
+  Shield,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/Store";
@@ -459,6 +460,47 @@ function AccountContent() {
       />
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
+        <div className="lg:hidden mb-6 flex items-center justify-between bg-[#0f172a] p-4 rounded-2xl shadow-lg border border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-purple-600 border border-purple-500/20 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-purple-600/20">
+              {user?.name?.[0]?.toUpperCase() || "U"}
+            </div>
+            <div className="overflow-hidden">
+              <span className="text-xl font-bold text-white tracking-tight truncate block">
+                {user?.name || "User"}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {user?.isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="text-purple-400 hover:text-purple-300 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700 transition-colors"
+                title="Switch to Admin View"
+              >
+                <Shield size={18} />
+              </Link>
+            )}
+            <button
+              onClick={handleLogout}
+              className="text-red-400 hover:text-red-300 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700 transition-colors"
+              title="Logout"
+            >
+              <LogOut size={18} />
+            </button>
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              className="bg-slate-800 text-purple-400 text-xs font-bold py-2 px-3 rounded-lg border border-slate-700 outline-none"
+            >
+              <option value="dashboard">Dashboard</option>
+              <option value="profile">Edit Profile</option>
+              <option value="orders">Orders</option>
+              <option value="wishlist">Wishlist</option>
+              <option value="cart">Cart</option>
+            </select>
+          </div>
+        </div>
         <div className="flex flex-col lg:flex-row gap-8">
           <UserSidebar
             user={user}

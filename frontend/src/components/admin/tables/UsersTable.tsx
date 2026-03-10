@@ -13,6 +13,7 @@ interface UsersTableProps {
   userPage: number;
   setUserPage: React.Dispatch<React.SetStateAction<number>>;
   totalUserPages: number;
+  isSuperAdmin: boolean;
 }
 
 const UsersTable = ({
@@ -24,6 +25,7 @@ const UsersTable = ({
   userPage,
   setUserPage,
   totalUserPages,
+  isSuperAdmin,
 }: UsersTableProps) => {
   return (
     <div
@@ -85,13 +87,15 @@ const UsersTable = ({
                 </td>
                 <td className="px-8 py-5 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => onPromoteToAdmin(u.id, u.name)}
-                      className="text-slate-400 hover:text-purple-600 p-2.5 rounded-xl hover:bg-purple-50 transition-colors"
-                      title="Promote to Admin"
-                    >
-                      <Shield size={18} />
-                    </button>
+                    {isSuperAdmin && (
+                      <button
+                        onClick={() => onPromoteToAdmin(u.id, u.name)}
+                        className="text-slate-400 hover:text-purple-600 p-2.5 rounded-xl hover:bg-purple-50 transition-colors"
+                        title="Promote to Admin"
+                      >
+                        <Shield size={18} />
+                      </button>
+                    )}
                     <button
                       onClick={() => setDeleteConfirm(u.id)}
                       className="text-slate-400 hover:text-red-600 p-2.5 rounded-xl hover:bg-red-50 transition-colors"

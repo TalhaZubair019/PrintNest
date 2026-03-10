@@ -2,6 +2,7 @@ const express = require("express");
 const { connectDB } = require("../../lib/db");
 const { CategoryModel } = require("../../lib/models");
 const { requireAdmin } = require("../../middleware/auth");
+const { logActivity } = require("../../lib/activityLog");
 
 const router = express.Router();
 
@@ -36,6 +37,14 @@ router.post("/", requireAdmin, async (req, res) => {
       slug,
       image: image || null,
     });
+
+    await logActivity(req, {
+      action: "add",
+      entity: "category",
+      entityId: category._id.toString(),
+      details: `Added category "${name.trim()}"`,
+    });
+
     return res.status(201).json({ message: "Category created", category });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });
@@ -64,6 +73,14 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     );
     if (!updated)
       return res.status(404).json({ message: "Category not found" });
+
+    await logActivity(req, {
+      action: "update",
+      entity: "category",
+      entityId: req.params.id,
+      details: `Updated category "${updated.name}"`,
+    });
+
     return res.json({ message: "Category updated", category: updated });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });
@@ -76,6 +93,14 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     const deleted = await CategoryModel.findByIdAndDelete(req.params.id);
     if (!deleted)
       return res.status(404).json({ message: "Category not found" });
+
+    await logActivity(req, {
+      action: "delete",
+      entity: "category",
+      entityId: req.params.id,
+      details: `Deleted category "${deleted.name}"`,
+    });
+
     return res.json({ message: "Category deleted" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });

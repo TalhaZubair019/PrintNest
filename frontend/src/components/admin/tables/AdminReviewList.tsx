@@ -157,7 +157,7 @@ export default function AdminReviewList({
     if (!confirm("Are you sure you want to delete this review?")) return;
 
     try {
-      const response = await fetch(`/api/public/reviews/${reviewId}`, {
+      const response = await fetch(`/api/admin/reviews/${reviewId}`, {
         method: "DELETE",
       });
 

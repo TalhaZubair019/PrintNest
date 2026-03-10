@@ -2,6 +2,7 @@ const express = require("express");
 const { connectDB } = require("../../lib/db");
 const { ProductModel } = require("../../lib/models");
 const { requireAdmin } = require("../../middleware/auth");
+const { logActivity } = require("../../lib/activityLog");
 
 const router = express.Router();
 
@@ -14,6 +15,14 @@ router.post("/", requireAdmin, async (req, res) => {
         ? lastProduct.id + 1
         : 1;
     const newProduct = await ProductModel.create({ ...req.body, id: newId });
+
+    await logActivity(req, {
+      action: "add",
+      entity: "product",
+      entityId: newId.toString(),
+      details: `Added product "${req.body.title || "Untitled"}" (ID: ${newId})`,
+    });
+
     return res.json({
       message: "Product added successfully",
       product: newProduct,
@@ -46,6 +55,14 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       { returnDocument: "after" },
     ).lean();
     if (!updated) return res.status(404).json({ message: "Product not found" });
+
+    await logActivity(req, {
+      action: "update",
+      entity: "product",
+      entityId: req.params.id,
+      details: `Updated product "${updated.title}" (ID: ${req.params.id})`,
+    });
+
     return res.json({ message: "Product updated", product: updated });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });
@@ -59,6 +76,14 @@ router.delete("/:id", requireAdmin, async (req, res) => {
       id: Number(req.params.id),
     });
     if (!deleted) return res.status(404).json({ message: "Product not found" });
+
+    await logActivity(req, {
+      action: "delete",
+      entity: "product",
+      entityId: req.params.id,
+      details: `Deleted product "${deleted.title}" (ID: ${req.params.id})`,
+    });
+
     return res.json({ message: "Product deleted" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });

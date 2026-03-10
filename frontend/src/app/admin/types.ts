@@ -41,6 +41,7 @@ export interface UserData {
   wishlist?: any[];
   createdAt?: string;
   isAdmin?: boolean;
+  adminRole?: "super_admin" | "admin" | null;
 }
 
 export interface DashboardStats {

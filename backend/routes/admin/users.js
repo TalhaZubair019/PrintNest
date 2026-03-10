@@ -2,11 +2,11 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const { connectDB } = require("../../lib/db");
 const { UserModel } = require("../../lib/models");
-const { requireAdmin } = require("../../middleware/auth");
+const { requireSuperAdmin } = require("../../middleware/auth");
 
 const router = express.Router();
 
-router.post("/", requireAdmin, async (req, res) => {
+router.post("/", requireSuperAdmin, async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password)
@@ -28,6 +28,8 @@ router.post("/", requireAdmin, async (req, res) => {
       email,
       password: hashedPassword,
       isAdmin: true,
+      adminRole: "admin",
+      promotedBy: req.user.id,
       cart: [],
       wishlist: [],
       savedCards: [],
@@ -40,12 +42,24 @@ router.post("/", requireAdmin, async (req, res) => {
   }
 });
 
-router.patch("/:id", requireAdmin, async (req, res) => {
+router.patch("/:id", requireSuperAdmin, async (req, res) => {
   try {
     await connectDB();
+    const updateData = { isAdmin: req.body.isAdmin };
+    if (req.body.isAdmin) {
+      updateData.adminRole = "admin";
+      updateData.promotedBy = req.user.id;
+      updateData.promotionPending = true;
+      updateData.demotionPending = false;
+    } else {
+      updateData.adminRole = null;
+      updateData.promotedBy = null;
+      updateData.promotionPending = false;
+      updateData.demotionPending = true;
+    }
     const updated = await UserModel.findOneAndUpdate(
       { id: req.params.id },
-      { isAdmin: req.body.isAdmin },
+      updateData,
       { new: true },
     );
     if (!updated) return res.status(404).json({ message: "User not found" });
@@ -55,11 +69,15 @@ router.patch("/:id", requireAdmin, async (req, res) => {
   }
 });
 
-router.delete("/:id", requireAdmin, async (req, res) => {
+router.delete("/:id", requireSuperAdmin, async (req, res) => {
   try {
     await connectDB();
-    const deleted = await UserModel.findOneAndDelete({ id: req.params.id });
-    if (!deleted) return res.status(404).json({ message: "User not found" });
+    const targetUser = await UserModel.findOne({ id: req.params.id }).lean();
+    if (!targetUser) return res.status(404).json({ message: "User not found" });
+    if (targetUser.email === process.env.EMAIL_USER) {
+      return res.status(403).json({ message: "Cannot delete the super admin account" });
+    }
+    await UserModel.findOneAndDelete({ id: req.params.id });
     return res.json({ message: "User deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });

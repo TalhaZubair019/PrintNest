@@ -34,10 +34,20 @@ function requireAdmin(req, res, next) {
   });
 }
 
+function requireSuperAdmin(req, res, next) {
+  requireAuth(req, res, () => {
+    if (req.user.email !== ADMIN_EMAIL) {
+      return res.status(403).json({ message: "Only the super admin can perform this action" });
+    }
+    next();
+  });
+}
+
 module.exports = {
   extractToken,
   requireAuth,
   requireAdmin,
+  requireSuperAdmin,
   JWT_SECRET,
   ADMIN_EMAIL,
 };

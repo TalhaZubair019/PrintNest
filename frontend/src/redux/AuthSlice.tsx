@@ -14,6 +14,7 @@ export interface User {
   cart?: any[];
   wishlist?: any[];
   isAdmin?: boolean;
+  adminRole?: "super_admin" | "admin" | null;
 }
 
 interface AuthState {

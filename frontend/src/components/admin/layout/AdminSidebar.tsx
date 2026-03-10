@@ -11,10 +11,11 @@ import {
   LogOut,
   Shield,
   Tag,
+  ScrollText,
 } from "lucide-react";
 
 interface AdminSidebarProps {
-  user: { name: string; email?: string } | null | any;
+  user: { name: string; email?: string; adminRole?: string } | null | any;
   activeTab:
     | "overview"
     | "users"
@@ -22,7 +23,8 @@ interface AdminSidebarProps {
     | "orders"
     | "products"
     | "reviews"
-    | "categories";
+    | "categories"
+    | "logs";
   setActiveTab: React.Dispatch<
     React.SetStateAction<
       | "overview"
@@ -32,6 +34,7 @@ interface AdminSidebarProps {
       | "products"
       | "reviews"
       | "categories"
+      | "logs"
     >
   >;
   stats: any;
@@ -127,6 +130,14 @@ const AdminSidebar = ({
           icon={<Tag />}
           label={`Categories (${stats?.categories?.length ?? 0})`}
         />
+        {user?.adminRole === "super_admin" && (
+          <NavButton
+            active={activeTab === "logs"}
+            onClick={() => setActiveTab("logs")}
+            icon={<ScrollText />}
+            label="Activity Logs"
+          />
+        )}
       </nav>
       <div className="p-4 border-t border-slate-800/50 mt-auto">
         <div className="space-y-1">

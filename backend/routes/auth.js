@@ -23,8 +23,9 @@ router.post("/login", async (req, res) => {
     }
 
     const isAdmin = user.email === ADMIN_EMAIL || !!user.isAdmin;
+    const adminRole = user.email === ADMIN_EMAIL ? "super_admin" : user.isAdmin ? "admin" : null;
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name, isAdmin },
+      { id: user.id, email: user.email, name: user.name, isAdmin, adminRole },
       JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -38,7 +39,7 @@ router.post("/login", async (req, res) => {
     });
 
     const { password: _, ...userWithoutPassword } = user;
-    return res.json({ token, user: { ...userWithoutPassword, isAdmin } });
+    return res.json({ token, user: { ...userWithoutPassword, isAdmin, adminRole } });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -84,7 +85,8 @@ router.get("/me", requireAuth, async (req, res) => {
 
     const { password, ...userWithoutPassword } = user;
     const isAdmin = user.email === ADMIN_EMAIL || !!user.isAdmin;
-    return res.json({ user: { ...userWithoutPassword, isAdmin } });
+    const adminRole = user.email === ADMIN_EMAIL ? "super_admin" : user.isAdmin ? "admin" : null;
+    return res.json({ user: { ...userWithoutPassword, isAdmin, adminRole } });
   } catch (error) {
     return res.status(401).json({ message: "Invalid token" });
   }
@@ -105,6 +107,8 @@ router.put("/me", requireAuth, async (req, res) => {
       "savedCards",
       "cart",
       "wishlist",
+      "promotionPending",
+      "demotionPending",
     ];
     const updateData = {};
     for (const field of allowedFields) {

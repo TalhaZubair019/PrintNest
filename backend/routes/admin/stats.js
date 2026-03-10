@@ -99,9 +99,12 @@ router.get("/", requireAdmin, async (req, res) => {
 
     const usersWithDetails = users.map((user) => {
       const { password, ...rest } = user;
+      const isAdmin = !!user.isAdmin || user.email === ADMIN_EMAIL;
+      const adminRole = user.email === ADMIN_EMAIL ? "super_admin" : user.isAdmin ? "admin" : null;
       return {
         ...rest,
-        isAdmin: !!user.isAdmin || user.email === ADMIN_EMAIL,
+        isAdmin,
+        adminRole,
         cartCount: user.cart?.length || 0,
         wishlistCount: user.wishlist?.length || 0,
       };

@@ -3,6 +3,7 @@ const { connectDB } = require("../../lib/db");
 const { OrderModel } = require("../../lib/models");
 const { requireAdmin } = require("../../middleware/auth");
 const { transporter } = require("../../lib/mailer");
+const { logActivity } = require("../../lib/activityLog");
 
 const router = express.Router();
 
@@ -221,6 +222,13 @@ router.patch("/:id", requireAdmin, async (req, res) => {
         .catch((e) => console.error("Tracking email error:", e));
     } catch (_) {}
 
+    await logActivity(req, {
+      action: "update",
+      entity: "order",
+      entityId: req.params.id,
+      details: `Changed order #${req.params.id.slice(-8).toUpperCase()} status from "${existingOrder.status}" to "${status}"`,
+    });
+
     return res.json({ message: "Order status updated", order });
   } catch (error) {
     console.error("Admin order patch error:", error);
@@ -233,6 +241,14 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     await connectDB();
     const deleted = await OrderModel.findOneAndDelete({ id: req.params.id });
     if (!deleted) return res.status(404).json({ message: "Order not found" });
+
+    await logActivity(req, {
+      action: "delete",
+      entity: "order",
+      entityId: req.params.id,
+      details: `Deleted order #${req.params.id.slice(-8).toUpperCase()} (Total: $${deleted.total?.toFixed(2) || "0.00"})`,
+    });
+
     return res.json({ message: "Order deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });

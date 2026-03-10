@@ -1,7 +1,5 @@
 const fetch = require("node-fetch");
 
-// Brevo (formerly Sendinblue) - Free HTTPS email API
-// 300 emails/day, no domain verification needed, just verify sender email
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
 const transporter = {
@@ -12,7 +10,6 @@ const transporter = {
       throw new Error("BREVO_API_KEY is not set in environment variables");
     }
 
-    // Extract sender name and email from "Name <email>" format
     let senderName = "PrintNest";
     let senderEmail = process.env.EMAIL_USER;
     if (options.from) {

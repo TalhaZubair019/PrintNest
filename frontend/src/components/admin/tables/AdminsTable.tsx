@@ -10,6 +10,7 @@ interface AdminsTableProps {
   setAdminPage: React.Dispatch<React.SetStateAction<number>>;
   totalAdminPages: number;
   onAddAdmin: () => void;
+  isSuperAdmin: boolean;
 }
 
 const AdminsTable = ({
@@ -20,6 +21,7 @@ const AdminsTable = ({
   setAdminPage,
   totalAdminPages,
   onAddAdmin,
+  isSuperAdmin,
 }: AdminsTableProps) => {
   return (
     <div
@@ -42,13 +44,15 @@ const AdminsTable = ({
               </p>
             </div>
           </div>
-          <button
-            onClick={onAddAdmin}
-            className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-md shadow-purple-200"
-          >
-            <UserPlus size={16} />
-            Add Admin
-          </button>
+          {isSuperAdmin && (
+            <button
+              onClick={onAddAdmin}
+              className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-purple-600 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-md shadow-purple-200"
+            >
+              <UserPlus size={16} />
+              Add Admin
+            </button>
+          )}
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -90,28 +94,37 @@ const AdminsTable = ({
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">
-                      <Crown size={11} />
-                      Administrator
-                    </span>
+                    {u.adminRole === "super_admin" ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                        <Crown size={11} />
+                        Super Admin
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">
+                        <Shield size={11} />
+                        Admin
+                      </span>
+                    )}
                   </td>
                   <td className="px-8 py-5 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => onRevokeAdmin(u.id, u.name)}
-                        className="text-slate-400 hover:text-orange-600 p-2.5 rounded-xl hover:bg-orange-50 transition-colors"
-                        title="Revoke Admin Access"
-                      >
-                        <ShieldOff size={18} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirm(u.id)}
-                        className="text-slate-400 hover:text-red-600 p-2.5 rounded-xl hover:bg-red-50 transition-colors"
-                        title="Delete Account"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
+                    {isSuperAdmin && u.adminRole !== "super_admin" && (
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => onRevokeAdmin(u.id, u.name)}
+                          className="text-slate-400 hover:text-orange-600 p-2.5 rounded-xl hover:bg-orange-50 transition-colors"
+                          title="Revoke Admin Access"
+                        >
+                          <ShieldOff size={18} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirm(u.id)}
+                          className="text-slate-400 hover:text-red-600 p-2.5 rounded-xl hover:bg-red-50 transition-colors"
+                          title="Delete Account"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))
