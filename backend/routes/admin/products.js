@@ -49,6 +49,13 @@ router.get("/:id", requireAdmin, async (req, res) => {
 router.patch("/:id", requireAdmin, async (req, res) => {
   try {
     await connectDB();
+
+    const oldProduct = await ProductModel.findOne({
+      id: Number(req.params.id),
+    }).lean();
+    if (!oldProduct)
+      return res.status(404).json({ message: "Product not found" });
+
     const updated = await ProductModel.findOneAndUpdate(
       { id: Number(req.params.id) },
       req.body,
@@ -56,11 +63,40 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     ).lean();
     if (!updated) return res.status(404).json({ message: "Product not found" });
 
+    const trackFields = [
+      "title",
+      "description",
+      "price",
+      "oldPrice",
+      "image",
+      "badge",
+      "printText",
+      "category",
+    ];
+
+    const changes = [];
+    for (const field of trackFields) {
+      if (
+        req.body[field] !== undefined &&
+        String(oldProduct[field] ?? "") !== String(req.body[field] ?? "")
+      ) {
+        const oldVal = oldProduct[field] ?? "(empty)";
+        const newVal = req.body[field] ?? "(empty)";
+        const label = field.charAt(0).toUpperCase() + field.slice(1);
+        changes.push(`${label}: "${oldVal}" → "${newVal}"`);
+      }
+    }
+
+    const detailStr =
+      changes.length > 0
+        ? `Updated product "${updated.title}" (ID: ${req.params.id}) — ${changes.join(", ")}`
+        : `Updated product "${updated.title}" (ID: ${req.params.id}) (no field changes)`;
+
     await logActivity(req, {
       action: "update",
       entity: "product",
       entityId: req.params.id,
-      details: `Updated product "${updated.title}" (ID: ${req.params.id})`,
+      details: detailStr,
     });
 
     return res.json({ message: "Product updated", product: updated });

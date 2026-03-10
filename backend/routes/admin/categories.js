@@ -66,6 +66,11 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     if (image !== undefined) updateData.image = image || null;
 
     await connectDB();
+
+    const oldCategory = await CategoryModel.findById(req.params.id).lean();
+    if (!oldCategory)
+      return res.status(404).json({ message: "Category not found" });
+
     const updated = await CategoryModel.findByIdAndUpdate(
       req.params.id,
       updateData,
@@ -74,11 +79,23 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     if (!updated)
       return res.status(404).json({ message: "Category not found" });
 
+    const changes = [];
+    if (updateData.name && oldCategory.name !== updateData.name) {
+      changes.push(`Name: "${oldCategory.name}" → "${updateData.name}"`);
+    }
+    if (image !== undefined && oldCategory.image !== (image || null)) {
+      changes.push(`Image: ${oldCategory.image ? "changed" : "added"}`);
+    }
+
+    const detailStr = changes.length > 0
+      ? `Updated category "${updated.name}" — ${changes.join(", ")}`
+      : `Updated category "${updated.name}" (no field changes)`;
+
     await logActivity(req, {
       action: "update",
       entity: "category",
       entityId: req.params.id,
-      details: `Updated category "${updated.name}"`,
+      details: detailStr,
     });
 
     return res.json({ message: "Category updated", category: updated });

@@ -16,6 +16,9 @@ import {
   ChevronRight,
   User,
   Loader2,
+  Clock,
+  Mail,
+  Hash,
 } from "lucide-react";
 
 interface LogEntry {
@@ -100,19 +103,36 @@ function timeAgo(dateStr: string) {
   });
 }
 
+function formatFullDate(dateStr: string) {
+  return new Date(dateStr).toLocaleString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+}
+
 export default function ActivityLogsTable() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [availableAdmins, setAvailableAdmins] = useState<
+    { id: string; name: string; email: string }[]
+  >([]);
   const [filterEntity, setFilterEntity] = useState("all");
   const [filterAction, setFilterAction] = useState("all");
   const [filterAdmin, setFilterAdmin] = useState("all");
+  const [expandedLogs, setExpandedLogs] = useState<Record<string, boolean>>({});
   const LIMIT = 15;
 
-  const fetchLogs = async () => {
-    setLoading(true);
+  const fetchLogs = async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
       const params = new URLSearchParams({
         page: page.toString(),
@@ -128,11 +148,14 @@ export default function ActivityLogsTable() {
         setLogs(data.logs);
         setTotal(data.total);
         setTotalPages(data.totalPages);
+        if (data.admins) {
+          setAvailableAdmins(data.admins);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch logs");
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
@@ -141,22 +164,22 @@ export default function ActivityLogsTable() {
   }, [page, filterEntity, filterAction, filterAdmin]);
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      fetchLogs(true);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [page, filterEntity, filterAction, filterAdmin]);
+
+  useEffect(() => {
     setPage(1);
   }, [filterEntity, filterAction, filterAdmin]);
 
-  const uniqueAdmins = useMemo(() => {
-    const map = new Map<string, { id: string; name: string; email: string }>();
-    logs.forEach((l) => {
-      if (!map.has(l.adminId)) {
-        map.set(l.adminId, {
-          id: l.adminId,
-          name: l.adminName,
-          email: l.adminEmail,
-        });
-      }
-    });
-    return Array.from(map.values());
-  }, [logs]);
+  const toggleExpand = (logId: string) => {
+    setExpandedLogs((prev) => ({
+      ...prev,
+      [logId]: !prev[logId],
+    }));
+  };
 
   const hasFilters =
     filterEntity !== "all" || filterAction !== "all" || filterAdmin !== "all";
@@ -177,6 +200,10 @@ export default function ActivityLogsTable() {
                 {total} total {total === 1 ? "entry" : "entries"}
               </p>
             </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 bg-white px-3 py-1.5 rounded-full border shadow-xs">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            Auto-refreshing
           </div>
         </div>
       </div>
@@ -225,7 +252,7 @@ export default function ActivityLogsTable() {
               className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all appearance-none text-slate-700 font-medium"
             >
               <option value="all">All Admins</option>
-              {uniqueAdmins.map((a) => (
+              {availableAdmins.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.name} ({a.email})
                 </option>
@@ -249,7 +276,7 @@ export default function ActivityLogsTable() {
         </div>
       </div>
       <div className="divide-y divide-slate-100">
-        {loading ? (
+        {loading && logs.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 size={28} className="animate-spin text-indigo-500" />
           </div>
@@ -269,6 +296,8 @@ export default function ActivityLogsTable() {
           logs.map((log) => {
             const entity = ENTITY_CONFIG[log.entity] || ENTITY_CONFIG.product;
             const action = ACTION_CONFIG[log.action] || ACTION_CONFIG.update;
+            const isExpanded = expandedLogs[log._id];
+            const shouldTruncate = log.details.length > 150;
 
             return (
               <div
@@ -282,7 +311,7 @@ export default function ActivityLogsTable() {
                     <span className={action.color}>{action.icon}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <div className="flex items-center gap-2 flex-wrap mb-1.5">
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold border ${action.bg} ${action.color}`}
                       >
@@ -294,11 +323,29 @@ export default function ActivityLogsTable() {
                         {entity.icon}
                         {entity.label}
                       </span>
+                      {log.entityId && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold border bg-slate-50 border-slate-200 text-slate-500">
+                          <Hash size={10} />
+                          {log.entityId.length > 12
+                            ? log.entityId.slice(-8).toUpperCase()
+                            : log.entityId}
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-slate-700 font-medium leading-relaxed">
-                      {log.details}
+                      {isExpanded
+                        ? log.details
+                        : `${log.details.slice(0, 150)}${shouldTruncate ? "..." : ""}`}
+                      {shouldTruncate && (
+                        <button
+                          onClick={() => toggleExpand(log._id)}
+                          className="ml-2 text-indigo-600 hover:text-indigo-800 font-semibold text-xs transition-colors"
+                        >
+                          {isExpanded ? "Show Less" : "Read More"}
+                        </button>
+                      )}
                     </p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400 flex-wrap">
                       <span className="flex items-center gap-1.5">
                         <div className="w-5 h-5 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-[10px] font-bold">
                           {log.adminName?.[0]?.toUpperCase()}
@@ -307,9 +354,17 @@ export default function ActivityLogsTable() {
                           {log.adminName}
                         </span>
                       </span>
+                      <span className="flex items-center gap-1 text-slate-400">
+                        <Mail size={10} />
+                        <span>{log.adminEmail}</span>
+                      </span>
                       <span>·</span>
-                      <span title={new Date(log.createdAt).toLocaleString()}>
+                      <span className="flex items-center gap-1">
+                        <Clock size={11} />
                         {timeAgo(log.createdAt)}
+                      </span>
+                      <span className="hidden sm:inline text-slate-400">
+                        ({formatFullDate(log.createdAt)})
                       </span>
                     </div>
                   </div>
