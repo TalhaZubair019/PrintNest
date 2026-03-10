@@ -24,8 +24,13 @@ export default function LoginPage() {
 
   React.useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
+    const savedPassword = localStorage.getItem("rememberedPassword");
     if (savedEmail) {
-      setFormData((prev) => ({ ...prev, email: savedEmail }));
+      setFormData((prev) => ({
+        ...prev,
+        email: savedEmail,
+        password: savedPassword || prev.password,
+      }));
       setRememberMe(true);
     }
   }, []);
@@ -37,8 +42,10 @@ export default function LoginPage() {
 
     if (rememberMe) {
       localStorage.setItem("rememberedEmail", formData.email);
+      localStorage.setItem("rememberedPassword", formData.password);
     } else {
       localStorage.removeItem("rememberedEmail");
+      localStorage.removeItem("rememberedPassword");
     }
 
     try {
