@@ -6,9 +6,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Users,
-  ShoppingBag,
-  DollarSign,
   ChevronRight,
   Search,
   X,
@@ -19,6 +16,9 @@ import AdminReviewList from "@/components/admin/tables/AdminReviewList";
 import db from "@data/db.json";
 import { DashboardStats, UserData, Order } from "@/app/admin/types";
 import StatCard from "@/components/admin/ui/StatCard";
+import OrdersStatCard from "@/components/admin/ui/OrdersStatCard";
+import RevenueStatCard from "@/components/admin/ui/RevenueStatCard";
+import UsersStatCard from "@/components/admin/ui/UsersStatCard";
 import RevenueChart from "@/components/admin/charts/RevenueChart";
 import OrderStatusChart from "@/components/admin/charts/OrderStatusChart";
 import AverageOrderValueChart from "@/components/admin/charts/AverageOrderValueChart";
@@ -39,6 +39,7 @@ import ActivityLogsTable from "@/components/admin/tables/ActivityLogsTable";
 import CategoryModal from "@/components/admin/modals/CategoryModal";
 import UserModal from "@/components/admin/modals/UserModal";
 import OrderModal from "@/components/admin/modals/OrderModal";
+import CancelOrderConfirmModal from "@/components/admin/modals/CancelOrderConfirmModal";
 import DeleteConfirmationModal from "@/components/admin/modals/DeleteConfirmationModal";
 import AddAdminModal from "@/components/admin/modals/AddAdminModal";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
@@ -132,9 +133,10 @@ export default function AdminDashboard() {
   const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
-  const [orderDeleteConfirm, setOrderDeleteConfirm] = useState<Order | null>(
+  const [cancelOrderConfirm, setCancelOrderConfirm] = useState<Order | null>(
     null,
   );
+  const [isCancellingOrder, setIsCancellingOrder] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     message: string;
@@ -458,23 +460,26 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteOrder = async (orderId: string) => {
-    setIsDeletingOrder(true);
+  const handleCancelOrder = async () => {
+    if (!cancelOrderConfirm) return;
+    setIsCancellingOrder(true);
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "DELETE",
+      const res = await fetch(`/api/admin/orders/${cancelOrderConfirm.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Cancelled" }),
       });
       if (res.ok) {
         await fetchStats();
-        setOrderDeleteConfirm(null);
-        showToast("Order deleted successfully.", "success");
+        setCancelOrderConfirm(null);
+        showToast("Order cancelled successfully.", "success");
       } else {
-        showToast("Failed to delete order.", "error");
+        showToast("Failed to cancel order.", "error");
       }
     } catch {
-      showToast("Error deleting order.", "error");
+      showToast("Error cancelling order.", "error");
     } finally {
-      setIsDeletingOrder(false);
+      setIsCancellingOrder(false);
     }
   };
 
@@ -661,23 +666,18 @@ export default function AdminDashboard() {
                 className="space-y-6 animate-in fade-in duration-300"
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <StatCard
-                    title="Total Revenue"
-                    value={`$${stats.totalRevenue.toLocaleString()}`}
-                    icon={DollarSign}
-                    color="text-purple-600 bg-purple-600"
+                  <RevenueStatCard
+                    totalRevenue={stats.totalRevenue}
+                    grossRevenue={stats.grossRevenue ?? 0}
+                    cancelledRevenue={stats.cancelledRevenue ?? 0}
                   />
-                  <StatCard
-                    title="Total Orders"
-                    value={stats.totalOrders}
-                    icon={ShoppingBag}
-                    color="text-blue-600 bg-blue-600"
+                  <OrdersStatCard
+                    totalOrders={stats.totalOrders}
+                    cancelledOrders={stats.cancelledOrders ?? 0}
                   />
-                  <StatCard
-                    title="Total Users"
-                    value={stats.totalUsers}
-                    icon={Users}
-                    color="text-teal-600 bg-teal-600"
+                  <UsersStatCard
+                    totalUsers={stats.totalUsers}
+                    totalAdmins={stats.totalAdmins ?? 0}
                   />
                 </div>
 
@@ -775,8 +775,8 @@ export default function AdminDashboard() {
               <OrdersTable
                 allOrders={filteredOrders || []}
                 handleStatusChange={handleStatusChange}
+                requestCancelOrder={setCancelOrderConfirm}
                 setSelectedOrder={setSelectedOrder}
-                setOrderDeleteConfirm={setOrderDeleteConfirm}
                 orderPage={orderPage}
                 setOrderPage={setOrderPage}
                 users={stats.users}
@@ -874,29 +874,6 @@ export default function AdminDashboard() {
         isLoading={isDeleting}
       />
       <DeleteConfirmationModal
-        isOpen={!!orderDeleteConfirm}
-        onClose={() => setOrderDeleteConfirm(null)}
-        onConfirm={() =>
-          orderDeleteConfirm && handleDeleteOrder(orderDeleteConfirm.id)
-        }
-        title="Delete Order?"
-        message={
-          <>
-            Are you sure you want to delete the order for{" "}
-            <span className="font-bold text-slate-900">
-              {orderDeleteConfirm?.customer?.name || "this customer"}
-            </span>{" "}
-            (
-            <span className="font-mono font-bold">
-              #{orderDeleteConfirm?.id?.slice(-8).toUpperCase()}
-            </span>
-            )?
-          </>
-        }
-        warning="This will permanently remove this order and update all graphs and statistics."
-        isLoading={isDeletingOrder}
-      />
-      <DeleteConfirmationModal
         isOpen={!!promoteConfirm}
         onClose={() => setPromoteConfirm(null)}
         onConfirm={() =>
@@ -977,6 +954,16 @@ export default function AdminDashboard() {
         message={`Remove the "${categoryDeleteConfirm?.name}" category? Products assigned to this category will become uncategorized.`}
         isLoading={isDeletingCategory}
       />
+
+      {cancelOrderConfirm && (
+        <CancelOrderConfirmModal
+          isOpen={!!cancelOrderConfirm}
+          order={cancelOrderConfirm}
+          onClose={() => setCancelOrderConfirm(null)}
+          onConfirm={handleCancelOrder}
+          isLoading={isCancellingOrder}
+        />
+      )}
     </div>
   );
 }

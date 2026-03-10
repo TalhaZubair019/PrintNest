@@ -50,7 +50,8 @@ export default function CheckoutPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUsingSavedAddress, setIsUsingSavedAddress] = useState(false);
-  const [isEditingSavedAddress, setIsEditingSavedAddress] = useState(false);
+  const [isViewingSavedAddress, setIsViewingSavedAddress] = useState(false);
+  const [copyProfileAddress, setCopyProfileAddress] = useState(false);
   const [saveAddressToProfile, setSaveAddressToProfile] = useState(false);
 
   const subtotal = cartItems.reduce(
@@ -169,16 +170,16 @@ export default function CheckoutPage() {
         setFormData((prev) => ({
           ...prev,
           email: user.email || prev.email || "",
-          firstName: prev.firstName || user.name?.split(" ")[0] || "",
-          lastName: prev.lastName || user.name?.split(" ")[1] || "",
-          phone: prev.phone || user.phone || "",
-          address: prev.address || user.address || "",
-          city: prev.city || user.city || "",
-          province: prev.province || user.province || "",
-          country: prev.country || user.country || "Pakistan",
-          countryCode: prev.countryCode || user.countryCode || "PK",
-          stateCode: prev.stateCode || user.stateCode || "",
-          postcode: prev.postcode || user.postcode || "",
+          firstName: user.name?.split(" ")[0] || prev.firstName || "",
+          lastName: user.name?.split(" ")[1] || prev.lastName || "",
+          phone: user.phone || prev.phone || "",
+          address: user.address || "",
+          city: user.city || "",
+          province: user.province || "",
+          country: user.country || "Pakistan",
+          countryCode: user.countryCode || "PK",
+          stateCode: user.stateCode || "",
+          postcode: user.postcode || "",
         }));
       } else {
         setFormData((prev) => ({
@@ -193,34 +194,36 @@ export default function CheckoutPage() {
 
   const handleAddressModeChange = (useSaved: boolean) => {
     setIsUsingSavedAddress(useSaved);
-    setIsEditingSavedAddress(false);
+    setIsViewingSavedAddress(false);
     if (useSaved && user) {
       setFormData((prev) => ({
         ...prev,
         firstName: user.name?.split(" ")[0] || prev.firstName,
         lastName: user.name?.split(" ")[1] || prev.lastName,
         phone: user.phone || prev.phone,
-        address: user.address || prev.address,
-        city: user.city || prev.city,
-        province: user.province || prev.province,
-        country: user.country || prev.country,
-        countryCode: user.countryCode || prev.countryCode,
-        stateCode: user.stateCode || prev.stateCode,
-        postcode: user.postcode || prev.postcode,
+        address: user.address || "",
+        city: user.city || "",
+        province: user.province || "",
+        country: user.country || "Pakistan",
+        countryCode: user.countryCode || "PK",
+        stateCode: user.stateCode || "",
+        postcode: user.postcode || "",
       }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        address: "",
-        apartment: "",
-        city: "",
-        province: "",
-        country: "Pakistan",
-        countryCode: "PK",
-        stateCode: "",
-        postcode: "",
-        phone: "",
-      }));
+      if (!copyProfileAddress) {
+        setFormData((prev) => ({
+          ...prev,
+          address: "",
+          apartment: "",
+          city: "",
+          province: "",
+          country: "Pakistan",
+          countryCode: "PK",
+          stateCode: "",
+          postcode: "",
+          phone: "",
+        }));
+      }
     }
   };
 
@@ -385,11 +388,13 @@ export default function CheckoutPage() {
                   user={user}
                   isAuthenticated={isAuthenticated}
                   isUsingSavedAddress={isUsingSavedAddress}
-                  isEditingSavedAddress={isEditingSavedAddress}
-                  setIsEditingSavedAddress={setIsEditingSavedAddress}
+                  isViewingSavedAddress={isViewingSavedAddress}
+                  setIsViewingSavedAddress={setIsViewingSavedAddress}
                   onAddressModeChange={handleAddressModeChange}
                   saveAddressToProfile={saveAddressToProfile}
                   setSaveAddressToProfile={setSaveAddressToProfile}
+                  copyProfileAddress={copyProfileAddress}
+                  setCopyProfileAddress={setCopyProfileAddress}
                   countries={countries}
                   states={states}
                   cities={cities}
@@ -498,11 +503,13 @@ function BillingSection({
   user,
   isAuthenticated,
   isUsingSavedAddress,
-  isEditingSavedAddress,
-  setIsEditingSavedAddress,
+  isViewingSavedAddress,
+  setIsViewingSavedAddress,
   onAddressModeChange,
   saveAddressToProfile,
   setSaveAddressToProfile,
+  copyProfileAddress,
+  setCopyProfileAddress,
   countries,
   states,
   cities,
@@ -544,17 +551,17 @@ function BillingSection({
                       : "No address saved in your profile yet"}
                   </span>
                 </div>
-                {isUsingSavedAddress && !isEditingSavedAddress && (
+                {isUsingSavedAddress && !isViewingSavedAddress && (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setIsEditingSavedAddress(true);
+                      setIsViewingSavedAddress(true);
                     }}
                     className="text-xs font-bold text-blue-600 hover:text-blue-700 px-3 py-1 bg-blue-50 rounded-md transition-colors"
                   >
-                    Edit
+                    View
                   </button>
                 )}
               </div>
@@ -566,35 +573,80 @@ function BillingSection({
               type="radio"
               name="addressMode"
               checked={!isUsingSavedAddress}
-              onChange={() => onAddressModeChange(false)}
+              onChange={() => {
+                onAddressModeChange(false);
+              }}
               className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
             />
             <span className="block text-sm font-bold text-slate-700">
               Use a different address
             </span>
           </label>
+
+          {!isUsingSavedAddress && hasProfileAddress && (
+            <label className="flex items-center gap-2 mt-3 p-2 cursor-pointer bg-blue-50/50 rounded-md">
+              <input
+                type="checkbox"
+                checked={copyProfileAddress}
+                onChange={(e) => {
+                  setCopyProfileAddress(e.target.checked);
+                  if (e.target.checked) {
+                    update({
+                      firstName: user.name?.split(" ")[0] || data.firstName,
+                      lastName: user.name?.split(" ")[1] || data.lastName,
+                      phone: user.phone || data.phone,
+                      address: user.address || "",
+                      city: user.city || "",
+                      province: user.province || "",
+                      country: user.country || "Pakistan",
+                      countryCode: user.countryCode || "PK",
+                      stateCode: user.stateCode || "",
+                      postcode: user.postcode || "",
+                    });
+                  } else {
+                    update({
+                      address: "",
+                      apartment: "",
+                      city: "",
+                      province: "",
+                      country: "Pakistan",
+                      countryCode: "PK",
+                      stateCode: "",
+                      postcode: "",
+                      phone: "",
+                    });
+                  }
+                }}
+                className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-blue-800">
+                Copy my saved address data here
+              </span>
+            </label>
+          )}
         </div>
       )}
 
       {hasMounted &&
         (!hasProfileAddress ||
           !isUsingSavedAddress ||
-          isEditingSavedAddress) && (
+          isViewingSavedAddress) && (
           <AddressForm
             data={data}
             update={update}
             countries={countries}
             states={states}
             cities={cities}
+            isReadOnly={isUsingSavedAddress && isViewingSavedAddress}
           />
         )}
     </section>
   );
 }
 
-function AddressForm({ data, update, countries, states, cities }: any) {
+function AddressForm({ data, update, countries, states, cities, isReadOnly }: any) {
   const InputClass =
-    "w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400";
+    `w-full border border-slate-300 rounded-md px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700 placeholder:text-slate-400 ${isReadOnly ? "bg-slate-50 cursor-not-allowed opacity-80" : ""}`;
   const LabelClass =
     "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block";
 
@@ -606,7 +658,8 @@ function AddressForm({ data, update, countries, states, cities }: any) {
         </label>
         <select
           required
-          className={`${InputClass} appearance-none bg-slate-50 cursor-pointer`}
+          disabled={isReadOnly}
+          className={`${InputClass} appearance-none bg-slate-50 ${isReadOnly ? "cursor-not-allowed" : "cursor-pointer"}`}
           value={data.countryCode}
           onChange={(e) => {
             const country = countries.find(
@@ -641,6 +694,7 @@ function AddressForm({ data, update, countries, states, cities }: any) {
           <input
             type="text"
             required
+            readOnly={isReadOnly}
             className={InputClass}
             value={data.firstName}
             onChange={(e) => update({ firstName: e.target.value })}
@@ -653,6 +707,7 @@ function AddressForm({ data, update, countries, states, cities }: any) {
           <input
             type="text"
             required
+            readOnly={isReadOnly}
             className={InputClass}
             value={data.lastName}
             onChange={(e) => update({ lastName: e.target.value })}
@@ -666,6 +721,7 @@ function AddressForm({ data, update, countries, states, cities }: any) {
         <input
           type="text"
           required
+          readOnly={isReadOnly}
           placeholder="House number and street name"
           className={`${InputClass} mb-3`}
           value={data.address}
@@ -673,6 +729,7 @@ function AddressForm({ data, update, countries, states, cities }: any) {
         />
         <input
           type="text"
+          readOnly={isReadOnly}
           placeholder="Apartment, suite, unit, etc. (optional)"
           className={InputClass}
           value={data.apartment}
@@ -686,7 +743,8 @@ function AddressForm({ data, update, countries, states, cities }: any) {
           </label>
           <select
             required
-            className={`${InputClass} appearance-none bg-transparent cursor-pointer`}
+            disabled={isReadOnly || !data.countryCode}
+            className={`${InputClass} appearance-none bg-transparent ${isReadOnly ? "cursor-not-allowed" : "cursor-pointer"}`}
             value={data.stateCode}
             onChange={(e) => {
               const state = states.find(
@@ -698,7 +756,6 @@ function AddressForm({ data, update, countries, states, cities }: any) {
                 city: "",
               });
             }}
-            disabled={!data.countryCode}
           >
             <option value="">Select...</option>
             {states.map((s: any) => (
@@ -720,10 +777,10 @@ function AddressForm({ data, update, countries, states, cities }: any) {
             <>
               <select
                 required
-                className={`${InputClass} appearance-none bg-transparent cursor-pointer`}
+                disabled={isReadOnly || !data.stateCode}
+                className={`${InputClass} appearance-none bg-transparent ${isReadOnly ? "cursor-not-allowed" : "cursor-pointer"}`}
                 value={data.city}
                 onChange={(e) => update({ city: e.target.value })}
-                disabled={!data.stateCode}
               >
                 <option value="">Select...</option>
                 {cities.map((c: any) => (
@@ -741,11 +798,12 @@ function AddressForm({ data, update, countries, states, cities }: any) {
             <input
               type="text"
               required
+              readOnly={isReadOnly}
               placeholder="Enter city"
               className={InputClass}
               value={data.city}
               onChange={(e) => update({ city: e.target.value })}
-              disabled={!data.stateCode}
+              disabled={isReadOnly || !data.stateCode}
             />
           )}
         </div>
@@ -756,6 +814,7 @@ function AddressForm({ data, update, countries, states, cities }: any) {
           <input
             type="text"
             required
+            readOnly={isReadOnly}
             className={InputClass}
             value={data.postcode}
             onChange={(e) => update({ postcode: e.target.value })}
@@ -769,6 +828,7 @@ function AddressForm({ data, update, countries, states, cities }: any) {
         <input
           type="tel"
           required
+          readOnly={isReadOnly}
           className={InputClass}
           value={data.phone}
           onChange={(e) => update({ phone: e.target.value })}

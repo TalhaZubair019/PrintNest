@@ -23,7 +23,9 @@ router.get("/", requireAdmin, async (req, res) => {
       CategoryModel.find({}).sort({ name: 1 }).lean(),
     ]);
 
-    const totalRevenue = orders.reduce((acc, o) => acc + (o.total || 0), 0);
+    const totalRevenue = orders
+      .filter((o) => o.status !== "Cancelled")
+      .reduce((acc, o) => acc + (o.total || 0), 0);
 
     const { startDate: startDateParam, endDate: endDateParam } = req.query;
     let rangeStart, rangeEnd;
@@ -54,6 +56,7 @@ router.get("/", requireAdmin, async (req, res) => {
         .filter((o) => {
           const od = new Date(o.date);
           return (
+            o.status !== "Cancelled" &&
             od.getDate() === d.getDate() &&
             od.getMonth() === d.getMonth() &&
             od.getFullYear() === d.getFullYear()
@@ -63,7 +66,8 @@ router.get("/", requireAdmin, async (req, res) => {
     }));
 
     const productSales = {};
-    orders.forEach((order) =>
+    orders.forEach((order) => {
+      if (order.status === "Cancelled") return;
       order.items?.forEach((item) => {
         if (!productSales[item.name])
           productSales[item.name] = {
@@ -74,26 +78,31 @@ router.get("/", requireAdmin, async (req, res) => {
           };
         productSales[item.name].quantity += item.quantity;
         productSales[item.name].revenue += item.totalPrice;
-      }),
-    );
-    const topProducts = Object.values(productSales)
+      });
+    });
+    const topProductsByQuantity = Object.values(productSales)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
+    const topProductsByRevenue = Object.values(productSales)
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
     const recentOrders = [...orders]
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .map((order) => {
-        const customer = users.find((u) => u.id === order.userId);
+        const liveCustomer = users.find((u) => u.id === order.userId);
         return {
           ...order,
-          customer: customer
-            ? {
-                name: customer.name,
-                email: customer.email,
-                address: customer.address,
-                city: customer.city,
-              }
-            : null,
+          customer: {
+            name: order.customer?.firstName
+              ? `${order.customer.firstName} ${order.customer.lastName}`
+              : liveCustomer?.name || order.customer?.name || "Unknown",
+            email: order.customer?.email || liveCustomer?.email || "Unknown",
+            address: order.customer?.address || liveCustomer?.address || "",
+            city: order.customer?.city || liveCustomer?.city || "",
+            country: order.customer?.country || liveCustomer?.country || "",
+          },
         };
       });
 
@@ -114,16 +123,66 @@ router.get("/", requireAdmin, async (req, res) => {
     const hourCounts = {};
     for (let i = 0; i < 24; i++)
       hourCounts[i.toString().padStart(2, "0") + ":00"] = 0;
+    const perCategoryStats = {};
     orders.forEach((order) => {
-      const hour =
-        new Date(order.date).getHours().toString().padStart(2, "0") + ":00";
-      if (hourCounts[hour] !== undefined) hourCounts[hour]++;
       order.items?.forEach((item) => {
-        const cat =
-          products.find((p) => p.title === item.name)?.badge || "General";
-        categorySales[cat] = (categorySales[cat] || 0) + (item.totalPrice || 0);
+        const cat = products.find((p) => p.title === item.name)?.badge || "General";
+        if (!perCategoryStats[cat]) {
+          perCategoryStats[cat] = { totalRevenue: 0, units: 0, orders: new Set(), fulfilledOrders: new Set(), totalItems: 0, fulfilledItems: 0 };
+        }
+        
+        perCategoryStats[cat].totalItems++;
+        perCategoryStats[cat].units += (item.quantity || 1);
+        perCategoryStats[cat].orders.add(order.id);
+
+        if (order.status !== "Cancelled") {
+          perCategoryStats[cat].fulfilledItems++;
+          perCategoryStats[cat].fulfilledOrders.add(order.id);
+          perCategoryStats[cat].totalRevenue += (item.totalPrice || 0);
+        }
       });
+
+      const hour = new Date(order.date).getHours().toString().padStart(2, "0") + ":00";
+      if (hourCounts[hour] !== undefined) hourCounts[hour]++;
+      
+      if (order.status !== "Cancelled") {
+        order.items?.forEach((item) => {
+          const cat = products.find((p) => p.title === item.name)?.badge || "General";
+          categorySales[cat] = (categorySales[cat] || 0) + (item.totalPrice || 0);
+        });
+      }
     });
+
+    const categoryPerformance = {
+      topSeller: { label: "N/A", value: 0 },
+      mostPopular: { label: "N/A", value: 0 },
+      highestValue: { label: "N/A", value: 0 },
+      bestFulfillment: { label: "N/A", value: 0 }
+    };
+
+    const catStatsArray = Object.entries(perCategoryStats).map(([cat, stats]) => {
+      const fulfillmentRate = stats.totalItems > 0 ? (stats.fulfilledItems / stats.totalItems) * 100 : 0;
+      const aov = stats.fulfilledOrders.size > 0 ? stats.totalRevenue / stats.fulfilledOrders.size : 0;
+      return {
+        category: cat,
+        revenue: stats.totalRevenue,
+        units: stats.units,
+        aov,
+        fulfillmentRate
+      };
+    });
+
+    if (catStatsArray.length > 0) {
+      const topSeller = [...catStatsArray].sort((a, b) => b.revenue - a.revenue)[0];
+      const mostPopular = [...catStatsArray].sort((a, b) => b.units - a.units)[0];
+      const highestValue = [...catStatsArray].sort((a, b) => b.aov - a.aov)[0];
+      const bestFulfillment = [...catStatsArray].sort((a, b) => b.fulfillmentRate - a.fulfillmentRate)[0];
+
+      categoryPerformance.topSeller = { label: topSeller.category, value: topSeller.revenue };
+      categoryPerformance.mostPopular = { label: mostPopular.category, value: mostPopular.units };
+      categoryPerformance.highestValue = { label: highestValue.category, value: highestValue.aov };
+      categoryPerformance.bestFulfillment = { label: bestFulfillment.category, value: Math.round(bestFulfillment.fulfillmentRate) };
+    }
 
     const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     reviews.forEach((r) => {
@@ -167,14 +226,27 @@ router.get("/", requireAdmin, async (req, res) => {
       .sort((a, b) => b.total - a.total)
       .slice(0, 5);
 
+    const grossRevenue = orders.reduce((acc, o) => acc + (o.total || 0), 0);
+    const cancelledRevenue = grossRevenue - totalRevenue;
+    const nonCancelledOrders = orders.filter((o) => o.status !== "Cancelled");
+    const averageOrderValue = nonCancelledOrders.length > 0 ? totalRevenue / nonCancelledOrders.length : 0;
+
+    const totalAdmins = users.filter((u) => u.isAdmin || u.email === ADMIN_EMAIL).length;
+
     return res.json({
       totalUsers: users.length,
+      totalAdmins,
       totalOrders: orders.length,
+      cancelledOrders: orders.filter((o) => o.status === "Cancelled").length,
       totalRevenue,
+      grossRevenue,
+      cancelledRevenue,
+      averageOrderValue,
       recentOrders,
       users: usersWithDetails,
       revenueData,
-      topProducts,
+      topProductsByQuantity,
+      topProductsByRevenue,
       products,
       ratingDistribution,
       topReviewedProducts,
@@ -188,6 +260,7 @@ router.get("/", requireAdmin, async (req, res) => {
         hour: h,
         count: c,
       })),
+      categoryPerformance,
       categories,
     });
   } catch (error) {

@@ -46,12 +46,23 @@ export interface UserData {
 
 export interface DashboardStats {
   totalUsers: number;
+  totalAdmins: number;
   totalOrders: number;
+  cancelledOrders: number;
   totalRevenue: number;
+  grossRevenue: number;
+  cancelledRevenue: number;
+  categoryPerformance?: {
+    topSeller: { label: string; value: number };
+    mostPopular: { label: string; value: number };
+    highestValue: { label: string; value: number };
+    bestFulfillment: { label: string; value: number };
+  };
   recentOrders: Order[];
   users: UserData[];
+  topProductsByQuantity: any[];
+  topProductsByRevenue: any[];
   products: any[];
-  topProducts: any[];
   revenueData: any[];
   ratingDistribution: Record<string, number>;
   topReviewedProducts: { name: string; image: string; count: number }[];

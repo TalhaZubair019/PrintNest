@@ -8,15 +8,20 @@ interface ProductSalesChartProps {
 const ProductSalesChart = ({ stats }: ProductSalesChartProps) => {
   return (
     <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-      <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
-        Product Sales Performance
-        <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-300" />
+      <h3 className="font-bold text-slate-800 mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          Product Sales Performance
+          <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-300" />
+        </div>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-full">
+          Units Sold
+        </span>
       </h3>
       <div className="space-y-4">
-        {stats.topProducts.length > 0 ? (
-          stats.topProducts.slice(0, 5).map((product: any, i: number) => {
+        {stats.topProductsByQuantity && stats.topProductsByQuantity.length > 0 ? (
+          stats.topProductsByQuantity.slice(0, 5).map((product: any, i: number) => {
             const maxSales = Math.max(
-              ...stats.topProducts.map((p: any) => p.quantity || 0),
+              ...stats.topProductsByQuantity.map((p: any) => p.quantity || 0),
             );
             const percentage =
               maxSales > 0 ? (product.quantity / maxSales) * 100 : 0;

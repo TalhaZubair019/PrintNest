@@ -60,8 +60,6 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
               );
             })}
           </svg>
-
-          {/* Central Label */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">
               Total
@@ -75,8 +73,6 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
             </span>
           </div>
         </div>
-
-        {/* Legend Container */}
         <div className="flex-1 w-full space-y-4">
           {data.slice(0, 6).map((item, i) => {
             const percentage = (item.value / totalValue) * 100;
@@ -126,37 +122,62 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-6 border-t border-slate-100 mt-auto">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t border-slate-100 mt-auto">
         <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-purple-200 transition-colors">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-purple-500">
-            Average Sale
+            Top Seller
           </p>
-          <p className="text-lg font-black text-slate-800 tabular-nums">
-            $
-            {(totalValue / (data.length || 1)).toLocaleString(undefined, {
-              maximumFractionDigits: 0,
-            })}
-          </p>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-lg font-black text-slate-800 tabular-nums leading-none">
+              ${stats.categoryPerformance?.topSeller.value.toLocaleString()}
+            </p>
+            <p className="text-[10px] font-medium text-slate-400 truncate">
+              {stats.categoryPerformance?.topSeller.label}
+            </p>
+          </div>
         </div>
         <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-blue-200 transition-colors">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-blue-500">
-            Categories
+            Most Popular
           </p>
-          <p className="text-lg font-black text-slate-800 tabular-nums">
-            {data.length}{" "}
-            <span className="text-[10px] font-bold text-slate-400">Total</span>
-          </p>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-lg font-black text-slate-800 tabular-nums leading-none">
+              {stats.categoryPerformance?.mostPopular.value.toLocaleString()}
+              <span className="text-[10px] ml-1 font-bold text-slate-400">
+                units
+              </span>
+            </p>
+            <p className="text-[10px] font-medium text-slate-400 truncate">
+              {stats.categoryPerformance?.mostPopular.label}
+            </p>
+          </div>
         </div>
-        <div className="hidden md:block bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-emerald-200 transition-colors">
+        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-amber-200 transition-colors">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-amber-500">
+            Highest Value
+          </p>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-lg font-black text-slate-800 tabular-nums leading-none">
+              $
+              {Math.round(
+                stats.categoryPerformance?.highestValue.value || 0,
+              ).toLocaleString()}
+            </p>
+            <p className="text-[10px] font-medium text-slate-400 truncate">
+              {stats.categoryPerformance?.highestValue.label} (AOV)
+            </p>
+          </div>
+        </div>
+        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-emerald-200 transition-colors">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-emerald-500">
-            Top Growth
+            Best Fulfillment
           </p>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-lg border border-emerald-100">
-              +12%
+              {stats.categoryPerformance?.bestFulfillment.value}%
             </span>
-            <span className="text-[10px] font-medium text-slate-400">
-              This Month
+            <span className="text-[10px] font-medium text-slate-400 truncate">
+              {stats.categoryPerformance?.bestFulfillment.label}
             </span>
           </div>
         </div>

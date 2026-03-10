@@ -236,23 +236,4 @@ router.patch("/:id", requireAdmin, async (req, res) => {
   }
 });
 
-router.delete("/:id", requireAdmin, async (req, res) => {
-  try {
-    await connectDB();
-    const deleted = await OrderModel.findOneAndDelete({ id: req.params.id });
-    if (!deleted) return res.status(404).json({ message: "Order not found" });
-
-    await logActivity(req, {
-      action: "delete",
-      entity: "order",
-      entityId: req.params.id,
-      details: `Deleted order #${req.params.id.slice(-8).toUpperCase()} (Total: $${deleted.total?.toFixed(2) || "0.00"})`,
-    });
-
-    return res.json({ message: "Order deleted successfully" });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal Error" });
-  }
-});
-
 module.exports = router;

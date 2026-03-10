@@ -14,10 +14,10 @@ const TopSellingProducts = ({ stats }: TopSellingProductsProps) => {
         Highest Grossing Products
       </h3>
       <div className="space-y-4">
-        {stats.topProducts.length === 0 ? (
+        {!stats.topProductsByRevenue || stats.topProductsByRevenue.length === 0 ? (
           <p className="text-sm text-slate-400 italic">No sales data yet.</p>
         ) : (
-          stats.topProducts.map((p, i) => (
+          stats.topProductsByRevenue.map((p, i) => (
             <div key={i} className="flex items-center justify-between group">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 overflow-hidden relative shrink-0 group-hover:border-purple-200 transition-colors">

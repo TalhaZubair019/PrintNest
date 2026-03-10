@@ -13,8 +13,8 @@ import { Order } from "@/app/admin/types";
 interface OrdersTableProps {
   allOrders: Order[];
   handleStatusChange: (orderId: string, newStatus: string) => void;
+  requestCancelOrder: (order: Order) => void;
   setSelectedOrder: React.Dispatch<React.SetStateAction<Order | null>>;
-  setOrderDeleteConfirm: React.Dispatch<React.SetStateAction<Order | null>>;
   orderPage: number;
   setOrderPage: React.Dispatch<React.SetStateAction<number>>;
   users?: { id: string; name: string; email?: string }[];
@@ -24,8 +24,8 @@ interface OrdersTableProps {
 const OrdersTable = ({
   allOrders,
   handleStatusChange,
+  requestCancelOrder,
   setSelectedOrder,
-  setOrderDeleteConfirm,
   orderPage,
   setOrderPage,
   users = [],
@@ -308,8 +308,14 @@ const OrdersTable = ({
                   <div className="relative group min-w-[140px]">
                     <select
                       value={o.status}
-                      disabled={updatingOrderId === o.id}
-                      onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                      disabled={updatingOrderId === o.id || o.status === "Delivered" || o.status === "Cancelled"}
+                      onChange={(e) => {
+                        if (e.target.value === "Cancelled") {
+                          requestCancelOrder(o);
+                        } else {
+                          handleStatusChange(o.id, e.target.value);
+                        }
+                      }}
                       className={`w-full text-xs font-bold py-1.5 border rounded-lg px-3 focus:outline-none transition-all ring-offset-1 focus:ring-2 appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
                         o.status === "Pending"
                           ? "bg-amber-50 text-amber-600 border-amber-200 focus:ring-amber-500/20"
@@ -328,16 +334,14 @@ const OrdersTable = ({
                                       : "bg-red-50 text-red-600 border-red-200 focus:ring-red-500/20"
                       } ${updatingOrderId === o.id ? "animate-pulse" : ""}`}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Accepted">Accepted</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Arrived in Country">
-                        Arrived in Country
-                      </option>
-                      <option value="Arrived in City">Arrived in City</option>
-                      <option value="Out for Delivery">Out for Delivery</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
+                      <option value={o.status}>{o.status}</option>
+                      {o.status === "Pending" && <option value="Accepted">Accepted</option>}
+                      {o.status === "Accepted" && <option value="Shipped">Shipped</option>}
+                      {o.status === "Shipped" && <option value="Arrived in Country">Arrived in Country</option>}
+                      {o.status === "Arrived in Country" && <option value="Arrived in City">Arrived in City</option>}
+                      {o.status === "Arrived in City" && <option value="Out for Delivery">Out for Delivery</option>}
+                      {o.status === "Out for Delivery" && <option value="Delivered">Delivered</option>}
+                      {o.status !== "Delivered" && o.status !== "Cancelled" && <option value="Cancelled">Cancelled</option>}
                     </select>
                     {updatingOrderId === o.id && (
                       <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -353,12 +357,6 @@ const OrdersTable = ({
                       className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-purple-600"
                     >
                       <Eye size={14} /> View
-                    </button>
-                    <button
-                      onClick={() => setOrderDeleteConfirm(o)}
-                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 size={16} />
                     </button>
                   </div>
                 </td>
