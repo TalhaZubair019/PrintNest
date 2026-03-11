@@ -59,9 +59,11 @@ function AuthInitializer() {
           } else if (data.user.demotionPending) {
             setShowDemotionModal(true);
           }
+        } else if (res.status === 401) {
+          dispatch(logout());
         }
       } catch (err) {
-        console.error("Session check failed", err);
+        console.warn("Session check skipped due to network error", err);
       } finally {
         setIsLoaded(true);
         dispatch(setAuthLoaded());
