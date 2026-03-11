@@ -80,6 +80,8 @@ export default function EditProductPage() {
     }
   };
 
+
+
   const handleGenerateDescription = async () => {
     if (!productForm.title) {
       alert("Please enter a product title first.");
@@ -257,6 +259,8 @@ export default function EditProductPage() {
                   ))}
                 </select>
               </div>
+
+
 
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 <div className="flex justify-between items-center mb-2">

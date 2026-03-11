@@ -1,5 +1,7 @@
 const express = require("express");
 const Stripe = require("stripe");
+const { connectDB } = require("../lib/db");
+const { ProductModel } = require("../lib/models");
 const router = express.Router();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -10,6 +12,23 @@ router.post("/checkout", async (req, res) => {
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Cart items are required." });
+    }
+
+    await connectDB();
+    for (const item of items) {
+      const dbProduct = await ProductModel.findOne({ id: item.id }).lean();
+      if (!dbProduct) {
+        return res.status(400).json({ 
+          error: `Item "${item.name}" is no longer available.` 
+        });
+      }
+      
+      const currentStock = dbProduct.stockQuantity || 0;
+      if (item.quantity > currentStock) {
+        return res.status(400).json({
+          error: `Sorry, we only have ${currentStock} of "${item.name}" left in stock.`
+        });
+      }
     }
 
     const appUrl = (

@@ -176,6 +176,7 @@ const ProductsTable = ({
           <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
             <tr>
               <th className="px-8 py-4">Product Info</th>
+              <th className="px-4 py-4">Inventory</th>
               <th className="px-8 py-4">Price</th>
               <th className="px-8 py-4 text-right">Actions</th>
             </tr>
@@ -221,6 +222,27 @@ const ProductsTable = ({
                           ) || "Standard Item"}
                         </p>
                       </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-col gap-1.5 items-start">
+                      <span className="font-bold text-sm text-slate-800">
+                        {p.stockQuantity || 0} in stock
+                      </span>
+                      {(!p.stockQuantity || p.stockQuantity === 0) ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">
+                          Out of Stock
+                        </span>
+                      ) : p.stockQuantity <= (p.lowStockThreshold || 5) ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                          Low Stock
+                        </span>
+                      ) : null}
+                      {p.sku && (
+                        <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                          SKU: {p.sku}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-8 py-4">

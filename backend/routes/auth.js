@@ -169,6 +169,7 @@ router.post("/forgot-password", async (req, res) => {
 
     const { transporter } = require("../lib/mailer");
     await transporter.sendMail({
+      from: `"PrintNest Support" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Password Reset Request - PrintNest",
       html: `

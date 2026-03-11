@@ -12,6 +12,7 @@ const transporter = {
 
     let senderName = "PrintNest";
     let senderEmail = process.env.EMAIL_USER;
+
     if (options.from) {
       const match = options.from.match(/"?([^"<]*)"?\s*<?([^>]*)>?/);
       if (match) {
@@ -28,14 +29,17 @@ const transporter = {
       sender: { name: senderName, email: senderEmail },
       to: toList,
       subject: options.subject,
-      htmlContent: options.html,
+      htmlContent: options.html || options.text || "",
     };
 
     if (options.replyTo) {
       payload.replyTo = { email: options.replyTo };
     }
 
-    const response = await fetch(BREVO_API_URL, {
+    const fetchFn =
+      typeof fetch !== "undefined" ? fetch : require("node-fetch");
+
+    const response = await fetchFn(BREVO_API_URL, {
       method: "POST",
       headers: {
         "api-key": apiKey,

@@ -33,7 +33,29 @@ const orderSchema = new mongoose.Schema(
     date: { type: String, required: true },
     status: { type: String, required: true },
     total: { type: Number, required: true },
-    items: { type: Array, required: true },
+    items: {
+      type: [
+        {
+          id: { type: Number },
+          productId: { type: Number },
+          name: { type: String },
+          price: { type: Number },
+          quantity: { type: Number },
+          totalPrice: { type: Number },
+          image: { type: String },
+          fulfilledFromWarehouse: {
+            type: [
+              {
+                warehouse: { type: String },
+                qty: { type: Number },
+              },
+            ],
+            default: [],
+          },
+        },
+      ],
+      required: true,
+    },
     customer: { type: Object },
     trackingNumber: { type: String, default: "Pending" },
     trackingUrl: { type: String, default: "" },
@@ -62,6 +84,19 @@ const productSchema = new mongoose.Schema(
     badges: { type: [String], default: [] },
     printText: { type: String, default: "We print with" },
     category: { type: String, default: null },
+    sku: { type: String, default: "" },
+    stockQuantity: { type: Number, default: 0 },
+    lowStockThreshold: { type: Number, default: 5 },
+    warehouseInventory: {
+      type: [
+        {
+          warehouseName: { type: String, required: true },
+          location: { type: String, required: true },
+          quantity: { type: Number, required: true, default: 0 },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true },
 );
@@ -91,6 +126,15 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+const warehouseSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    location: { type: String, required: true },
+  },
+  { timestamps: true },
+);
+
 const UserModel = mongoose.models?.User || mongoose.model("User", userSchema);
 const OrderModel =
   mongoose.models?.Order || mongoose.model("Order", orderSchema);
@@ -100,6 +144,8 @@ const ReviewModel =
   mongoose.models?.Review || mongoose.model("Review", reviewSchema);
 const CategoryModel =
   mongoose.models?.Category || mongoose.model("Category", categorySchema);
+const WarehouseModel =
+  mongoose.models?.Warehouse || mongoose.model("Warehouse", warehouseSchema);
 
 module.exports = {
   UserModel,
@@ -107,4 +153,5 @@ module.exports = {
   ProductModel,
   ReviewModel,
   CategoryModel,
+  WarehouseModel,
 };

@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { connectDB } = require("../../lib/db");
 const { UserModel } = require("../../lib/models");
 const { requireSuperAdmin } = require("../../middleware/auth");
+const { logActivity } = require("../../lib/activityLog");
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.post("/", requireSuperAdmin, async (req, res) => {
         .json({ message: "An account with this email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await UserModel.create({
+    const newUser = await UserModel.create({
       id: Date.now().toString(),
       name,
       email,
@@ -34,6 +35,13 @@ router.post("/", requireSuperAdmin, async (req, res) => {
       wishlist: [],
       savedCards: [],
     });
+    await logActivity(req, {
+      action: "add",
+      entity: "user",
+      entityId: newUser.id,
+      details: `Created new admin account for "${name}" (${email})`
+    });
+
     return res
       .status(201)
       .json({ message: "Admin account created successfully" });
@@ -63,6 +71,16 @@ router.patch("/:id", requireSuperAdmin, async (req, res) => {
       { new: true },
     );
     if (!updated) return res.status(404).json({ message: "User not found" });
+
+    await logActivity(req, {
+      action: "update",
+      entity: "user",
+      entityId: req.params.id,
+      details: req.body.isAdmin 
+        ? `Promoted user "${updated.name}" (${updated.email}) to Admin` 
+        : `Demoted user "${updated.name}" (${updated.email}) to Regular User`
+    });
+
     return res.json({ message: "User updated successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });
@@ -78,6 +96,14 @@ router.delete("/:id", requireSuperAdmin, async (req, res) => {
       return res.status(403).json({ message: "Cannot delete the super admin account" });
     }
     await UserModel.findOneAndDelete({ id: req.params.id });
+
+    await logActivity(req, {
+      action: "delete",
+      entity: "user",
+      entityId: req.params.id,
+      details: `Deleted user account: "${targetUser.name}" (${targetUser.email})`
+    });
+
     return res.json({ message: "User deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Error" });

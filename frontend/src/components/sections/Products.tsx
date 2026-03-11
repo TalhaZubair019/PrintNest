@@ -69,6 +69,8 @@ function FeaturedProducts() {
   const [quickViewProduct, setQuickViewProduct] = useState<any | null>(null);
   const [compareItems, setCompareItems] = useState<any[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [dynamicProducts, setDynamicProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -78,6 +80,26 @@ function FeaturedProducts() {
     message: "",
     type: "add",
   });
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/public/content?section=products");
+        if (response.ok) {
+          const data = await response.json();
+          const productsWithSku = (data.products || [])
+            .filter((p: any) => p.sku && p.sku.trim() !== "")
+            .sort((a: any, b: any) => a.id - b.id);
+          setDynamicProducts(productsWithSku.slice(0, 5));
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const showToast = (message: string, type: "add" | "remove") => {
     setToast({ show: true, message, type });
@@ -101,9 +123,7 @@ function FeaturedProducts() {
   };
 
   const handleToggleWishlist = (id: number, title: string) => {
-    const product = productsData.products.find(
-      (p: (typeof productsData.products)[0]) => p.id === id,
-    );
+    const product = dynamicProducts.find((p: any) => p.id === id);
     if (product) {
       const wasInWishlist = wishlistItems.some((item) => item.id === id);
       dispatch(
@@ -257,8 +277,15 @@ function FeaturedProducts() {
               className="flex gap-6 overflow-x-auto pb-10 scrollbar-hide snap-x pt-4"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {productsData.products.map(
-                (product: (typeof productsData.products)[0]) => (
+              {loading ? (
+                <div className="flex gap-6 w-full items-center justify-center py-20">
+                  <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-slate-400 font-medium">
+                    Loading products...
+                  </p>
+                </div>
+              ) : (
+                dynamicProducts.map((product: any) => (
                   <ProductCard
                     key={product.id}
                     product={product}
@@ -273,7 +300,7 @@ function FeaturedProducts() {
                     onCompare={addToCompare}
                     onAddToCart={handleAddToCart}
                   />
-                ),
+                ))
               )}
             </div>
 
@@ -313,7 +340,7 @@ function FeaturedProducts() {
       <CompareDrawer
         isOpen={isCompareOpen}
         compareItems={compareItems}
-        allProducts={productsData.products}
+        allProducts={dynamicProducts}
         onClose={() => {
           setIsCompareOpen(false);
           document.body.style.overflow = "auto";

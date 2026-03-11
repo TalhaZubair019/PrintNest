@@ -12,6 +12,8 @@ import {
   Shield,
   Tag,
   ScrollText,
+  Building2,
+  Boxes,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -24,7 +26,9 @@ interface AdminSidebarProps {
     | "products"
     | "reviews"
     | "categories"
-    | "logs";
+    | "logs"
+    | "warehouses"
+    | "inventory";
   setActiveTab: React.Dispatch<
     React.SetStateAction<
       | "overview"
@@ -35,6 +39,8 @@ interface AdminSidebarProps {
       | "reviews"
       | "categories"
       | "logs"
+      | "warehouses"
+      | "inventory"
     >
   >;
   stats: any;
@@ -129,6 +135,18 @@ const AdminSidebar = ({
           onClick={() => setActiveTab("categories")}
           icon={<Tag />}
           label={`Categories (${stats?.categories?.length ?? 0})`}
+        />
+        <NavButton
+          active={activeTab === "warehouses"}
+          onClick={() => setActiveTab("warehouses")}
+          icon={<Building2 />}
+          label={`Warehouses (${stats?.warehouses?.length ?? 0})`}
+        />
+        <NavButton
+          active={activeTab === "inventory"}
+          onClick={() => setActiveTab("inventory")}
+          icon={<Boxes />}
+          label="Inventory"
         />
         {user?.adminRole === "super_admin" && (
           <NavButton

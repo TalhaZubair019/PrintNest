@@ -540,40 +540,7 @@
     "headerBtnText": "See Our Products",
     "headerBtnLink": "/shop",
     "featuredImage": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p1-man-1.webp",
-    "products": [
-      {
-        "id": 1,
-        "title": "Print Mug",
-        "price": "$15.50",
-        "image": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p1-img-1-1.webp",
-        "badge": "New",
-        "printText": "We print with"
-      },
-      {
-        "id": 2,
-        "title": "Winter Jacket",
-        "price": "$20.50",
-        "image": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p1-img-2-1.webp",
-        "badge": "New",
-        "printText": "We print with"
-      },
-      {
-        "id": 3,
-        "title": "Print Cap",
-        "price": "$50.25",
-        "image": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p1-img-3-1.webp",
-        "badge": null,
-        "printText": "We print with"
-      },
-      {
-        "id": 4,
-        "title": "Winter Hoodie",
-        "price": "$36.00",
-        "image": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p4-600x559-1-300x300.png",
-        "badge": null,
-        "printText": "We print with"
-      }
-    ]
+    "products": []
   },
   "social": {
     "title": "Loved by over 100,000 brands",

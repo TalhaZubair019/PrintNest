@@ -14,6 +14,7 @@ import {
   Heart,
   Eye,
 } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
 import db from "@data/db.json";
 import Toast from "@/components/products/Toast";
 import QuickViewModal from "@/components/products/QuickViewModal";
@@ -29,14 +30,20 @@ export default function ShopPage() {
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const { cartItems } = useSelector((state: RootState) => state.cart);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pageParam = searchParams.get("page");
+  const catParam = searchParams.get("category");
+  const sortParam = searchParams.get("sort");
+  
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("Default Sorting");
+  const [currentPage, setCurrentPage] = useState(pageParam ? parseInt(pageParam) : 1);
+  const [sortBy, setSortBy] = useState(sortParam || "Default Sorting");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [categories, setCategories] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [selectedCategory, setSelectedCategory] = useState(catParam || "All Categories");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [toast, setToast] = useState<{
     show: boolean;
@@ -170,9 +177,25 @@ export default function ShopPage() {
     );
   };
 
+  const updateURL = (page: number, category: string, sort: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (page === 1) params.delete("page");
+    else params.set("page", page.toString());
+    
+    if (category === "All Categories") params.delete("category");
+    else params.set("category", category);
+    
+    if (sort === "Default Sorting") params.delete("sort");
+    else params.set("sort", sort);
+    
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+      updateURL(page, selectedCategory, sortBy);
     }
   };
 
@@ -239,6 +262,7 @@ export default function ShopPage() {
                             setSelectedCategory(option);
                             setIsCategoryOpen(false);
                             setCurrentPage(1);
+                            updateURL(1, option, sortBy);
                           }}
                           className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
                             selectedCategory === option
@@ -279,6 +303,7 @@ export default function ShopPage() {
                             setSortBy(option);
                             setIsSortOpen(false);
                             setCurrentPage(1);
+                            updateURL(1, selectedCategory, option);
                           }}
                           className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
                             sortBy === option
@@ -415,6 +440,7 @@ function SimpleProductCard({
 
   const showFilled = mounted && isWishlisted;
   const showInCart = mounted && isInCart;
+  const isOutOfStock = !product.stockQuantity || product.stockQuantity === 0;
 
   return (
     <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
@@ -446,11 +472,26 @@ function SimpleProductCard({
             src={product.image}
             alt={product.title}
             fill
-            className="object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+            className={`object-contain p-2 mix-blend-multiply transition-transform duration-500 ${
+              isOutOfStock 
+                ? "grayscale opacity-60" 
+                : "group-hover:scale-105"
+            }`}
           />
+          {isOutOfStock && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+              <span className="bg-red-500/90 text-white font-bold px-4 py-2 rounded-lg rotate-12 backdrop-blur-sm shadow-xl border border-white/20 whitespace-nowrap text-xs">
+                OUT OF STOCK
+              </span>
+            </div>
+          )}
         </Link>
-        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/5">
-          {showInCart ? (
+        <div className={`absolute inset-0 flex items-center justify-center gap-2 transition-opacity duration-300 z-10 bg-black/5 ${isOutOfStock ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+          {isOutOfStock ? (
+            <div className="flex items-center gap-2 px-6 py-2.5 bg-slate-400 text-white text-sm font-bold rounded-full shadow-lg cursor-not-allowed">
+              <span>Out of Stock</span>
+            </div>
+          ) : showInCart ? (
             <>
               <button
                 onClick={handleCartClick}

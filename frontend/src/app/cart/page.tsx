@@ -4,11 +4,12 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart, removeFromCart, deleteItem } from "@/redux/CartSlice";
+import { addToCart, removeFromCart, deleteItem, syncCart } from "@/redux/CartSlice";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import db from "@data/db.json";
 import Loading from "@/components/ui/Loading";
 import AuthPromptModal from "@/components/auth/AuthPromptModal";
+import Toast from "@/components/products/Toast";
 import { useRouter } from "next/navigation";
 
 const cartData = db.cart;
@@ -24,6 +25,7 @@ type CartItemType = {
 export default function CartPage() {
   const { cartItems } = useSelector((state: any) => state.cart);
   const { isAuthenticated } = useSelector((state: any) => state.auth);
+  const dispatch = useDispatch();
   const totalAmount = cartItems.reduce(
     (acc: number, item: CartItemType) =>
       acc + item.price * (item.quantity || 1),
@@ -31,11 +33,62 @@ export default function CartPage() {
   );
   const [isClient, setIsClient] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [toast, setToast] = useState<{show: boolean; message: string; type: "add" | "remove"}>({
+    show: false,
+    message: "",
+    type: "add"
+  });
   const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    const validateCart = async () => {
+      if (cartItems.length === 0) return;
+
+      const productIds = cartItems.map((item: CartItemType) => item.id);
+      try {
+        const response = await fetch("/api/public/validate-cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productIds }),
+        });
+
+        if (response.ok) {
+          const validProducts = await response.json();
+          let stockAdjusted = false;
+
+          // Check if any items need adjusting
+          for (const cartItem of cartItems) {
+            const dbRef = validProducts.find((vp: any) => String(vp.id) === String(cartItem.id));
+            if (!dbRef || dbRef.stockQuantity < cartItem.quantity) {
+              stockAdjusted = true;
+              break;
+            }
+          }
+
+          if (stockAdjusted) {
+             setToast({
+               show: true,
+               message: "Some items in your cart were adjusted or removed due to limited stock.",
+               type: "remove"
+             });
+             setTimeout(() => setToast(prev => ({ ...prev, show: false })), 5000);
+          }
+
+          dispatch(syncCart(validProducts));
+        }
+      } catch (error) {
+        console.error("Failed to validate cart:", error);
+      }
+    };
+
+    if (isClient && cartItems.length > 0) {
+      validateCart();
+    }
+  }, [isClient, dispatch]); // Notice we DO NOT include cartItems in dependencies to avoid infinite loops on adjustment
 
   const handleCheckoutClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {
@@ -103,6 +156,12 @@ export default function CartPage() {
           )}
         </div>
       </div>
+      <Toast 
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })}
+      />
     </div>
   );
 }
@@ -187,19 +246,19 @@ function CartItem({ item }: { item: CartItemType }) {
             {cartData.placeholders.description}
           </p>
           <div className="flex flex-wrap items-center gap-6 mt-auto">
-            <div className="flex items-center border border-slate-300 rounded px-1 py-1 w-28 justify-between bg-white">
+            <div className="flex items-center border border-slate-300 rounded overflow-hidden w-28 bg-white">
               <button
                 onClick={() => dispatch(removeFromCart(item.id))}
-                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 font-bold text-lg transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold text-lg transition-colors border-r border-slate-200"
               >
                 -
               </button>
-              <span className="font-semibold text-slate-700 text-sm">
+              <span className="flex-1 text-center font-semibold text-slate-700 text-sm py-1">
                 {item.quantity}
               </span>
               <button
                 onClick={() => dispatch(addToCart({ ...item, quantity: 1 }))}
-                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 font-bold text-lg transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 font-bold text-lg transition-colors border-l border-slate-200"
               >
                 +
               </button>

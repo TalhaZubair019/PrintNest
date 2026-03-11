@@ -1,10 +1,10 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Star } from "lucide-react";
+import { ChevronRight, Star, ArrowLeft } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/redux/CartSlice";
 import { toggleWishlist } from "@/redux/WishListSlice";
@@ -30,10 +30,14 @@ interface Product {
   category?: string;
   badges?: string[];
   reviews?: Review[];
+  sku?: string;
+  stockQuantity?: number;
+  lowStockThreshold?: number;
 }
 
 export default function ProductPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
   const dispatch = useDispatch();
 
@@ -104,6 +108,14 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     if (!product) return;
+
+    const currentStock = product.stockQuantity ?? 0;
+    if (quantity > currentStock) {
+      alert(`Sorry, we only have ${currentStock} in stock right now.`);
+      setQuantity(currentStock);
+      return;
+    }
+
     const priceNumber = parseFloat(
       product.price.toString().replace(/[^0-9.]/g, ""),
     );
@@ -273,7 +285,20 @@ export default function ProductPage() {
         <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
       </div>
 
-      <div className="relative z-10 pt-80">
+      <div className="relative z-10 pt-40">
+        <div className="max-w-6xl mx-auto px-4 mb-20">
+          <button
+            onClick={() => router.back()}
+            className="group flex items-center gap-2 text-slate-600 hover:text-purple-600 font-semibold transition-all duration-300 bg-white/50 backdrop-blur-sm px-5 py-2.5 rounded-full border border-slate-200 shadow-sm hover:shadow-md hover:-translate-x-1"
+          >
+            <ArrowLeft
+              size={18}
+              className="group-hover:-translate-x-0.5 transition-transform"
+            />
+            <span>Go Back</span>
+          </button>
+        </div>
+
         <div className="w-full pb-10 flex flex-col items-center justify-center">
           <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 text-center px-4">
             {product.title}
@@ -343,9 +368,32 @@ export default function ProductPage() {
                     {product.price}
                   </span>
                 </div>
-                <span className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded">
-                  In Stock
-                </span>
+                {(() => {
+                  const stock = product.stockQuantity || 0;
+                  const threshold = product.lowStockThreshold || 5;
+                  if (stock <= 0) {
+                    return (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 font-bold text-xs rounded-full ring-1 ring-red-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                        Out of Stock
+                      </span>
+                    );
+                  } else if (stock <= threshold) {
+                    return (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 font-bold text-xs rounded-full ring-1 ring-amber-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        Low Stock ({stock} left)
+                      </span>
+                    );
+                  } else {
+                    return (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs rounded-full ring-1 ring-emerald-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        In Stock
+                      </span>
+                    );
+                  }
+                })()}
               </div>
 
               <p className="text-gray-600 mb-8 leading-relaxed">
@@ -356,17 +404,29 @@ export default function ProductPage() {
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-4">
                   <label className="font-semibold text-black">Quantity:</label>
-                  <div className="flex items-center border border-gray-300 rounded">
+                  <div className="flex items-center border border-gray-300 rounded overflow-hidden">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-2 hover:bg-gray-100"
+                      disabled={
+                        !product.stockQuantity || product.stockQuantity === 0
+                      }
+                      className="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition-colors"
                     >
                       -
                     </button>
-                    <span className="px-4 py-2">{quantity}</span>
+                    <span className="px-5 py-2 font-medium bg-white border-x border-gray-200">
+                      {quantity}
+                    </span>
                     <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="px-3 py-2 hover:bg-gray-100"
+                      onClick={() => {
+                        const maxStock = product.stockQuantity ?? 0;
+                        setQuantity(Math.min(maxStock, quantity + 1));
+                      }}
+                      disabled={
+                        !product.stockQuantity ||
+                        quantity >= product.stockQuantity
+                      }
+                      className="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition-colors"
                     >
                       +
                     </button>
@@ -384,13 +444,21 @@ export default function ProductPage() {
                 <div className="flex gap-4">
                   <button
                     onClick={handleAddToCart}
-                    disabled={addingToCart}
-                    className="flex-1 px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:cursor-not-allowed"
+                    disabled={
+                      addingToCart ||
+                      !product.stockQuantity ||
+                      product.stockQuantity === 0
+                    }
+                    className="flex-1 px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-500"
                   >
                     {addingToCart ? (
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : null}
-                    {addingToCart ? "Adding..." : "Add to Cart"}
+                    {!product.stockQuantity || product.stockQuantity === 0
+                      ? "Out of Stock"
+                      : addingToCart
+                        ? "Adding..."
+                        : "Add to Cart"}
                   </button>
                   <button
                     onClick={handleToggleWishlist}
@@ -404,7 +472,7 @@ export default function ProductPage() {
               <div className="space-y-4 text-sm text-gray-600 border-t pt-8">
                 <div className="flex justify-between">
                   <span>SKU:</span>
-                  <span className="font-semibold">PROD-{product.id}</span>
+                  <span className="font-semibold">{product.sku || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Category:</span>

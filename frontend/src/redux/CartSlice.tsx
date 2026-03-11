@@ -113,11 +113,23 @@ export const cartSlice = createSlice({
     },
     syncCart: (state, action: PayloadAction<any[]>) => {
       const activeProducts = action.payload;
-      const activeProductIds = activeProducts.map((p) => p.id);
 
-      state.cartItems = state.cartItems.filter((item: any) =>
-        activeProducts.some((p: any) => String(p.id) === String(item.id)),
-      );
+      state.cartItems = state.cartItems.filter((item) => {
+        const dbProduct = activeProducts.find(
+          (p) => String(p.id) === String(item.id),
+        );
+
+        if (!dbProduct) return false;
+
+        const dbStock = dbProduct.stockQuantity || 0;
+        if (dbStock <= 0) return false;
+        if (item.quantity > dbStock) {
+          item.quantity = dbStock;
+          item.totalPrice = item.price * dbStock;
+        }
+
+        return true;
+      });
 
       state.totalQuantity = state.cartItems.reduce(
         (acc, item) => acc + item.quantity,

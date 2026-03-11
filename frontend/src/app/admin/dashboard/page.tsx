@@ -35,6 +35,8 @@ import UsersTable from "@/components/admin/tables/UsersTable";
 import AdminsTable from "@/components/admin/tables/AdminsTable";
 import OrdersTable from "@/components/admin/tables/OrdersTable";
 import ActivityLogsTable from "@/components/admin/tables/ActivityLogsTable";
+import WarehousesTable from "@/components/admin/tables/WarehousesTable";
+import InventoryTable from "@/components/admin/tables/InventoryTable";
 
 import CategoryModal from "@/components/admin/modals/CategoryModal";
 import UserModal from "@/components/admin/modals/UserModal";
@@ -43,6 +45,8 @@ import CancelOrderConfirmModal from "@/components/admin/modals/CancelOrderConfir
 import DeleteConfirmationModal from "@/components/admin/modals/DeleteConfirmationModal";
 import AddAdminModal from "@/components/admin/modals/AddAdminModal";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
+import StockAdjustmentModal from "@/components/admin/modals/StockAdjustmentModal";
+import WarehouseModal from "@/components/admin/modals/WarehouseModal";
 
 const PageHeader = ({ title, breadcrumb }: any) => (
   <div className="relative w-full h-175 z-0">
@@ -98,6 +102,8 @@ export default function AdminDashboard() {
     | "reviews"
     | "categories"
     | "logs"
+    | "warehouses"
+    | "inventory"
   >("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
@@ -132,6 +138,11 @@ export default function AdminDashboard() {
   const [categoryDeleteConfirm, setCategoryDeleteConfirm] = useState<any>(null);
   const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
+  const [isWarehouseModalOpen, setIsWarehouseModalOpen] = useState(false);
+  const [editingWarehouse, setEditingWarehouse] = useState<any>(null);
+  const [warehouseDeleteConfirm, setWarehouseDeleteConfirm] = useState<any>(null);
+  const [isDeletingWarehouse, setIsDeletingWarehouse] = useState(false);
+
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
   const [cancelOrderConfirm, setCancelOrderConfirm] = useState<Order | null>(
     null,
@@ -142,6 +153,7 @@ export default function AdminDashboard() {
     message: string;
     type: "success" | "error";
   } | null>(null);
+  const [selectedProductForInventory, setSelectedProductForInventory] = useState<any>(null);
 
   const [revenueFilter, setRevenueFilter] = useState<
     "week" | "month" | "current-month" | "custom"
@@ -174,6 +186,8 @@ export default function AdminDashboard() {
         "reviews",
         "categories",
         "logs",
+        "warehouses",
+        "inventory",
       ];
       if (tab && validTabs.includes(tab)) {
         setActiveTab(tab as any);
@@ -200,11 +214,14 @@ export default function AdminDashboard() {
     if (!user?.isAdmin) return;
 
     const interval = setInterval(() => {
-      fetchStats();
+      // Do not auto-refresh when on warehouses tab to prevent form reset
+      if (activeTab !== "warehouses") {
+        fetchStats();
+      }
     }, 15000);
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, activeTab]);
 
   useEffect(() => {
     setSearchTerm("");
@@ -232,12 +249,19 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch("/api/admin/stats");
-      if (res.ok) {
+      const [res, whRes] = await Promise.all([
+        fetch("/api/admin/stats"),
+        fetch("/api/admin/warehouses")
+      ]);
+
+      if (res.ok && whRes.ok) {
         const data = await res.json();
-        setStats(data);
-        setFilteredRevenueData(data.revenueData);
-        setFilteredAovData(data.revenueData);
+        const whData = await whRes.json();
+        
+        const nextStats = { ...data, warehouses: whData };
+        setStats(nextStats);
+        setFilteredRevenueData(nextStats.revenueData);
+        setFilteredAovData(nextStats.revenueData);
       }
     } catch (error) {
       console.error("Failed to fetch admin stats");
@@ -503,6 +527,27 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteWarehouse = async (id: string) => {
+    setIsDeletingWarehouse(true);
+    try {
+      const res = await fetch(`/api/admin/warehouses/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        await fetchStats();
+        setWarehouseDeleteConfirm(null);
+        showToast("Warehouse deleted successfully.", "success");
+      } else {
+        const data = await res.json();
+        showToast(data.message || "Failed to delete warehouse.", "error");
+      }
+    } catch {
+      showToast("Error deleting warehouse.", "error");
+    } finally {
+      setIsDeletingWarehouse(false);
+    }
+  };
+
   const filteredUsers = stats?.users
     .filter((u) => !u.isAdmin)
     .filter(
@@ -613,6 +658,8 @@ export default function AdminDashboard() {
               <option value="admins">Admins</option>
               <option value="orders">Orders</option>
               <option value="categories">Categories</option>
+              <option value="warehouses">Warehouses</option>
+              <option value="inventory">Inventory</option>
               {user?.adminRole === "super_admin" && (
                 <option value="logs">Activity Logs</option>
               )}
@@ -799,6 +846,28 @@ export default function AdminDashboard() {
                 onDelete={(cat) => setCategoryDeleteConfirm(cat)}
               />
             )}
+            {activeTab === "warehouses" && (
+              <WarehousesTable 
+                warehouseData={stats.warehouses || []}
+                onRefresh={fetchStats}
+                showToast={showToast}
+                onCreate={() => {
+                  setEditingWarehouse(null);
+                  setIsWarehouseModalOpen(true);
+                }}
+                onEdit={(wh) => {
+                  setEditingWarehouse(wh);
+                  setIsWarehouseModalOpen(true);
+                }}
+                onDelete={(wh) => setWarehouseDeleteConfirm(wh)}
+              />
+            )}
+            {activeTab === "inventory" && (
+              <InventoryTable 
+                products={stats.products || []} 
+                onAdjustStock={setSelectedProductForInventory} 
+              />
+            )}
             {activeTab === "logs" && user?.adminRole === "super_admin" && (
               <ActivityLogsTable />
             )}
@@ -966,6 +1035,38 @@ export default function AdminDashboard() {
           isLoading={isCancellingOrder}
         />
       )}
+      
+      {selectedProductForInventory && (
+        <StockAdjustmentModal
+          product={selectedProductForInventory}
+          onClose={() => setSelectedProductForInventory(null)}
+          onSuccess={() => {
+            fetchStats();
+            setSelectedProductForInventory(null);
+            showToast("Inventory adjusted successfully.", "success");
+          }}
+        />
+      )}
+
+      <WarehouseModal
+        isOpen={isWarehouseModalOpen}
+        onClose={() => setIsWarehouseModalOpen(false)}
+        editingWarehouse={editingWarehouse}
+        onSaved={fetchStats}
+        showToast={showToast}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={!!warehouseDeleteConfirm}
+        onClose={() => setWarehouseDeleteConfirm(null)}
+        onConfirm={() =>
+          warehouseDeleteConfirm &&
+          handleDeleteWarehouse(warehouseDeleteConfirm.id)
+        }
+        title="Delete Warehouse?"
+        message={`Delete "${warehouseDeleteConfirm?.warehouseName}"? Removing this warehouse will completely delete it from the system.`}
+        isLoading={isDeletingWarehouse}
+      />
     </div>
   );
 }

@@ -19,6 +19,7 @@ function ProductCard({
     setIsMounted(true);
   }, []);
   const activeWishlist = isMounted && isWishlisted;
+  const isOutOfStock = !product.stockQuantity || product.stockQuantity === 0;
 
   return (
     <Link href={`/product/${encodeURIComponent(slug)}`}>
@@ -72,8 +73,15 @@ function ProductCard({
             src={product.image}
             alt={product.title}
             fill
-            className="object-contain group-hover:scale-105 transition-transform duration-500"
+            className={`object-contain transition-transform duration-500 ${isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-105"}`}
           />
+          {isOutOfStock && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="bg-red-500/90 text-white font-bold px-4 py-2 rounded-lg rotate-12 backdrop-blur-sm shadow-xl border border-white/20 whitespace-nowrap">
+                OUT OF STOCK
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex justify-between items-center mb-2">
           <span className="text-2xl font-bold text-slate-900">
@@ -92,23 +100,31 @@ function ProductCard({
             )}
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 w-full h-20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-10">
+        <div className={`absolute bottom-0 left-0 w-full h-20 ${isOutOfStock ? "translate-y-0" : "translate-y-full group-hover:translate-y-0"} transition-transform duration-300 ease-in-out z-10`}>
           <button
             onClick={(e) => {
               e.preventDefault();
-              if (addingToCart) return;
+              if (addingToCart || isOutOfStock) return;
               setAddingToCart(true);
               onAddToCart(product, 1);
               setTimeout(() => setAddingToCart(false), 700);
             }}
-            disabled={addingToCart}
-            className="w-full h-full bg-linear-to-r from-[#6366F1] to-[#22D3EE] text-white font-bold text-lg flex items-center justify-between px-8 cursor-pointer disabled:opacity-90"
+            disabled={addingToCart || isOutOfStock}
+            className={`w-full h-full text-white font-bold text-lg flex items-center justify-between px-8 transition-colors ${
+              isOutOfStock 
+                ? "bg-slate-300 cursor-not-allowed" 
+                : "bg-linear-to-r from-[#6366F1] to-[#22D3EE] cursor-pointer"
+            }`}
           >
-            <span>{addingToCart ? "Adding..." : "Add to cart"}</span>
-            {addingToCart ? (
-              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <ShoppingCart className="w-6 h-6" />
+            <span>
+              {isOutOfStock ? "Out of Stock" : addingToCart ? "Adding..." : "Add to cart"}
+            </span>
+            {!isOutOfStock && (
+              addingToCart ? (
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <ShoppingCart className="w-6 h-6" />
+              )
             )}
           </button>
         </div>
