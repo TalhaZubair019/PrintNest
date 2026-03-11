@@ -1,9 +1,21 @@
 import React from "react";
-import { Shield, Trash2, Crown, UserPlus, ShieldOff } from "lucide-react";
+import {
+  Shield,
+  Trash2,
+  Crown,
+  UserPlus,
+  ShieldOff,
+  ShoppingCart,
+  Heart,
+} from "lucide-react";
 import { UserData } from "@/app/admin/types";
 
 interface AdminsTableProps {
   paginatedAdmins: UserData[];
+  setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+  setViewType: React.Dispatch<
+    React.SetStateAction<"cart" | "wishlist" | "both">
+  >;
   setDeleteConfirm: React.Dispatch<React.SetStateAction<string | null>>;
   onRevokeAdmin: (userId: string, userName: string) => void;
   adminPage: number;
@@ -15,6 +27,8 @@ interface AdminsTableProps {
 
 const AdminsTable = ({
   paginatedAdmins,
+  setSelectedUser,
+  setViewType,
   setDeleteConfirm,
   onRevokeAdmin,
   adminPage,
@@ -61,6 +75,7 @@ const AdminsTable = ({
             <tr>
               <th className="px-8 py-4">Administrator</th>
               <th className="px-8 py-4">Role</th>
+              <th className="px-8 py-4">Storage</th>
               <th className="px-8 py-4 text-right">Actions</th>
             </tr>
           </thead>
@@ -105,6 +120,30 @@ const AdminsTable = ({
                         Admin
                       </span>
                     )}
+                  </td>
+                  <td className="px-8 py-5">
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => {
+                          setSelectedUser(u);
+                          setViewType("cart");
+                        }}
+                        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200"
+                      >
+                        <ShoppingCart size={14} className="text-blue-500" />{" "}
+                        Cart ({u.cartCount})
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedUser(u);
+                          setViewType("wishlist");
+                        }}
+                        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200"
+                      >
+                        <Heart size={14} className="text-red-500" /> Wishlist (
+                        {u.wishlistCount})
+                      </button>
+                    </div>
                   </td>
                   <td className="px-8 py-5 text-right">
                     {isSuperAdmin && u.adminRole !== "super_admin" && (

@@ -762,6 +762,8 @@ export default function AdminDashboard() {
             {activeTab === "admins" && (
               <AdminsTable
                 paginatedAdmins={paginatedAdmins || []}
+                setSelectedUser={setSelectedUser}
+                setViewType={setViewType}
                 setDeleteConfirm={setDeleteConfirm}
                 onRevokeAdmin={(id, name) => setRevokeConfirm({ id, name })}
                 adminPage={adminPage}
