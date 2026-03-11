@@ -318,15 +318,20 @@ function SimpleProductCard({
   };
   return (
     <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
-      {product.badge && (
-        <span
-          className={`absolute top-4 left-4 z-20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white rounded-sm ${
-            product.badge === "New" ? "bg-blue-500" : "bg-red-500"
-          }`}
-        >
-          {product.badge}
-        </span>
-      )}
+      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+        {(product.badges || (product.badge ? [product.badge] : [])).map(
+          (badge: string, idx: number) => (
+            <span
+              key={idx}
+              className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white rounded-sm ${
+                badge === "New" ? "bg-blue-500" : "bg-red-500"
+              }`}
+            >
+              {badge}
+            </span>
+          ),
+        )}
+      </div>
 
       <button
         onClick={onToggleWishlist}

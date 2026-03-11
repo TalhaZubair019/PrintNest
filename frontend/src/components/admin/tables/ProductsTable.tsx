@@ -41,13 +41,15 @@ const ProductsTable = ({
       } else {
         categoryMatch = product.category === selectedCategory;
       }
+
       let badgeMatch = false;
+      const productBadges = product.badges || (product.badge ? [product.badge] : []);
       if (selectedBadge === "all") {
         badgeMatch = true;
       } else if (selectedBadge === "none") {
-        badgeMatch = !product.badge;
+        badgeMatch = productBadges.length === 0;
       } else {
-        badgeMatch = product.badge === selectedBadge;
+        badgeMatch = productBadges.includes(selectedBadge);
       }
 
       return categoryMatch && badgeMatch;
@@ -55,11 +57,15 @@ const ProductsTable = ({
   }, [allProducts, selectedCategory, selectedBadge]);
 
   const uniqueBadges = useMemo(() => {
-    const badges = new Set<string>();
+    const badgesSet = new Set<string>();
     allProducts.forEach((p) => {
-      if (p.badge) badges.add(p.badge);
+      if (p.badges) {
+        p.badges.forEach((b: string) => badgesSet.add(b));
+      } else if (p.badge) {
+        badgesSet.add(p.badge);
+      }
     });
-    return Array.from(badges);
+    return Array.from(badgesSet);
   }, [allProducts]);
 
   const totalProductPages =
@@ -210,7 +216,9 @@ const ProductsTable = ({
                           {p.title}
                         </p>
                         <p className="text-xs text-slate-500">
-                          {p.badge || "Standard Item"}
+                          {(p.badges || (p.badge ? [p.badge] : [])).join(
+                            ", ",
+                          ) || "Standard Item"}
                         </p>
                       </div>
                     </div>

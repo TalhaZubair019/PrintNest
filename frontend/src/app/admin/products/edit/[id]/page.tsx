@@ -34,7 +34,7 @@ export default function EditProductPage() {
     price: "",
     oldPrice: "",
     image: "",
-    badge: "",
+    badges: [] as string[],
     category: "",
   });
   const [categories, setCategories] = useState<Category[]>([]);
@@ -59,7 +59,7 @@ export default function EditProductPage() {
               price: p.price ? p.price.replace("$", "") : "",
               oldPrice: p.oldPrice ? p.oldPrice.replace("$", "") : "",
               image: p.image || "",
-              badge: p.badge || "",
+              badges: p.badges || (p.badge ? [p.badge] : []),
               category: p.category || "",
             });
           }
@@ -141,7 +141,7 @@ export default function EditProductPage() {
           ? `$${parseFloat(productForm.oldPrice).toFixed(2)}`
           : null,
         image: imageUrl,
-        badge: productForm.badge || null,
+        badges: productForm.badges,
         printText: "We print with",
         category: productForm.category || null,
       };
@@ -342,30 +342,45 @@ export default function EditProductPage() {
               </div>
 
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <label className="block text-sm font-bold mb-2 text-slate-700">
-                  Badge{" "}
+                <label className="block text-sm font-bold mb-3 text-slate-700">
+                  Product Badges{" "}
                   <span className="text-xs text-slate-400 font-normal">
-                    (optional)
+                    (Select all that apply)
                   </span>
                 </label>
-                <select
-                  value={productForm.badge}
-                  onChange={(e) =>
-                    setProductForm((prev) => ({
-                      ...prev,
-                      badge: e.target.value,
-                    }))
-                  }
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 bg-white transition-all"
-                >
-                  <option value="">No Badge</option>
-                  <option value="New">New</option>
-                  <option value="Sale">Sale</option>
-                  <option value="Hot">Hot</option>
-                  <option value="Best Seller">Best Seller</option>
-                  <option value="Limited">Limited</option>
-                  <option value="Trending">Trending</option>
-                </select>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "New",
+                    "Sale",
+                    "Hot",
+                    "Best Seller",
+                    "Limited",
+                    "Trending",
+                  ].map((badge) => {
+                    const isSelected = productForm.badges.includes(badge);
+                    return (
+                      <button
+                        key={badge}
+                        type="button"
+                        onClick={() => {
+                          setProductForm((prev) => {
+                            const newBadges = isSelected
+                              ? prev.badges.filter((b) => b !== badge)
+                              : [...prev.badges, badge];
+                            return { ...prev, badges: newBadges };
+                          });
+                        }}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border-2 ${
+                          isSelected
+                            ? "bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-100"
+                            : "bg-slate-50 border-slate-100 text-slate-600 hover:border-purple-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        {badge}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
             <div className="lg:col-span-2 space-y-5">

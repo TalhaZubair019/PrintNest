@@ -69,21 +69,30 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       "price",
       "oldPrice",
       "image",
-      "badge",
+      "badges",
       "printText",
       "category",
     ];
 
     const changes = [];
     for (const field of trackFields) {
-      if (
-        req.body[field] !== undefined &&
-        String(oldProduct[field] ?? "") !== String(req.body[field] ?? "")
-      ) {
-        const oldVal = oldProduct[field] ?? "(empty)";
-        const newVal = req.body[field] ?? "(empty)";
-        const label = field.charAt(0).toUpperCase() + field.slice(1);
-        changes.push(`${label}: "${oldVal}" → "${newVal}"`);
+      const oldVal = oldProduct[field];
+      const newVal = req.body[field];
+
+      if (newVal !== undefined) {
+        let hasChanged = false;
+        if (Array.isArray(oldVal) || Array.isArray(newVal)) {
+          hasChanged = JSON.stringify(oldVal || []) !== JSON.stringify(newVal || []);
+        } else {
+          hasChanged = String(oldVal ?? "") !== String(newVal ?? "");
+        }
+
+        if (hasChanged) {
+          const oldStr = Array.isArray(oldVal) ? `[${oldVal.join(", ")}]` : (oldVal ?? "(empty)");
+          const newStr = Array.isArray(newVal) ? `[${newVal.join(", ")}]` : (newVal ?? "(empty)");
+          const label = field.charAt(0).toUpperCase() + field.slice(1);
+          changes.push(`${label}: "${oldStr}" → "${newStr}"`);
+        }
       }
     }
 

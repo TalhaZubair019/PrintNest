@@ -79,11 +79,18 @@ function ProductCard({
           <span className="text-2xl font-bold text-slate-900">
             {product.price}
           </span>
-          {product.badge && (
-            <span className="px-4 py-1 rounded-full border border-red-300 text-red-500 text-sm font-semibold bg-white">
-              {product.badge}
-            </span>
-          )}
+          <div className="flex flex-wrap gap-2">
+            {(product.badges || (product.badge ? [product.badge] : [])).map(
+              (badge: string, idx: number) => (
+                <span
+                  key={idx}
+                  className="px-4 py-1 rounded-full border border-red-300 text-red-500 text-sm font-semibold bg-white"
+                >
+                  {badge}
+                </span>
+              ),
+            )}
+          </div>
         </div>
         <div className="absolute bottom-0 left-0 w-full h-20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-10">
           <button

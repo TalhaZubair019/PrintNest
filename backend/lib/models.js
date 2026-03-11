@@ -59,7 +59,7 @@ const productSchema = new mongoose.Schema(
     price: { type: String, required: true },
     oldPrice: { type: String, default: null },
     image: { type: String, required: true },
-    badge: { type: String, default: null },
+    badges: { type: [String], default: [] },
     printText: { type: String, default: "We print with" },
     category: { type: String, default: null },
   },
