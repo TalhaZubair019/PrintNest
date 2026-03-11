@@ -24,6 +24,7 @@ interface Product {
   title: string;
   price: string;
   image: string;
+  badges?: string[];
   badge?: string | null;
   printText?: string;
   oldPrice?: string | null;
