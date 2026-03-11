@@ -327,6 +327,19 @@ export default function NewProductPage() {
                   </span>
                 </label>
                 <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setProductForm((prev) => ({ ...prev, badges: [] }))
+                    }
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border-2 ${
+                      productForm.badges.length === 0
+                        ? "bg-slate-900 border-slate-900 text-white shadow-md shadow-slate-100"
+                        : "bg-slate-50 border-slate-100 text-slate-600 hover:border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    None
+                  </button>
                   {[
                     "New",
                     "Sale",

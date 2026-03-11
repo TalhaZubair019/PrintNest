@@ -28,6 +28,7 @@ interface Product {
   image: string;
   description?: string;
   category?: string;
+  badges?: string[];
   reviews?: Review[];
 }
 
