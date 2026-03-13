@@ -11,12 +11,34 @@ router.get("/", async (req, res) => {
 
     if (section === "products") {
       await connectDB();
-      const shopProducts = await ProductModel.find({}).sort({ id: -1 }).lean();
+      const { OrderModel } = require("../../lib/models");
+
+      const [shopProducts, orders] = await Promise.all([
+        ProductModel.find({}).sort({ id: -1 }).lean(),
+        OrderModel.find({}).lean(),
+      ]);
+
+      const salesData = {};
+      orders.forEach((order) => {
+        if (order.status === "Cancelled") return;
+        order.items?.forEach((item) => {
+          salesData[item.name] =
+            (salesData[item.name] || 0) + (item.quantity || 1);
+        });
+      });
+
       const dbProducts = db.products?.products || [];
       const allProducts = [...shopProducts, ...dbProducts];
       const uniqueProducts = Array.from(
         new Map(allProducts.map((p) => [p.id, p])).values(),
-      );
+      ).map((p) => {
+        const salesCount = salesData[p.title] || 0;
+        return {
+          ...p,
+          salesCount,
+        };
+      });
+
       return res.json({ ...db.products, products: uniqueProducts });
     }
 

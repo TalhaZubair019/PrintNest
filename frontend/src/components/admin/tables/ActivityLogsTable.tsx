@@ -181,6 +181,20 @@ export default function ActivityLogsTable() {
     }));
   };
 
+  const handleDownloadCSV = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filterEntity !== "all") params.set("entity", filterEntity);
+      if (filterAction !== "all") params.set("action", filterAction);
+      if (filterAdmin !== "all") params.set("adminId", filterAdmin);
+
+      const downloadUrl = `/api/admin/logs/export?${params.toString()}`;
+      window.open(downloadUrl, "_blank");
+    } catch (err) {
+      console.error("Failed to download CSV");
+    }
+  };
+
   const hasFilters =
     filterEntity !== "all" || filterAction !== "all" || filterAdmin !== "all";
 
@@ -259,7 +273,6 @@ export default function ActivityLogsTable() {
               ))}
             </select>
           </div>
-
           {hasFilters && (
             <button
               onClick={() => {
@@ -273,6 +286,29 @@ export default function ActivityLogsTable() {
               Clear
             </button>
           )}
+
+          <button
+            onClick={handleDownloadCSV}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-indigo-600 bg-white border border-indigo-100 hover:bg-indigo-50 rounded-xl transition-all shadow-xs shrink-0 ml-auto"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-download"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+            Download CSV
+          </button>
         </div>
       </div>
       <div className="divide-y divide-slate-100">
@@ -302,70 +338,79 @@ export default function ActivityLogsTable() {
             return (
               <div
                 key={log._id}
-                className="px-6 py-4 hover:bg-slate-50/50 transition-colors"
+                className="px-4 lg:px-6 py-4 hover:bg-slate-50/50 transition-colors border-b last:border-0 border-slate-100"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 lg:gap-4">
                   <div
-                    className={`mt-0.5 w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${action.bg}`}
+                    className={`mt-0.5 w-8 h-8 lg:w-9 lg:h-9 rounded-xl border flex items-center justify-center shrink-0 ${action.bg}`}
                   >
-                    <span className={action.color}>{action.icon}</span>
+                    <span className={action.color}>
+                      {React.cloneElement(
+                        action.icon as React.ReactElement<any>,
+                        { size: 14 },
+                      )}
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold border ${action.bg} ${action.color}`}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] lg:text-[11px] font-bold border whitespace-nowrap ${action.bg} ${action.color}`}
                       >
                         {action.label}
                       </span>
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold border ${entity.bg} ${entity.color}`}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] lg:text-[11px] font-bold border whitespace-nowrap ${entity.bg} ${entity.color}`}
                       >
-                        {entity.icon}
+                        {React.cloneElement(
+                          entity.icon as React.ReactElement<any>,
+                          { size: 10 },
+                        )}
                         {entity.label}
                       </span>
                       {log.entityId && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold border bg-slate-50 border-slate-200 text-slate-500">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] lg:text-[11px] font-bold border bg-white border-slate-200 text-slate-500 whitespace-nowrap">
                           <Hash size={10} />
-                          {log.entityId.length > 12
-                            ? log.entityId.slice(-8).toUpperCase()
-                            : log.entityId}
+                          {String(log.entityId).slice(-6).toUpperCase()}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-slate-700 font-medium leading-relaxed">
+                    <p className="text-xs lg:text-sm text-slate-700 font-medium leading-relaxed">
                       {isExpanded
                         ? log.details
-                        : `${log.details.slice(0, 150)}${shouldTruncate ? "..." : ""}`}
+                        : `${log.details.slice(0, 100)}${log.details.length > 100 ? "..." : ""}`}
                       {shouldTruncate && (
                         <button
                           onClick={() => toggleExpand(log._id)}
-                          className="ml-2 text-indigo-600 hover:text-indigo-800 font-semibold text-xs transition-colors"
+                          className="ml-1 text-indigo-600 hover:text-indigo-800 font-bold text-[10px] lg:text-xs transition-colors"
                         >
                           {isExpanded ? "Show Less" : "Read More"}
                         </button>
                       )}
                     </p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400 flex-wrap">
-                      <span className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-[10px] font-bold">
+                    <div className="flex items-center gap-x-3 gap-y-1.5 mt-2.5 text-[10px] lg:text-xs text-slate-400 flex-wrap">
+                      <span className="flex items-center gap-1.5 shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-[8px] font-bold">
                           {log.adminName?.[0]?.toUpperCase()}
                         </div>
-                        <span className="font-semibold text-slate-500">
+                        <span className="font-bold text-slate-600 truncate max-w-[100px] lg:max-w-none">
                           {log.adminName}
                         </span>
                       </span>
                       <span className="flex items-center gap-1 text-slate-400">
-                        <Mail size={10} />
-                        <span>{log.adminEmail}</span>
+                        <Mail size={10} className="shrink-0" />
+                        <span className="truncate max-w-[100px] lg:max-w-none">
+                          {log.adminEmail}
+                        </span>
                       </span>
-                      <span>·</span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={11} />
-                        {timeAgo(log.createdAt)}
-                      </span>
-                      <span className="hidden sm:inline text-slate-400">
-                        ({formatFullDate(log.createdAt)})
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-300 hidden sm:inline">
+                          •
+                        </span>
+                        <span className="flex items-center gap-1 whitespace-nowrap">
+                          <Clock size={10} className="shrink-0" />
+                          {timeAgo(log.createdAt)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -375,25 +420,25 @@ export default function ActivityLogsTable() {
         )}
       </div>
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t bg-slate-50">
+        <div className="flex items-center justify-between px-4 lg:px-6 py-4 border-t bg-slate-50">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="flex items-center gap-1 px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50 hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-1 px-3 lg:px-4 py-2 text-[10px] lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50 hover:bg-slate-50 transition-colors"
           >
-            <ChevronLeft size={14} />
-            Previous
+            <ChevronLeft size={12} />
+            Prev
           </button>
-          <span className="text-sm text-slate-500 font-medium">
+          <span className="text-[10px] lg:text-sm text-slate-500 font-medium">
             Page {page} of {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="flex items-center gap-1 px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50 hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-1 px-3 lg:px-4 py-2 text-[10px] lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50 hover:bg-slate-50 transition-colors"
           >
             Next
-            <ChevronRight size={14} />
+            <ChevronRight size={12} />
           </button>
         </div>
       )}

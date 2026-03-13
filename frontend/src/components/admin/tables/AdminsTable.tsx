@@ -69,7 +69,82 @@ const AdminsTable = ({
           )}
         </div>
       </div>
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {paginatedAdmins.length === 0 ? (
+          <div className="px-6 py-12 text-center text-slate-400 text-sm italic">
+            No admins found.
+          </div>
+        ) : (
+          paginatedAdmins.map((u) => (
+            <div key={u.id} className="p-4 space-y-4 hover:bg-purple-50/40 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                    {u.name?.[0]?.toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm text-slate-900 truncate max-w-[150px]">
+                      {u.name}
+                    </p>
+                    <p className="text-[10px] text-slate-500 truncate max-w-[150px]">{u.email}</p>
+                  </div>
+                </div>
+                {u.adminRole === "super_admin" ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full">
+                    <Crown size={10} /> Super
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 text-[10px] font-bold rounded-full">
+                    <Shield size={10} /> Admin
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setSelectedUser(u);
+                    setViewType("cart");
+                  }}
+                  className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-600 bg-slate-50 border border-slate-100 py-2 rounded-xl hover:bg-white hover:border-blue-200 transition-all"
+                >
+                  <ShoppingCart size={14} className="text-blue-500" />
+                  Cart ({u.cartCount})
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedUser(u);
+                    setViewType("wishlist");
+                  }}
+                  className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-600 bg-slate-50 border border-slate-100 py-2 rounded-xl hover:bg-white hover:border-red-200 transition-all"
+                >
+                  <Heart size={14} className="text-red-500" />
+                  Wishlist ({u.wishlistCount})
+                </button>
+              </div>
+
+              {isSuperAdmin && u.adminRole !== "super_admin" && (
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-50">
+                  <button
+                    onClick={() => onRevokeAdmin(u.id, u.name)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+                  >
+                    <ShieldOff size={14} /> Revoke
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm(u.id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+      <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         <table className="w-full text-left">
           <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
             <tr>
@@ -83,7 +158,7 @@ const AdminsTable = ({
             {paginatedAdmins.length === 0 ? (
               <tr>
                 <td
-                  colSpan={3}
+                  colSpan={4}
                   className="px-8 py-12 text-center text-slate-400 text-sm"
                 >
                   No admins found.
@@ -97,26 +172,26 @@ const AdminsTable = ({
                 >
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
                         {u.name?.[0]?.toUpperCase()}
                       </div>
-                      <div>
-                        <p className="font-bold text-sm text-slate-900">
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-slate-900 truncate">
                           {u.name}
                         </p>
-                        <p className="text-xs text-slate-500">{u.email}</p>
+                        <p className="text-xs text-slate-500 truncate">{u.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-8 py-5">
                     {u.adminRole === "super_admin" ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
-                        <Crown size={11} />
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full whitespace-nowrap">
+                        <Crown size={10} />
                         Super Admin
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">
-                        <Shield size={11} />
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full whitespace-nowrap">
+                        <Shield size={10} />
                         Admin
                       </span>
                     )}
@@ -128,9 +203,9 @@ const AdminsTable = ({
                           setSelectedUser(u);
                           setViewType("cart");
                         }}
-                        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200"
+                        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 whitespace-nowrap"
                       >
-                        <ShoppingCart size={14} className="text-blue-500" />{" "}
+                        <ShoppingCart size={12} className="text-blue-500" />{" "}
                         Cart ({u.cartCount})
                       </button>
                       <button
@@ -138,9 +213,9 @@ const AdminsTable = ({
                           setSelectedUser(u);
                           setViewType("wishlist");
                         }}
-                        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200"
+                        className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 whitespace-nowrap"
                       >
-                        <Heart size={14} className="text-red-500" /> Wishlist (
+                        <Heart size={12} className="text-red-500" /> Wishlist (
                         {u.wishlistCount})
                       </button>
                     </div>
@@ -170,28 +245,28 @@ const AdminsTable = ({
             )}
           </tbody>
         </table>
-        <div className="flex items-center justify-between px-8 py-4 border-t bg-slate-50">
+      </div>
+        <div className="flex items-center justify-between px-4 lg:px-8 py-4 border-t bg-slate-50">
           <button
             disabled={adminPage === 1}
             onClick={() => setAdminPage((p) => p - 1)}
-            className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
+            className="px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-sm text-slate-500 font-medium">
+          <span className="text-xs lg:text-sm text-slate-500 font-medium">
             Page {adminPage} of {totalAdminPages}
           </span>
           <button
             disabled={adminPage === totalAdminPages || totalAdminPages === 0}
             onClick={() => setAdminPage((p) => p + 1)}
-            className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
+            className="px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
           >
             Next
           </button>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default AdminsTable;

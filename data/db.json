@@ -282,13 +282,13 @@
     ],
     "contact": {
       "title": "Keep In Touch",
-      "address": ["2118 Thornridge Cir. Syracuse,", "Connecticut 35624"],
+      "address": ["2118 Thornridge Cir. Syracuse,"],
       "email": "tranthuy.nute@gmail.com",
       "phone": "(252) 555-0126",
       "phoneLink": "2525550126"
     },
     "bottom": {
-      "copyright": "© 2026 ThemeXriver - PrintNest. All rights reserved.",
+      "copyright": "© 2026 PrintNest. All rights reserved.",
       "paymentMethods": [
         "https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/payment-1.webp",
         "https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/payment-2.webp",

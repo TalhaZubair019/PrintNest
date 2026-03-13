@@ -1,13 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import {
-  Eye,
-  Trash2,
-  User,
-  Filter,
-  FilterX,
-  ClipboardList,
-  Calendar,
-} from "lucide-react";
+import { Eye, User, Filter, FilterX, Calendar } from "lucide-react";
 import { Order } from "@/app/admin/types";
 
 interface OrdersTableProps {
@@ -263,7 +255,128 @@ const OrdersTable = ({
           </div>
         )}
       </div>
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {paginatedOrders?.length === 0 ? (
+          <div className="px-6 py-10 text-center text-slate-500 italic">
+            No orders found.
+          </div>
+        ) : (
+          paginatedOrders?.map((o) => (
+            <div key={o.id} className="p-4 space-y-4 hover:bg-slate-50 transition-colors">
+              <div className="flex justify-between items-start">
+                <div className="flex flex-col">
+                  <span className="font-mono text-sm font-bold text-slate-700">
+                    #{String(o.id).slice(-8).toUpperCase()}
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    {new Date(o.date).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="text-sm font-bold text-slate-900">
+                  {o.total}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer</span>
+                {o.customer?.name ? (
+                  <div className="flex flex-col">
+                    <div className="text-sm text-slate-700 font-semibold truncate max-w-[200px]">
+                      {o.customer.name}
+                    </div>
+                    <div className="text-xs text-slate-500 truncate max-w-[200px]">
+                      {o.customer.email}
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-xs text-red-600 font-medium italic">
+                    Deleted Account
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <div className="relative flex-1 min-w-[140px]">
+                  <select
+                    value={o.status}
+                    disabled={
+                      updatingOrderId === o.id ||
+                      o.status === "Delivered" ||
+                      o.status === "Cancelled"
+                    }
+                    onChange={(e) => {
+                      if (e.target.value === "Cancelled") {
+                        requestCancelOrder(o);
+                      } else {
+                        handleStatusChange(o.id, e.target.value);
+                      }
+                    }}
+                    className={`w-full text-xs font-bold py-2 border rounded-xl px-3 focus:outline-none transition-all ring-offset-1 focus:ring-2 appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+                      o.status === "Pending"
+                        ? "bg-amber-50 text-amber-600 border-amber-200 focus:ring-amber-500/20"
+                        : o.status === "Accepted"
+                          ? "bg-blue-50 text-blue-600 border-blue-200 focus:ring-blue-500/20"
+                          : o.status === "Shipped"
+                            ? "bg-indigo-50 text-indigo-600 border-indigo-200 focus:ring-indigo-500/20"
+                            : o.status === "Arrived in Country"
+                              ? "bg-violet-50 text-violet-600 border-violet-200 focus:ring-violet-500/20"
+                              : o.status === "Arrived in City"
+                                ? "bg-pink-50 text-pink-600 border-pink-200 focus:ring-pink-500/20"
+                                : o.status === "Out for Delivery"
+                                  ? "bg-orange-50 text-orange-600 border-orange-200 focus:ring-orange-500/20"
+                                  : o.status === "Delivered"
+                                    ? "bg-emerald-50 text-emerald-600 border-emerald-200 focus:ring-emerald-500/20"
+                                    : "bg-red-50 text-red-600 border-red-200 focus:ring-red-500/20"
+                    } ${updatingOrderId === o.id ? "animate-pulse" : ""}`}
+                  >
+                    <option value={o.status}>{o.status}</option>
+                    {o.status === "Pending" && (
+                      <option value="Accepted">Accepted</option>
+                    )}
+                    {o.status === "Accepted" && (
+                      <option value="Shipped">Shipped</option>
+                    )}
+                    {o.status === "Shipped" && (
+                      <option value="Arrived in Country">
+                        Arrived in Country
+                      </option>
+                    )}
+                    {o.status === "Arrived in Country" && (
+                      <option value="Arrived in City">Arrived in City</option>
+                    )}
+                    {o.status === "Arrived in City" && (
+                      <option value="Out for Delivery">
+                        Out for Delivery
+                      </option>
+                    )}
+                    {o.status === "Out for Delivery" && (
+                      <option value="Delivered">Delivered</option>
+                    )}
+                    {o.status !== "Delivered" && o.status !== "Cancelled" && (
+                      <option value="Cancelled">Cancelled</option>
+                    )}
+                  </select>
+                  {updatingOrderId === o.id && (
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                      <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSelectedOrder(o)}
+                  className="flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-4 py-2 rounded-xl hover:bg-purple-600 transition-colors"
+                >
+                  <Eye size={14} /> View Order
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         <table className="w-full text-left">
           <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
             <tr>
@@ -276,9 +389,9 @@ const OrdersTable = ({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {paginatedOrders?.map((o) => (
-              <tr key={o.id} className="hover:bg-slate-50">
+              <tr key={o.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-8 py-5">
-                  <div className="flex flex-col">
+                  <div className="flex flex-col whitespace-nowrap">
                     <span className="font-mono text-sm font-bold text-slate-700">
                       #{o.id.slice(-8).toUpperCase()}
                     </span>
@@ -288,27 +401,33 @@ const OrdersTable = ({
                   </div>
                 </td>
                 <td className="px-8 py-5">
-                  {o.customer?.name ? (
-                    <>
-                      <div className="text-sm text-slate-700 font-medium">
-                        {o.customer.name}
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        {o.customer.email}
-                      </div>
-                    </>
-                  ) : (
-                    <span className="text-sm text-red-600 font-medium italic">
-                      Deleted Account
-                    </span>
-                  )}
+                  <div className="min-w-[120px]">
+                    {o.customer?.name ? (
+                      <>
+                        <div className="text-sm text-slate-700 font-medium truncate max-w-[150px]">
+                          {o.customer.name}
+                        </div>
+                        <div className="text-xs text-slate-500 truncate max-w-[150px]">
+                          {o.customer.email}
+                        </div>
+                      </>
+                    ) : (
+                      <span className="text-xs text-red-600 font-medium italic">
+                        Deleted Account
+                      </span>
+                    )}
+                  </div>
                 </td>
-                <td className="px-8 py-5 font-bold text-sm">{o.total}</td>
+                <td className="px-8 py-5 font-bold text-sm whitespace-nowrap">{o.total}</td>
                 <td className="px-8 py-5">
                   <div className="relative group min-w-[140px]">
                     <select
                       value={o.status}
-                      disabled={updatingOrderId === o.id || o.status === "Delivered" || o.status === "Cancelled"}
+                      disabled={
+                        updatingOrderId === o.id ||
+                        o.status === "Delivered" ||
+                        o.status === "Cancelled"
+                      }
                       onChange={(e) => {
                         if (e.target.value === "Cancelled") {
                           requestCancelOrder(o);
@@ -335,13 +454,31 @@ const OrdersTable = ({
                       } ${updatingOrderId === o.id ? "animate-pulse" : ""}`}
                     >
                       <option value={o.status}>{o.status}</option>
-                      {o.status === "Pending" && <option value="Accepted">Accepted</option>}
-                      {o.status === "Accepted" && <option value="Shipped">Shipped</option>}
-                      {o.status === "Shipped" && <option value="Arrived in Country">Arrived in Country</option>}
-                      {o.status === "Arrived in Country" && <option value="Arrived in City">Arrived in City</option>}
-                      {o.status === "Arrived in City" && <option value="Out for Delivery">Out for Delivery</option>}
-                      {o.status === "Out for Delivery" && <option value="Delivered">Delivered</option>}
-                      {o.status !== "Delivered" && o.status !== "Cancelled" && <option value="Cancelled">Cancelled</option>}
+                      {o.status === "Pending" && (
+                        <option value="Accepted">Accepted</option>
+                      )}
+                      {o.status === "Accepted" && (
+                        <option value="Shipped">Shipped</option>
+                      )}
+                      {o.status === "Shipped" && (
+                        <option value="Arrived in Country">
+                          Arrived in Country
+                        </option>
+                      )}
+                      {o.status === "Arrived in Country" && (
+                        <option value="Arrived in City">Arrived in City</option>
+                      )}
+                      {o.status === "Arrived in City" && (
+                        <option value="Out for Delivery">
+                          Out for Delivery
+                        </option>
+                      )}
+                      {o.status === "Out for Delivery" && (
+                        <option value="Delivered">Delivered</option>
+                      )}
+                      {o.status !== "Delivered" && o.status !== "Cancelled" && (
+                        <option value="Cancelled">Cancelled</option>
+                      )}
                     </select>
                     {updatingOrderId === o.id && (
                       <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -354,7 +491,7 @@ const OrdersTable = ({
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => setSelectedOrder(o)}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-purple-600"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-purple-600 whitespace-nowrap"
                     >
                       <Eye size={14} /> View
                     </button>
@@ -364,28 +501,28 @@ const OrdersTable = ({
             ))}
           </tbody>
         </table>
-        <div className="flex items-center justify-between px-8 py-4 border-t bg-slate-50">
+      </div>
+        <div className="flex items-center justify-between px-4 lg:px-8 py-4 border-t bg-slate-50">
           <button
             disabled={orderPage === 1}
             onClick={() => setOrderPage((p) => p - 1)}
-            className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
+            className="px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-sm text-slate-500 font-medium">
+          <span className="text-xs lg:text-sm text-slate-500 font-medium">
             Page {orderPage} of {totalPages}
           </span>
           <button
             disabled={orderPage === totalPages || totalPages === 0}
             onClick={() => setOrderPage((p) => p + 1)}
-            className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
+            className="px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
           >
             Next
           </button>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default OrdersTable;

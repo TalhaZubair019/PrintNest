@@ -53,7 +53,6 @@ router.post("/place-order", async (req, res) => {
 
     let fulfillmentDetails = [];
 
-    // --- STOCK ROUTING STRATEGY & DEDUCTION ---
     for (const item of items) {
       const product = await ProductModel.findOne({ id: item.id });
       if (!product) continue;
@@ -64,81 +63,86 @@ router.post("/place-order", async (req, res) => {
 
       for (let i = 0; i < updatedInventory.length; i++) {
         if (remainingToFulfill <= 0) break;
-        
+
         const wh = updatedInventory[i];
         if (wh.quantity > 0) {
           const deduction = Math.min(wh.quantity, remainingToFulfill);
           wh.quantity -= deduction;
           remainingToFulfill -= deduction;
-          
+
           itemFulfillmentList.push({
             warehouseName: wh.warehouseName,
             location: wh.location,
-            qty: deduction
+            qty: deduction,
           });
         }
       }
 
-      // If we couldn't fulfill the entire quantity from all warehouses combined
       if (remainingToFulfill > 0) {
         return res.status(400).json({
           error: `Insufficient stock to fulfill ${item.name}.`,
-          shortfall: remainingToFulfill
+          shortfall: remainingToFulfill,
         });
       }
 
-      // Update the product document with new warehouse quantities and total stock
-      const newTotalStock = updatedInventory.reduce((acc, curr) => acc + curr.quantity, 0);
+      const newTotalStock = updatedInventory.reduce(
+        (acc, curr) => acc + curr.quantity,
+        0,
+      );
       try {
         await ProductModel.findOneAndUpdate(
           { id: item.id },
-          { 
+          {
             $set: { warehouseInventory: updatedInventory },
-            $inc: { stockQuantity: -item.quantity } // fallback / backwards compat
-          }
+            $inc: { stockQuantity: -item.quantity },
+          },
         );
 
-        // Check for Low Stock Warning Email
         if (newTotalStock <= (product.lowStockThreshold || 5)) {
-          console.log(`[ALERT] Product ${product.title} (ID: ${product.id}) is low on stock: ${newTotalStock} remaining.`);
-          
+          console.log(
+            `[ALERT] Product ${product.title} (ID: ${product.id}) is low on stock: ${newTotalStock} remaining.`,
+          );
+
           const alertHtml = `
             <h2>Low Stock Alert</h2>
-            <p><strong>Product:</strong> ${product.title} (SKU: ${product.sku || 'N/A'})</p>
+            <p><strong>Product:</strong> ${product.title} (SKU: ${product.sku || "N/A"})</p>
             <p><strong>Remaining Stock:</strong> ${newTotalStock} (Threshold: ${product.lowStockThreshold || 5})</p>
             <p>Please restock this item soon to avoid turning away customers.</p>
           `;
 
-          transporter.sendMail({
-            from: `"Store Alerts" <${process.env.EMAIL_USER}>`,
-            to: process.env.EMAIL_USER,
-            subject: `⚠️ Low Stock Alert: ${product.title}`,
-            html: alertHtml,
-          }).catch(e => console.error("Alert email error:", e));
+          transporter
+            .sendMail({
+              from: `"Store Alerts" <${process.env.EMAIL_USER}>`,
+              to: process.env.EMAIL_USER,
+              subject: `⚠️ Low Stock Alert: ${product.title}`,
+              html: alertHtml,
+            })
+            .catch((e) => console.error("Alert email error:", e));
         }
-
       } catch (err) {
         console.error(`Failed to deduct stock for ${item.name}`, err);
-        return res.status(500).json({ error: "Checkout failed during inventory reservation." });
+        return res
+          .status(500)
+          .json({ error: "Checkout failed during inventory reservation." });
       }
 
-      // Save fulfillment data for this specific item into the order array
       fulfillmentDetails.push({
         productId: item.id,
         name: item.name,
-        fulfilledFromWarehouse: itemFulfillmentList
+        fulfilledFromWarehouse: itemFulfillmentList,
       });
     }
 
-    // Attach fulfillment route metadata back to the items array to save in the OrderModel
-    const itemsWithFulfillment = items.map(item => {
-      const match = fulfillmentDetails.find(f => f.productId === item.id);
+    const itemsWithFulfillment = items.map((item) => {
+      const match = fulfillmentDetails.find((f) => f.productId === item.id);
       if (match) {
-        return { ...item, fulfilledFromWarehouse: match.fulfilledFromWarehouse };
+        return {
+          ...item,
+          fulfilledFromWarehouse: match.fulfilledFromWarehouse,
+        };
       }
       return item;
     });
-    // --- END STOCK ROUTING ---
 
     const orderId = Date.now().toString();
     let trackingNumber = "Pending";

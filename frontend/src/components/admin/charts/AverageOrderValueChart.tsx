@@ -291,7 +291,7 @@ const AverageOrderValueChart = ({
                   className="absolute z-50 bg-slate-900/95 backdrop-blur-md text-white text-xs py-2 px-3 rounded-xl font-bold whitespace-nowrap shadow-2xl border border-white/10 flex flex-col items-center gap-0.5 pointer-events-none transform -translate-x-1/2 -translate-y-full animate-in fade-in zoom-in-95 duration-200"
                   style={{
                     left: `${(hoveredPoint.x / 300) * 100}%`,
-                    top: `calc(${hoveredPoint.y}px - 10px)`, // Approximation from svg viewBox -> css px height.
+                    top: `calc(${hoveredPoint.y}px - 10px)`,
                   }}
                 >
                   <span className="text-slate-400 text-[10px] font-medium leading-none mb-0.5">

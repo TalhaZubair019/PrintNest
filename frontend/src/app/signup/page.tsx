@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, ChevronRight, Eye, EyeOff } from "lucide-react";
 import db from "@data/db.json";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -47,34 +48,8 @@ export default function SignupPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
-      <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
-        <Image
-          src={db.shop.backgroundImage}
-          alt="Background"
-          fill
-          className="object-fill opacity-80"
-          priority
-        />
-        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
-      </div>
-      <div className="relative z-10 pt-80">
-        <div className="w-full pb-10 flex flex-col items-center justify-center">
-          <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4">
-            Create Account
-          </h1>
-          <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
-          <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
-            <Link href="/" className="hover:text-purple-600 transition-colors">
-              Home
-            </Link>
-            <div className="flex text-purple-400">
-              <ChevronRight size={14} strokeWidth={2.5} />
-              <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
-            </div>
-            <span className="text-slate-900">Signup</span>
-          </div>
-        </div>
+      <PageHeader title="Create Account" breadcrumb="Signup" />
+      <div className="relative z-10">
         <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
           <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
             <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">

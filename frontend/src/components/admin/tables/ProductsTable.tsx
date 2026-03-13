@@ -39,11 +39,25 @@ const ProductsTable = ({
       } else if (selectedCategory === "uncategorized") {
         categoryMatch = !product.category;
       } else {
-        categoryMatch = product.category === selectedCategory;
+        const targetCategory = selectedCategory.toLowerCase();
+        const productCategory = product.category?.toLowerCase();
+        
+        const catObj = categories?.find(
+          (c) => 
+            c.name?.toLowerCase() === targetCategory || 
+            c.slug?.toLowerCase() === targetCategory
+        );
+        categoryMatch = 
+          productCategory === targetCategory || 
+          (catObj && (
+            productCategory === catObj.name?.toLowerCase() || 
+            productCategory === catObj.slug?.toLowerCase()
+          ));
       }
 
       let badgeMatch = false;
-      const productBadges = product.badges || (product.badge ? [product.badge] : []);
+      const productBadges =
+        product.badges || (product.badge ? [product.badge] : []);
       if (selectedBadge === "all") {
         badgeMatch = true;
       } else if (selectedBadge === "none") {
@@ -75,9 +89,7 @@ const ProductsTable = ({
     productPage * ITEMS_PER_PAGE,
   );
 
-  useEffect(() => {
-    setProductPage(1);
-  }, [selectedCategory, selectedBadge, setProductPage]);
+
   return (
     <div
       key="products"
@@ -120,7 +132,10 @@ const ProductsTable = ({
               </div>
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setProductPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
               >
                 <option value="all">All Categories</option>
@@ -141,7 +156,10 @@ const ProductsTable = ({
               </div>
               <select
                 value={selectedBadge}
-                onChange={(e) => setSelectedBadge(e.target.value)}
+                onChange={(e) => {
+                  setSelectedBadge(e.target.value);
+                  setProductPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
               >
                 <option value="all">All Badges</option>
@@ -162,6 +180,7 @@ const ProductsTable = ({
               onClick={() => {
                 setSelectedCategory("all");
                 setSelectedBadge("all");
+                setProductPage(1);
               }}
               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
             >
@@ -171,7 +190,95 @@ const ProductsTable = ({
           )}
         </div>
       </div>
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {paginatedProducts?.length === 0 ? (
+          <div className="px-6 py-10 text-center text-slate-500 italic">
+            No products found.
+          </div>
+        ) : (
+          paginatedProducts?.map((p) => (
+            <div key={p.id} className="p-4 space-y-4 hover:bg-slate-50 transition-colors">
+              <div className="flex gap-4">
+                <div className="w-20 h-20 rounded-xl border overflow-hidden relative bg-white shrink-0">
+                  {p.image ? (
+                    <Image
+                      src={p.image}
+                      alt={p.title}
+                      fill
+                      className="object-contain p-2"
+                      unoptimized
+                    />
+                  ) : (
+                    <Package className="w-full h-full p-4 text-slate-300" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900 truncate">
+                      {p.title}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      {(p.badges || (p.badge ? [p.badge] : [])).join(", ") || "Standard Item"}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm text-purple-600">
+                        {p.price}
+                      </span>
+                      {p.oldPrice && (
+                        <span className="text-[10px] text-slate-400 line-through">
+                          {p.oldPrice}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/products/edit/${p.id}?fromPage=${productPage}`}
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-slate-100 bg-white"
+                      >
+                        <Edit size={16} />
+                      </Link>
+                      <button
+                        onClick={() => setProductDeleteConfirm(p)}
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-100 bg-white"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50/50 rounded-xl p-3 flex items-center justify-between border border-slate-100">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Stock Level</span>
+                  <span className="text-xs font-bold text-slate-800">
+                    {p.stockQuantity || 0} units available
+                  </span>
+                </div>
+                {!p.stockQuantity || p.stockQuantity === 0 ? (
+                  <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">
+                    Out of Stock
+                  </span>
+                ) : p.stockQuantity <= (p.lowStockThreshold || 5) ? (
+                  <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                    Low Stock
+                  </span>
+                ) : (
+                  <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
+                    In Stock
+                  </span>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         <table className="w-full text-left">
           <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
             <tr>
@@ -185,7 +292,7 @@ const ProductsTable = ({
             {paginatedProducts?.length === 0 ? (
               <tr>
                 <td
-                  colSpan={3}
+                  colSpan={4}
                   className="px-8 py-10 text-center text-slate-500 italic"
                 >
                   No products found.
@@ -195,11 +302,11 @@ const ProductsTable = ({
               paginatedProducts?.map((p) => (
                 <tr
                   key={p.id}
-                  className="hover:bg-slate-50/80 transition-colors"
+                  className="hover:bg-slate-50 transition-colors"
                 >
                   <td className="px-8 py-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg border overflow-hidden relative bg-white">
+                      <div className="w-12 h-12 rounded-lg border overflow-hidden relative bg-white shrink-0">
                         {p.image ? (
                           <Image
                             src={p.image}
@@ -212,8 +319,8 @@ const ProductsTable = ({
                           <Package className="w-full h-full p-3 text-slate-300" />
                         )}
                       </div>
-                      <div>
-                        <p className="font-bold text-sm text-slate-800">
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-slate-800 truncate">
                           {p.title}
                         </p>
                         <p className="text-xs text-slate-500">
@@ -229,7 +336,7 @@ const ProductsTable = ({
                       <span className="font-bold text-sm text-slate-800">
                         {p.stockQuantity || 0} in stock
                       </span>
-                      {(!p.stockQuantity || p.stockQuantity === 0) ? (
+                      {!p.stockQuantity || p.stockQuantity === 0 ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">
                           Out of Stock
                         </span>
@@ -238,16 +345,11 @@ const ProductsTable = ({
                           Low Stock
                         </span>
                       ) : null}
-                      {p.sku && (
-                        <span className="text-[10px] text-slate-400 font-mono mt-0.5">
-                          SKU: {p.sku}
-                        </span>
-                      )}
                     </div>
                   </td>
                   <td className="px-8 py-4">
                     <div className="flex flex-col">
-                      <span className="font-bold text-sm text-slate-800">
+                      <span className="font-bold text-sm text-slate-800 whitespace-nowrap">
                         {p.price}
                       </span>
                       {p.oldPrice && (
@@ -258,9 +360,9 @@ const ProductsTable = ({
                     </div>
                   </td>
                   <td className="px-8 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2 text-right">
                       <Link
-                        href={`/admin/products/edit/${p.id}`}
+                        href={`/admin/products/edit/${p.id}?fromPage=${productPage}`}
                         className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg inline-flex"
                       >
                         <Edit size={16} />
@@ -278,15 +380,16 @@ const ProductsTable = ({
             )}
           </tbody>
         </table>
-        <div className="flex items-center justify-between px-8 py-4 border-t bg-slate-50">
+      </div>
+        <div className="flex items-center justify-between px-4 lg:px-8 py-4 border-t bg-slate-50">
           <button
             disabled={productPage === 1}
             onClick={() => setProductPage((p) => p - 1)}
-            className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
+            className="px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-sm text-slate-500 font-medium">
+          <span className="text-xs lg:text-sm text-slate-500 font-medium">
             Page {productPage} of {totalProductPages}
           </span>
           <button
@@ -294,14 +397,13 @@ const ProductsTable = ({
               productPage === totalProductPages || totalProductPages === 0
             }
             onClick={() => setProductPage((p) => p + 1)}
-            className="px-4 py-2 text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
+            className="px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold bg-white border rounded-lg disabled:opacity-50"
           >
             Next
           </button>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default ProductsTable;

@@ -84,7 +84,7 @@ function getStatusContent(status, order) {
   );
 }
 
-function buildEmailHtml(order, status, trackingHistory, baseUrl) {
+function buildEmailHtml(order, status, baseUrl) {
   const content = getStatusContent(status, order);
   const appUrl = (
     baseUrl ||
@@ -202,29 +202,34 @@ router.patch("/:id", requireAdmin, async (req, res) => {
     ).lean();
 
     if (!order) return res.status(404).json({ message: "Order not found" });
-
-    // --- STOCK RESTORATION LOGIC ---
     if (status === "Cancelled" && existingOrder.status !== "Cancelled") {
       try {
         for (const item of order.items || []) {
-          // If this order item has warehouse fulfillment details, restore it exactly where it came from
-          if (item.fulfilledFromWarehouse && Array.isArray(item.fulfilledFromWarehouse)) {
-            const product = await ProductModel.findOne({ id: item.productId || item.id });
+          if (
+            item.fulfilledFromWarehouse &&
+            Array.isArray(item.fulfilledFromWarehouse)
+          ) {
+            const product = await ProductModel.findOne({
+              id: item.productId || item.id,
+            });
             if (!product) continue;
-            
+
             let updatedInventory = [...(product.warehouseInventory || [])];
             let restockAmount = 0;
 
             for (const fulfillment of item.fulfilledFromWarehouse) {
-              const whIndex = updatedInventory.findIndex(wh => wh.warehouseName === fulfillment.warehouseName && wh.location === fulfillment.location);
+              const whIndex = updatedInventory.findIndex(
+                (wh) =>
+                  wh.warehouseName === fulfillment.warehouseName &&
+                  wh.location === fulfillment.location,
+              );
               if (whIndex !== -1) {
                 updatedInventory[whIndex].quantity += fulfillment.qty;
               } else {
-                // Edge case: warehouse was deleted since order was placed. Recreate it to save the stock.
                 updatedInventory.push({
                   warehouseName: fulfillment.warehouseName,
                   location: fulfillment.location,
-                  quantity: fulfillment.qty
+                  quantity: fulfillment.qty,
                 });
               }
               restockAmount += fulfillment.qty;
@@ -232,30 +237,30 @@ router.patch("/:id", requireAdmin, async (req, res) => {
 
             await ProductModel.findOneAndUpdate(
               { id: item.productId || item.id },
-              { 
+              {
                 $set: { warehouseInventory: updatedInventory },
-                $inc: { stockQuantity: restockAmount }
-              }
+                $inc: { stockQuantity: restockAmount },
+              },
             );
           } else {
-            // Fallback for orders without multi-warehouse tracking
             await ProductModel.findOneAndUpdate(
               { id: item.productId || item.id },
-              { $inc: { stockQuantity: item.quantity } }
+              { $inc: { stockQuantity: item.quantity } },
             );
           }
         }
       } catch (restockErr) {
-        console.error("Failed to restore stock for cancelled order:", restockErr);
+        console.error(
+          "Failed to restore stock for cancelled order:",
+          restockErr,
+        );
       }
     }
-    // --- END STOCK RESTORATION ---
 
     try {
       const emailHtml = buildEmailHtml(
         order,
         status,
-        order.trackingHistory || [],
         req.headers.origin,
       );
       const content = getStatusContent(status, order);
@@ -268,7 +273,9 @@ router.patch("/:id", requireAdmin, async (req, res) => {
           html: emailHtml,
         })
         .catch((e) => console.error("Tracking email error:", e));
-    } catch (_) {}
+    } catch (emailErr) {
+      console.error("Email preparation error:", emailErr);
+    }
 
     await logActivity(req, {
       action: "update",

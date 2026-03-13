@@ -11,6 +11,7 @@ import { toggleWishlist } from "@/redux/WishListSlice";
 import { RootState } from "@/redux/Store";
 import Toast from "@/components/products/Toast";
 import db from "@data/db.json";
+import PageHeader from "@/components/ui/PageHeader";
 
 interface Category {
   id: number;
@@ -40,6 +41,7 @@ export default function CategoryPage() {
   const [category, setCategory] = useState<Category | null>(null);
   const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState("Default Sorting");
 
   const [toast, setToast] = useState<{
     show: boolean;
@@ -77,37 +79,37 @@ export default function CategoryPage() {
             if (staticCat && productsRes.ok) {
               const data = await productsRes.json();
               const allProducts: Product[] = data.products || [];
-              const keyword = staticCat.title.toLowerCase().replace(/s$/, "");
+              const catTitle = staticCat.title.toLowerCase();
+              const keyword = catTitle.replace(/s$/, "");
+
               const filtered = allProducts.filter((p) => {
-                const pCategory = p.category?.toLowerCase() || "";
-                const slugMatch = pCategory.replace(/\s+/g, "-") === slug;
-                const titleMatch = p.title.toLowerCase().includes(keyword);
-                return pCategory ? slugMatch || titleMatch : titleMatch;
+                const pCat = p.category?.toLowerCase() || "";
+                const isMatch =
+                  pCat === catTitle || pCat.replace(/\s+/g, "-") === slug;
+                if (pCat) return isMatch;
+                return p.title.toLowerCase().includes(keyword);
               });
               setCategoryProducts(filtered);
             }
           } else {
+            const currentCatName =
+              (foundCategory as any).name || foundCategory.title;
             setCategory({
               ...foundCategory,
-              title: (foundCategory as any).name || foundCategory.title,
+              title: currentCatName,
             });
             if (productsRes.ok) {
               const data = await productsRes.json();
               const allProducts: Product[] = data.products || [];
-              const catTitle = (
-                (foundCategory as any).name ||
-                foundCategory.title ||
-                ""
-              ).toLowerCase();
+              const catTitle = currentCatName.toLowerCase();
               const keyword = catTitle.replace(/s$/, "");
 
               const filtered = allProducts.filter((p) => {
-                const pCategory = p.category?.toLowerCase() || "";
-                const slugMatch =
-                  pCategory === catTitle ||
-                  pCategory.replace(/\s+/g, "-") === slug;
-                const titleMatch = p.title.toLowerCase().includes(keyword);
-                return pCategory ? slugMatch || titleMatch : titleMatch;
+                const pCat = p.category?.toLowerCase() || "";
+                const isMatch =
+                  pCat === catTitle || pCat.replace(/\s+/g, "-") === slug;
+                if (pCat) return isMatch;
+                return p.title.toLowerCase().includes(keyword);
               });
               setCategoryProducts(filtered);
             }
@@ -123,12 +125,14 @@ export default function CategoryPage() {
           if (staticCat && productsRes.ok) {
             const data = await productsRes.json();
             const allProducts: Product[] = data.products || [];
-            const keyword = staticCat.title.toLowerCase().replace(/s$/, "");
+            const catTitle = staticCat.title.toLowerCase();
+            const keyword = catTitle.replace(/s$/, "");
             const filtered = allProducts.filter((p) => {
-              const pCategory = p.category?.toLowerCase() || "";
-              const slugMatch = pCategory.replace(/\s+/g, "-") === slug;
-              const titleMatch = p.title.toLowerCase().includes(keyword);
-              return pCategory ? slugMatch || titleMatch : titleMatch;
+              const pCat = p.category?.toLowerCase() || "";
+              const isMatch =
+                pCat === catTitle || pCat.replace(/\s+/g, "-") === slug;
+              if (pCat) return isMatch;
+              return p.title.toLowerCase().includes(keyword);
             });
             setCategoryProducts(filtered);
           }
@@ -205,47 +209,14 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-800 pb-32">
-      <div className="w-full flex flex-col items-center justify-center pt-100 pb-16 px-4 relative">
-        <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
-        <div className="absolute top-0 left-0 w-full h-150 z-0 pointer-events-none">
-          <Image
-            src={db.categories.backgroundImage}
-            alt="Background"
-            fill
-            className="object-cover opacity-80"
-            priority
-          />
-        </div>
-
-        <div className="relative z-20 flex flex-col items-center">
-          <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 text-center">
-            Category: {category.title}
-          </h1>
-          <div className="relative group">
-            <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 bg-slate-50/50 px-6 py-2 rounded-md">
-              <Link href="/" className="hover:text-blue-600 transition-colors">
-                {db.categories.breadcrumbs.home}
-              </Link>
-              <div className="flex text-blue-400">
-                <ChevronRight size={12} strokeWidth={2.5} />
-                <ChevronRight size={12} className="-ml-1.5" strokeWidth={2.5} />
-              </div>
-              <Link
-                href="/shop"
-                className="hover:text-blue-600 transition-colors"
-              >
-                {db.categories.breadcrumbs.current}
-              </Link>
-              <div className="flex text-blue-400">
-                <ChevronRight size={12} strokeWidth={2.5} />
-                <ChevronRight size={12} className="-ml-1.5" strokeWidth={2.5} />
-              </div>
-              <span className="text-slate-900">{category.title}</span>
-            </div>
-            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-linear-to-r from-blue-500 via-purple-500 to-teal-400"></div>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={`Category: ${category.title}`}
+        breadcrumbs={[
+          { label: "Shop", href: "/shop" },
+          { label: category.title },
+        ]}
+        backgroundImage={db.categories.backgroundImage}
+      />
       <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
         <div className="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 rounded-full px-8 py-4 mt-12 mb-12 shadow-sm">
           <p className="text-slate-500 font-medium text-sm mb-2 sm:mb-0">
@@ -253,11 +224,16 @@ export default function CategoryPage() {
           </p>
 
           <div className="relative">
-            <select className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-2 pl-4 pr-10 rounded-full text-sm font-semibold focus:outline-none focus:border-blue-400 cursor-pointer">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-2 pl-4 pr-10 rounded-full text-sm font-semibold focus:outline-none focus:border-blue-400 cursor-pointer"
+            >
               <option>Default Sorting</option>
+              <option>Popularity</option>
+              <option>Newest First</option>
               <option>Price: Low to High</option>
               <option>Price: High to Low</option>
-              <option>Newest First</option>
             </select>
             <ChevronDown
               size={14}
@@ -267,18 +243,29 @@ export default function CategoryPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {categoryProducts.map((product) => (
-            <SimpleProductCard
-              key={product.id}
-              product={product}
-              isInCart={cartItems.some((item: any) => item.id === product.id)}
-              onAddToCart={() => handleAddToCart(product)}
-              isWishlisted={wishlistItems.some(
-                (item) => item.id === product.id,
-              )}
-              onToggleWishlist={() => handleToggleWishlist(product)}
-            />
-          ))}
+          {[...categoryProducts]
+            .sort((a: any, b: any) => {
+              const priceA = parseFloat(a.price.replace(/[^0-9.]/g, ""));
+              const priceB = parseFloat(b.price.replace(/[^0-9.]/g, ""));
+              if (sortBy === "Price: Low to High") return priceA - priceB;
+              if (sortBy === "Price: High to Low") return priceB - priceA;
+              if (sortBy === "Newest First") return (b.id || 0) - (a.id || 0);
+              if (sortBy === "Popularity")
+                return (b.salesCount || 0) - (a.salesCount || 0);
+              return (a.id || 0) - (b.id || 0);
+            })
+            .map((product) => (
+              <SimpleProductCard
+                key={product.id}
+                product={product}
+                isInCart={cartItems.some((item: any) => item.id === product.id)}
+                onAddToCart={() => handleAddToCart(product)}
+                isWishlisted={wishlistItems.some(
+                  (item) => item.id === product.id,
+                )}
+                onToggleWishlist={() => handleToggleWishlist(product)}
+              />
+            ))}
 
           {categoryProducts.length === 0 && (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">

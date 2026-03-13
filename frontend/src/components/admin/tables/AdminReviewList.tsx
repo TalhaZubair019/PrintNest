@@ -317,8 +317,131 @@ export default function AdminReviewList({
           </div>
         )}
       </div>
+      <div className="lg:hidden divide-y divide-slate-100 border-t border-slate-100">
+        {filteredReviews.length === 0 ? (
+          <div className="px-6 py-10 text-center text-slate-500 italic">
+            No reviews found.
+          </div>
+        ) : (
+          filteredReviews.map((review) => {
+            const product = getProductDetails(review.productId);
+            return (
+              <div
+                key={review.id}
+                className="p-4 space-y-4 hover:bg-slate-50 transition-colors"
+              >
+                <div className="flex justify-between items-start gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-bold shrink-0 border border-slate-200">
+                      {review.userName?.[0]?.toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-slate-900 text-sm truncate">
+                        {review.userName}
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-medium whitespace-nowrap">
+                        {review.date}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(review.id)}
+                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all border border-slate-100 bg-white"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
 
-      <div className="overflow-x-auto">
+                {product && (
+                  <div className="flex items-center gap-3 p-2.5 bg-white rounded-xl border border-slate-100">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border border-slate-50">
+                      <Image
+                        src={product.image}
+                        alt={product.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                        Product Reviewed
+                      </div>
+                      <div className="text-xs font-bold text-slate-700 truncate max-w-[180px]">
+                        {product.title}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex text-amber-400 gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={14}
+                          className={
+                            i < review.rating
+                              ? "fill-current"
+                              : "text-slate-200"
+                          }
+                        />
+                      ))}
+                    </div>
+                    {review.isEdited && (
+                      <button
+                        onClick={() =>
+                          setExpandedEditId(
+                            expandedEditId === review.id ? null : review.id,
+                          )
+                        }
+                        className="text-[9px] uppercase text-blue-500 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100"
+                      >
+                        {expandedEditId === review.id
+                          ? "Close Edit Hist."
+                          : "Show Edited"}
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-3 rounded-lg border border-slate-100/50">
+                    "{review.comment}"
+                  </p>
+                </div>
+
+                {expandedEditId === review.id && review.previousReview && (
+                  <div className="mt-2 p-3 bg-white rounded-xl border border-dashed border-slate-200 animate-in fade-in slide-in-from-top-1">
+                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                      Original Version
+                    </div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="flex text-amber-400 gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={`prev-mob-${i}`}
+                            size={10}
+                            className={
+                              i < review.previousReview!.rating
+                                ? "fill-current"
+                                : "text-slate-200"
+                            }
+                          />
+                        ))}
+                      </div>
+                      <span className="text-[10px] text-slate-400">
+                        {review.previousReview.date}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 italic">
+                      "{review.previousReview.comment}"
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+      <div className="hidden lg:block overflow-x-auto">
         <table className="w-full text-left">
           <thead className="bg-slate-50/50 text-slate-500 text-xs uppercase tracking-wider">
             <tr>

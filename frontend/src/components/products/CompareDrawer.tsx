@@ -8,6 +8,8 @@ import {
   Printer,
   Share2,
   Plus as PlusIcon,
+  Maximize2,
+  Trash2,
 } from "lucide-react";
 
 function CartButton({
@@ -47,150 +49,188 @@ function CompareDrawer({
   onRemoveItem,
   onAddItem,
   onAddToCart,
+  Maximize2,
 }: any) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+
   if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-60 bg-white animate-in slide-in-from-bottom duration-300 flex flex-col">
-      <div className="h-16 border-b border-slate-200 flex items-center justify-between px-6 lg:px-12 bg-white">
-        <div className="flex items-center gap-2 text-slate-800 font-bold tracking-widest text-sm uppercase">
-          <Settings size={18} />
-          <span>Settings</span>
+    <div className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm transition-all duration-500 flex justify-end">
+      {/* Overlay to close */}
+      <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
+
+      <div className="relative w-full sm:w-[500px] lg:w-[600px] bg-white h-full shadow-[-20px_0_50px_rgba(0,0,0,0.1)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
+        {/* Header */}
+        <div className="h-20 border-b border-slate-100 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
+              <Settings size={20} />
+            </div>
+            <div>
+              <h2 className="font-bold text-slate-900 text-lg">Comparison</h2>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-widest flex items-center gap-2">
+                <span>{compareItems.length} Products</span>
+                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                <span>Max 3</span>
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 transition-all text-slate-400 hover:text-slate-900 group"
+          >
+            <X
+              size={24}
+              className="group-hover:rotate-90 transition-transform duration-300"
+            />
+          </button>
         </div>
-        <div className="flex-1 flex justify-around px-12">
-          {compareItems.map((item: any) => (
-            <div key={item.id} className="flex items-center gap-2">
-              <span className="font-bold text-slate-900 uppercase text-xs lg:text-sm">
-                {item.title}
-              </span>
+
+        {/* Content */}
+        <div className="grow overflow-y-auto custom-scrollbar p-6 space-y-8 bg-slate-50/20">
+          {compareItems.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-4 p-10 opacity-60">
+              <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
+                <Maximize2 size={40} />
+              </div>
+              <p className="font-medium text-slate-500">
+                No products to compare.
+                <br />
+                Add products to see the details side by side.
+              </p>
               <button
-                onClick={() => onRemoveItem(item.id)}
-                className="text-xs text-slate-400 underline hover:text-red-500"
+                onClick={() => setIsPickerOpen(true)}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-full font-bold text-sm shadow-lg shadow-indigo-200"
               >
-                remove
+                Add Product
               </button>
             </div>
-          ))}
-          {[...Array(3 - compareItems.length)].map((_, i) => (
-            <div key={i} className="hidden md:block w-32"></div>
-          ))}
-        </div>
-        <button
-          onClick={onClose}
-          className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-        >
-          <X size={24} className="text-slate-500" />
-        </button>
-      </div>
-      <div className="grow overflow-y-auto bg-[#FAFAFA] p-4 lg:p-12">
-        <div className="max-w-7xl mx-auto bg-white shadow-sm border border-slate-100 rounded-xl overflow-hidden">
-          <div className="grid grid-cols-4 border-b border-slate-100 min-h-50">
-            <div className="col-span-1 p-6 flex items-center text-slate-500 font-medium">
-              Image
-            </div>
-            {compareItems.map((item: any) => (
-              <div
-                key={item.id}
-                className="col-span-1 p-6 border-l border-slate-100 bg-white flex items-center justify-center"
-              >
-                <div className="relative w-32 h-32">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-contain"
-                  />
+          ) : (
+            <div className="grid grid-cols-1 gap-6">
+              {compareItems.map((item: any) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-4xl p-6 shadow-sm border border-slate-100 relative group transition-all hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1"
+                >
+                  <button
+                    onClick={() => onRemoveItem(item.id)}
+                    className="absolute top-4 right-4 w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm z-10"
+                  >
+                    <X size={16} />
+                  </button>
+
+                  <div className="flex gap-6">
+                    <div className="relative w-32 h-32 bg-slate-50 rounded-3xl p-4 shrink-0 shadow-inner group-hover:bg-indigo-50/50 transition-colors">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-contain p-2"
+                      />
+                    </div>
+
+                    <div className="flex-1 flex flex-col justify-center">
+                      <h3 className="font-bold text-slate-900 text-lg mb-1 leading-tight">
+                        {item.title}
+                      </h3>
+                      <p className="text-indigo-600 font-extrabold text-xl mb-3">
+                        {item.price}
+                      </p>
+                      <CartButton item={item} onAddToCart={onAddToCart} />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-6 border-t border-slate-50 space-y-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="block text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">
+                          Status
+                        </span>
+                        <span className="inline-flex items-center gap-2 text-emerald-600 font-bold">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                          In Stock
+                        </span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">
+                          Category
+                        </span>
+                        <span className="text-slate-700 font-medium">
+                          Premium Original
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="block text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">
+                        Details
+                      </span>
+                      <p className="text-sm text-slate-500 leading-relaxed">
+                        Exquisitely crafted with premium materials. This product
+                        features a sophisticated design that stands out in any
+                        setting.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
-            {[...Array(3 - compareItems.length)].map((_, i) => (
-              <div
-                key={i}
-                className="col-span-1 border-l border-slate-100 bg-slate-50/50"
-              ></div>
-            ))}
-          </div>
-          <div className="grid grid-cols-4 border-b border-slate-100 min-h-20">
-            <div className="col-span-1 p-6 flex items-center text-slate-500 font-medium">
-              Price
+              ))}
+
+              {compareItems.length < 3 && (
+                <button
+                  onClick={() => setIsPickerOpen(true)}
+                  className="h-32 border-2 border-dashed border-slate-200 rounded-4xl flex flex-col items-center justify-center text-slate-400 hover:border-indigo-400 hover:text-indigo-600 transition-all gap-3 bg-white/40 group active:scale-95"
+                >
+                  <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
+                    <PlusIcon size={24} />
+                  </div>
+                  <span className="font-bold text-sm">Add Another Product</span>
+                </button>
+              )}
             </div>
-            {compareItems.map((item: any) => (
-              <div
-                key={item.id}
-                className="col-span-1 p-6 border-l border-slate-100 bg-white flex items-center text-lg font-bold text-slate-900"
-              >
-                {item.price}
-              </div>
-            ))}
-            {[...Array(3 - compareItems.length)].map((_, i) => (
-              <div
-                key={i}
-                className="col-span-1 border-l border-slate-100 bg-slate-50/50"
-              ></div>
-            ))}
-          </div>
-          <div className="grid grid-cols-4 border-b border-slate-100 min-h-25">
-            <div className="col-span-1 p-6 flex items-center text-slate-500 font-medium">
-              Add to cart
-            </div>
-            {compareItems.map((item: any) => (
-              <div
-                key={item.id}
-                className="col-span-1 p-6 border-l border-slate-100 bg-white flex items-center"
-              >
-                <CartButton item={item} onAddToCart={onAddToCart} />
-              </div>
-            ))}
-            {[...Array(3 - compareItems.length)].map((_, i) => (
-              <div
-                key={i}
-                className="col-span-1 border-l border-slate-100 bg-slate-50/50"
-              ></div>
-            ))}
-          </div>
-          <div className="grid grid-cols-4 min-h-37.5">
-            <div className="col-span-1 p-6 text-slate-500 font-medium">
-              Description
-            </div>
-            {compareItems.map((item: any) => (
-              <div
-                key={item.id}
-                className="col-span-1 p-6 border-l border-slate-100 text-sm text-slate-600 leading-relaxed"
-              >
-                Pellentesque habitant morbi tristique senectus et netus et
-                malesuada fames ac turpis egestas.
-              </div>
-            ))}
-            {[...Array(3 - compareItems.length)].map((_, i) => (
-              <div
-                key={i}
-                className="col-span-1 border-l border-slate-100 bg-slate-50/50"
-              ></div>
-            ))}
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-8 border-t border-slate-100 bg-white shrink-0">
+          <div className="flex gap-4">
+            <button className="flex-1 h-14 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-200">
+              Print Specification
+            </button>
+            <button
+              onClick={() =>
+                compareItems.forEach((item: any) => onRemoveItem(item.id))
+              }
+              className="w-14 h-14 bg-slate-100 flex items-center justify-center rounded-2xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-95"
+              title="Clear All"
+            >
+              <Trash2 size={24} />
+            </button>
           </div>
         </div>
       </div>
-      <div className="h-20 bg-[#1E293B] flex items-center justify-between px-6 lg:px-12 text-white relative">
-        <div className="flex gap-4">
-          <button className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded flex items-center justify-center transition-colors">
-            <Printer size={18} />
-          </button>
-          <button className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded flex items-center justify-center transition-colors">
-            <Share2 size={18} />
-          </button>
-          <button
-            onClick={() => setIsPickerOpen(!isPickerOpen)}
-            className={`w-10 h-10 rounded flex items-center justify-center transition-colors ${isPickerOpen ? "bg-blue-500 text-white" : "bg-slate-700 hover:bg-slate-600"}`}
-          >
-            <PlusIcon size={18} />
-          </button>
-        </div>
-        {isPickerOpen && (
-          <div className="absolute bottom-24 left-6 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-2">
-            <div className="bg-slate-50 px-4 py-3 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wide">
-              Add Product
+
+      {/* Product Picker Overlay */}
+      {isPickerOpen && (
+        <div className="fixed inset-0 z-70 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            onClick={() => setIsPickerOpen(false)}
+          />
+          <div className="relative bg-white w-full max-w-lg rounded-4xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+              <h3 className="font-bold text-slate-900 text-xl tracking-tight">
+                Select Product
+              </h3>
+              <button
+                onClick={() => setIsPickerOpen(false)}
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 transition-all"
+              >
+                <X size={24} />
+              </button>
             </div>
-            <div className="max-h-60 overflow-y-auto">
+            <div className="max-h-[60vh] overflow-y-auto p-4 space-y-2 custom-scrollbar">
               {allProducts
                 .filter(
                   (p: any) => !compareItems.find((c: any) => c.id === p.id),
@@ -202,55 +242,33 @@ function CompareDrawer({
                       onAddItem(product);
                       setIsPickerOpen(false);
                     }}
-                    className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-blue-50 transition-colors border-b border-slate-50 last:border-0"
+                    className="w-full p-4 flex items-center gap-6 hover:bg-indigo-50 rounded-4xl transition-all text-left group active:scale-[0.98]"
                   >
-                    <div className="relative w-10 h-10 bg-white rounded border border-slate-100">
+                    <div className="w-16 h-16 bg-white rounded-2xl border border-slate-100 p-2 shrink-0 relative shadow-sm group-hover:shadow-md transition-all">
                       <Image
                         src={product.image}
                         alt={product.title}
                         fill
-                        className="object-contain p-1"
+                        className="object-contain"
                       />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-800">
+                      <p className="font-bold text-slate-900 text-base mb-0.5">
                         {product.title}
                       </p>
-                      <p className="text-xs text-blue-500">{product.price}</p>
+                      <p className="text-indigo-600 font-extrabold text-sm">
+                        {product.price}
+                      </p>
                     </div>
-                    <PlusIcon size={14} className="ml-auto text-slate-400" />
+                    <div className="ml-auto w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all shadow-inner">
+                      <PlusIcon size={20} />
+                    </div>
                   </button>
                 ))}
             </div>
           </div>
-        )}
-        <div className="flex items-center gap-4">
-          {compareItems.map((item: any) => (
-            <div
-              key={item.id}
-              className="w-10 h-12 relative bg-white rounded overflow-hidden border border-slate-600"
-            >
-              <Image
-                src={item.image}
-                alt="thumb"
-                fill
-                className="object-cover"
-              />
-            </div>
-          ))}
-          <div className="flex items-center h-10 bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-bold rounded overflow-hidden cursor-pointer transition-colors">
-            <span className="px-6 flex items-center h-full text-sm">
-              COMPARE
-            </span>
-            <button
-              onClick={onClose}
-              className="h-full px-3 bg-black/20 hover:bg-black/30 border-l border-white/20"
-            >
-              <X size={14} />
-            </button>
-          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

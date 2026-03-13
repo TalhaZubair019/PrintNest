@@ -9,17 +9,15 @@ import { clearCart, syncCart } from "@/redux/CartSlice";
 import AuthPromptModal from "@/components/auth/AuthPromptModal";
 import Toast from "@/components/products/Toast";
 
-import {
-  ChevronLeft,
-} from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import db from "@data/db.json";
 import { Country, State, City } from "country-state-city";
 
-import CheckoutHeader from "@/components/checkout/CheckoutHeader";
 import ContactSection from "@/components/checkout/ContactSection";
 import BillingSection from "@/components/checkout/BillingSection";
 import PaymentSection from "@/components/checkout/PaymentSection";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import PageHeader from "@/components/ui/PageHeader";
 
 const checkoutConfig = db.checkout;
 
@@ -54,7 +52,6 @@ export default function CheckoutPage() {
   const [isUsingSavedAddress, setIsUsingSavedAddress] = useState(false);
   const [isViewingSavedAddress, setIsViewingSavedAddress] = useState(false);
   const [copyProfileAddress, setCopyProfileAddress] = useState(false);
-
 
   const subtotal = cartItems.reduce(
     (acc: number, item: any) => acc + item.price * (item.quantity || 1),
@@ -134,14 +131,20 @@ export default function CheckoutPage() {
             const activeProductIds = data.products.map((p: any) =>
               String(p.id),
             );
-            const removedItems = cartItems.filter(
-              (item: any) => !activeProductIds.includes(String(item.id)),
-            );
+            const removedItems = cartItems.filter((item: any) => {
+              const p = data.products.find(
+                (prod: any) => String(prod.id) === String(item.id),
+              );
+              return !p || p.stockQuantity <= 0;
+            });
 
             if (removedItems.length > 0) {
+              const names = removedItems
+                .map((i: any) => `"${i.name || i.title || "Unknown Item"}"`)
+                .join(", ");
               dispatch(syncCart(data.products));
               showToast(
-                `${removedItems.length} item(s) were removed from your cart as they are no longer available.`,
+                `${names} were removed from your cart as they are no longer available.`,
                 "remove",
               );
             } else {
@@ -155,6 +158,8 @@ export default function CheckoutPage() {
     };
 
     checkAndSyncCart();
+    const interval = setInterval(checkAndSyncCart, 30000);
+    return () => clearInterval(interval);
   }, [hasMounted, cartItems.length]);
 
   useEffect(() => {
@@ -268,8 +273,6 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-
-
       if (formData.paymentMethod === "stripe") {
         localStorage.setItem("pendingCheckoutData", JSON.stringify(formData));
         const orderId = Date.now().toString();
@@ -334,19 +337,13 @@ export default function CheckoutPage() {
           }}
         />
       )}
-      <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
-        <Image
-          src={checkoutConfig.backgroundImage}
-          alt="Hero Background"
-          fill
-          className="object-fill opacity-100"
-          priority
-        />
-        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent" />
-      </div>
+      <PageHeader
+        title="Checkout"
+        breadcrumb="Checkout"
+        backgroundImage={checkoutConfig.backgroundImage}
+      />
 
-      <div className="relative z-10 pt-40">
-        <CheckoutHeader />
+      <div className="relative z-10">
         <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
           <div
             className={`transition-all duration-300 ${
@@ -360,6 +357,19 @@ export default function CheckoutPage() {
               onSubmit={handleSubmit}
               className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start"
             >
+              <div className="lg:col-span-5">
+                {hasMounted ? (
+                  <OrderSummary cartItems={cartItems} subtotal={subtotal} />
+                ) : (
+                  <div className="bg-white border border-slate-200 rounded-lg p-6 lg:p-8 animate-pulse">
+                    <div className="h-6 w-32 bg-slate-100 rounded mb-6" />
+                    <div className="space-y-6">
+                      <div className="h-16 bg-slate-50 rounded" />
+                      <div className="h-16 bg-slate-50 rounded" />
+                    </div>
+                  </div>
+                )}
+              </div>
               <div className="lg:col-span-7 space-y-10">
                 <ContactSection
                   email={formData.email}
@@ -392,29 +402,22 @@ export default function CheckoutPage() {
                   </Link>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (hasMounted && cartItems.length === 0)}
                     className={`w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 transition-all duration-300 ${
-                      isSubmitting
-                        ? "opacity-70 cursor-not-allowed"
+                      isSubmitting || (hasMounted && cartItems.length === 0)
+                        ? "opacity-60 cursor-not-allowed grayscale"
                         : "hover:shadow-xl hover:scale-[1.02] cursor-pointer"
                     }`}
                   >
-                    {isSubmitting ? "Processing..." : "Place Order"}
+                    {!hasMounted
+                      ? "Place Order"
+                      : isSubmitting
+                        ? "Processing..."
+                        : cartItems.length === 0
+                          ? "Cart is Empty"
+                          : "Place Order"}
                   </button>
                 </div>
-              </div>
-              <div className="lg:col-span-5">
-                {hasMounted ? (
-                  <OrderSummary cartItems={cartItems} subtotal={subtotal} />
-                ) : (
-                  <div className="bg-white border border-slate-200 rounded-lg p-6 lg:p-8 animate-pulse">
-                    <div className="h-6 w-32 bg-slate-100 rounded mb-6" />
-                    <div className="space-y-6">
-                      <div className="h-16 bg-slate-50 rounded" />
-                      <div className="h-16 bg-slate-50 rounded" />
-                    </div>
-                  </div>
-                )}
               </div>
             </form>
           </div>
@@ -429,5 +432,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
-

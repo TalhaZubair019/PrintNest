@@ -81,6 +81,7 @@ function FeaturedProducts() {
     type: "add",
   });
 
+  // 👇 Updated fetch logic to only show products with a valid SKU 👇
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -90,6 +91,7 @@ function FeaturedProducts() {
           const productsWithSku = (data.products || [])
             .filter((p: any) => p.sku && p.sku.trim() !== "")
             .sort((a: any, b: any) => a.id - b.id);
+
           setDynamicProducts(productsWithSku.slice(0, 5));
         }
       } catch (error) {
@@ -99,6 +101,8 @@ function FeaturedProducts() {
       }
     };
     fetchProducts();
+    const interval = setInterval(fetchProducts, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const showToast = (message: string, type: "add" | "remove") => {
@@ -175,7 +179,11 @@ function FeaturedProducts() {
   const scroll = (direction: "prev" | "next") => {
     const container = scrollContainerRef.current;
     if (container) {
-      const amount = 350;
+      const card = container.querySelector(".snap-center");
+      const cardWidth = card ? card.clientWidth : 320;
+      const gap = 24;
+      const amount = cardWidth + gap;
+
       container.scrollBy({
         left: direction === "next" ? amount : -amount,
         behavior: "smooth",
@@ -197,8 +205,8 @@ function FeaturedProducts() {
       className="scroll-mt-24 py-16 sm:py-20 mx-4 sm:mx-8 lg:mx-20 lg:py-28 bg-white overflow-hidden relative"
     >
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex flex-col lg:flex-row justify-between items-end mb-12 gap-8">
-          <div>
+        <div className="flex flex-col min-[500px]:flex-row justify-between items-center min-[500px]:items-end mb-12 gap-8 text-center min-[500px]:text-left">
+          <div className="flex flex-col items-center min-[500px]:items-start">
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -222,7 +230,7 @@ function FeaturedProducts() {
               </span>
             </motion.h2>
           </div>
-          <div className="max-w-md flex flex-col items-start gap-6">
+          <div className="max-w-md flex flex-col items-center min-[500px]:items-start gap-6">
             <motion.p
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -260,18 +268,18 @@ function FeaturedProducts() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
-          <div className="hidden lg:block lg:col-span-4 relative h-125 lg:h-150 rounded-[2.5rem] overflow-hidden shadow-2xl group">
+        <div className="flex flex-col min-[500px]:flex-row gap-8 items-center min-[500px]:items-start relative z-10">
+          <div className="w-[236px] min-[500px]:w-[320px] lg:w-[400px] h-[340px] min-[500px]:h-[400px] lg:h-[600px] relative rounded-3xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl group shrink-0 z-0 mx-auto min-[500px]:mx-0 transition-all duration-300">
             <BlindsImage
               src={productsData.featuredImage}
               alt="Featured"
               delay={0}
               className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent pointer-events-none"></div>
           </div>
 
-          <div className="col-span-12 lg:col-span-8 flex flex-col justify-between h-full">
+          <div className="w-full min-[500px]:flex-1 flex flex-col justify-between h-full min-h-[450px] sm:min-h-[550px] relative z-20 min-[500px]:w-0">
             <div
               ref={scrollContainerRef}
               className="flex gap-6 overflow-x-auto pb-10 scrollbar-hide snap-x pt-4"
@@ -304,22 +312,35 @@ function FeaturedProducts() {
               )}
             </div>
 
-            <div className="flex items-center gap-6 mt-4">
-              <button
-                onClick={() => scroll("prev")}
-                className="w-14 h-14 rounded-full border border-blue-500 text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors bg-white shadow-sm group cursor-pointer"
-              >
-                <ChevronsLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-              </button>
-              <button
-                onClick={() => scroll("next")}
-                className="w-14 h-14 rounded-full border border-blue-300 text-blue-600 flex items-center justify-center bg-linear-to-br from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 transition-colors shadow-inner group cursor-pointer"
-              >
-                <ChevronsRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <div className="grow h-1.5 bg-blue-100 rounded-full overflow-hidden relative">
+            <div className="flex items-center justify-center min-[500px]:justify-start gap-4 mt-2 relative z-50">
+              <div className="flex gap-2 shrink-0 relative z-50">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    scroll("prev");
+                  }}
+                  className="w-12 h-12 rounded-full border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-white hover:text-indigo-600 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/10 transition-all bg-white shadow-sm group cursor-pointer active:scale-90 touch-manipulation relative z-50"
+                  aria-label="Previous products"
+                >
+                  <ChevronsLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform pointer-events-none" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    scroll("next");
+                  }}
+                  className="w-12 h-12 rounded-full border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-white hover:text-indigo-600 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/10 transition-all bg-white shadow-sm group cursor-pointer active:scale-90 touch-manipulation relative z-50"
+                  aria-label="Next products"
+                >
+                  <ChevronsRight className="w-5 h-5 group-hover:translate-x-1 transition-transform pointer-events-none" />
+                </button>
+              </div>
+
+              <div className="grow h-1 bg-slate-100 rounded-full overflow-hidden relative">
                 <div
-                  className="h-full bg-blue-700 rounded-full transition-all duration-300 ease-out"
+                  className="h-full bg-indigo-600 rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(79,70,229,0.5)]"
                   style={{ width: `${Math.max(10, scrollProgress)}%` }}
                 ></div>
               </div>

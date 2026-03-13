@@ -3,14 +3,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ChevronRight,
-  Upload,
-  Image as ImageIcon,
-  Sparkles,
-  Loader2,
-  Save,
-} from "lucide-react";
+import { ChevronRight, Upload, Sparkles, Loader2, Save } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
 import db from "@data/db.json";
 interface Category {
   _id: string;
@@ -21,7 +15,9 @@ interface Category {
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const id = params.id as string;
+  const fromPage = searchParams?.get("fromPage") || "1";
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,8 +75,6 @@ export default function EditProductPage() {
       }));
     }
   };
-
-
 
   const handleGenerateDescription = async () => {
     if (!productForm.title) {
@@ -155,7 +149,7 @@ export default function EditProductPage() {
       });
 
       if (res.ok) {
-        router.push("/admin/dashboard?tab=products");
+        router.push(`/admin/dashboard?tab=products&page=${fromPage}`);
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to save product: ${errData.message ?? res.statusText}`);
@@ -177,40 +171,10 @@ export default function EditProductPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans">
-      <div className="relative w-full h-175 z-0">
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-          <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
-          <Image
-            src={db.shop.backgroundImage}
-            alt="Background"
-            fill
-            className="object-fill opacity-80"
-            priority
-            unoptimized
-          />
-          <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
-        </div>
-        <div className="relative z-10 pt-80 flex flex-col items-center justify-center pb-10">
-          <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
-            Edit Product
-          </h1>
-          <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10" />
-          <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
-            <Link href="/" className="hover:text-purple-600 transition-colors">
-              Home
-            </Link>
-            <ChevronRight size={14} />
-            <Link
-              href="/admin/dashboard"
-              className="hover:text-purple-600 transition-colors"
-            >
-              Dashboard
-            </Link>
-            <ChevronRight size={14} />
-            <span className="text-slate-900">Edit Product</span>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Edit Product"
+        breadcrumb="Edit Product"
+      />
 
       <div className="max-w-5xl mx-auto px-4 lg:px-8 py-12">
         <form onSubmit={handleSubmit}>
@@ -259,9 +223,6 @@ export default function EditProductPage() {
                   ))}
                 </select>
               </div>
-
-
-
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-bold text-slate-700">
@@ -484,7 +445,7 @@ export default function EditProductPage() {
                   )}
                 </button>
                 <Link
-                  href="/admin/dashboard"
+                  href={`/admin/dashboard?tab=products&page=${fromPage}`}
                   className="w-full px-4 py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200 text-center transition-colors text-slate-700 text-sm flex items-center justify-center"
                 >
                   Cancel

@@ -1,616 +1,48 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/Store";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import {
-  ChevronRight,
-  Search,
-  X,
-  CheckCircle,
-  UserIcon,
-} from "lucide-react";
-import AdminReviewList from "@/components/admin/tables/AdminReviewList";
-import db from "@data/db.json";
-import { DashboardStats, UserData, Order } from "@/app/admin/types";
-import StatCard from "@/components/admin/ui/StatCard";
-import OrdersStatCard from "@/components/admin/ui/OrdersStatCard";
-import RevenueStatCard from "@/components/admin/ui/RevenueStatCard";
-import UsersStatCard from "@/components/admin/ui/UsersStatCard";
-import RevenueChart from "@/components/admin/charts/RevenueChart";
-import OrderStatusChart from "@/components/admin/charts/OrderStatusChart";
-import AverageOrderValueChart from "@/components/admin/charts/AverageOrderValueChart";
-import ReviewRatingChart from "@/components/admin/charts/ReviewRatingChart";
-import SentimentChart from "@/components/admin/charts/SentimentChart";
-import ProductSalesChart from "@/components/admin/charts/ProductSalesChart";
-import CategorySalesChart from "@/components/admin/charts/CategorySalesChart";
-import OrderVelocityChart from "@/components/admin/charts/OrderVelocityChart";
-import TopSellingProducts from "@/components/admin/charts/TopSellingProducts";
-import TopReviewedProducts from "@/components/admin/charts/TopReviewedProducts";
-import ProductsTable from "@/components/admin/tables/ProductsTable";
-import CategoriesTable from "@/components/admin/tables/CategoriesTable";
-import UsersTable from "@/components/admin/tables/UsersTable";
-import AdminsTable from "@/components/admin/tables/AdminsTable";
-import OrdersTable from "@/components/admin/tables/OrdersTable";
-import ActivityLogsTable from "@/components/admin/tables/ActivityLogsTable";
-import WarehousesTable from "@/components/admin/tables/WarehousesTable";
-import InventoryTable from "@/components/admin/tables/InventoryTable";
-
-import CategoryModal from "@/components/admin/modals/CategoryModal";
-import UserModal from "@/components/admin/modals/UserModal";
-import OrderModal from "@/components/admin/modals/OrderModal";
-import CancelOrderConfirmModal from "@/components/admin/modals/CancelOrderConfirmModal";
-import DeleteConfirmationModal from "@/components/admin/modals/DeleteConfirmationModal";
-import AddAdminModal from "@/components/admin/modals/AddAdminModal";
+import React from "react";
+import { CheckCircle, X } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
-import StockAdjustmentModal from "@/components/admin/modals/StockAdjustmentModal";
-import WarehouseModal from "@/components/admin/modals/WarehouseModal";
+import DashboardHeader from "@/components/admin/layout/DashboardHeader";
+import DashboardModals from "@/components/admin/layout/DashboardModals";
 
-const PageHeader = ({ title, breadcrumb }: any) => (
-  <div className="relative w-full h-175 z-0">
-    <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-      <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
-      <Image
-        src={db.shop.backgroundImage}
-        alt="Background"
-        fill
-        className="object-fill opacity-80"
-        priority
-        unoptimized
-      />
-      <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
-    </div>
+import OverviewTab from "@/components/admin/tabs/OverviewTab";
+import ProductsTabContent from "@/components/admin/tabs/ProductsTabContent";
+import ReviewsTabContent from "@/components/admin/tabs/ReviewsTabContent";
+import UsersTabContent from "@/components/admin/tabs/UsersTabContent";
+import AdminsTabContent from "@/components/admin/tabs/AdminsTabContent";
+import OrdersTabContent from "@/components/admin/tabs/OrdersTabContent";
+import CategoriesTabContent from "@/components/admin/tabs/CategoriesTabContent";
+import WarehousesTabContent from "@/components/admin/tabs/WarehousesTabContent";
+import InventoryTabContent from "@/components/admin/tabs/InventoryTabContent";
+import ActivityLogsTabContent from "@/components/admin/tabs/ActivityLogsTabContent";
 
-    <div className="relative z-10 pt-80 flex flex-col items-center justify-center pb-10">
-      <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 capitalize">
-        {title}
-      </h1>
-      <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
-      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
-        <Link href="/" className="hover:text-purple-600 transition-colors">
-          Home
-        </Link>
-        <ChevronRight size={14} />
-        <span className="text-slate-900">{breadcrumb}</span>
-      </div>
-    </div>
-  </div>
-);
+import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 
 export default function AdminDashboard() {
-  const {
-    user,
-    isAuthenticated,
-    isLoading: isAuthLoading,
-  } = useSelector((state: RootState) => state.auth);
-  const router = useRouter();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
+  const d = useAdminDashboard();
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  const [activeTab, setActiveTab] = useState<
-    | "overview"
-    | "users"
-    | "admins"
-    | "orders"
-    | "products"
-    | "reviews"
-    | "categories"
-    | "logs"
-    | "warehouses"
-    | "inventory"
-  >("overview");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [viewType, setViewType] = useState<"cart" | "wishlist" | "both">(
-    "both",
-  );
-  const ITEMS_PER_PAGE = 5;
-  const [userPage, setUserPage] = useState(1);
-  const [adminPage, setAdminPage] = useState(1);
-  const [orderPage, setOrderPage] = useState(1);
-  const [productPage, setProductPage] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [isAddAdminModalOpen, setIsAddAdminModalOpen] = useState(false);
-  const [promoteConfirm, setPromoteConfirm] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-  const [revokeConfirm, setRevokeConfirm] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isPromoting, setIsPromoting] = useState(false);
-  const [isRevoking, setIsRevoking] = useState(false);
-  const [isDeletingProduct, setIsDeletingProduct] = useState(false);
-  const [isDeletingOrder, setIsDeletingOrder] = useState(false);
-
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [categoryDeleteConfirm, setCategoryDeleteConfirm] = useState<any>(null);
-  const [isDeletingCategory, setIsDeletingCategory] = useState(false);
-
-  const [isWarehouseModalOpen, setIsWarehouseModalOpen] = useState(false);
-  const [editingWarehouse, setEditingWarehouse] = useState<any>(null);
-  const [warehouseDeleteConfirm, setWarehouseDeleteConfirm] = useState<any>(null);
-  const [isDeletingWarehouse, setIsDeletingWarehouse] = useState(false);
-
-  const [productDeleteConfirm, setProductDeleteConfirm] = useState<any>(null);
-  const [cancelOrderConfirm, setCancelOrderConfirm] = useState<Order | null>(
-    null,
-  );
-  const [isCancellingOrder, setIsCancellingOrder] = useState(false);
-  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-  const [selectedProductForInventory, setSelectedProductForInventory] = useState<any>(null);
-
-  const [revenueFilter, setRevenueFilter] = useState<
-    "week" | "month" | "current-month" | "custom"
-  >("week");
-  const [showRevenueDropdown, setShowRevenueDropdown] = useState(false);
-  const [customStart, setCustomStart] = useState("");
-  const [customEnd, setCustomEnd] = useState("");
-  const [filteredRevenueData, setFilteredRevenueData] = useState<any[]>([]);
-  const [revenueLoading, setRevenueLoading] = useState(false);
-
-  const [aovFilter, setAovFilter] = useState<
-    "week" | "month" | "current-month" | "custom"
-  >("week");
-  const [showAovDropdown, setShowAovDropdown] = useState(false);
-  const [aovCustomStart, setAovCustomStart] = useState("");
-  const [aovCustomEnd, setAovCustomEnd] = useState("");
-  const [filteredAovData, setFilteredAovData] = useState<any[]>([]);
-  const [aovLoading, setAovLoading] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const tab = params.get("tab");
-      const validTabs = [
-        "overview",
-        "users",
-        "admins",
-        "orders",
-        "products",
-        "reviews",
-        "categories",
-        "logs",
-        "warehouses",
-        "inventory",
-      ];
-      if (tab && validTabs.includes(tab)) {
-        setActiveTab(tab as any);
-      }
+  React.useEffect(() => {
+    if (d.user?.isAdmin) {
+      d.fetchStats();
     }
-  }, []);
-
-  useEffect(() => {
-    if (isAuthLoading) return;
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-    if (user && !user.isAdmin) {
-      router.push("/account");
-      return;
-    }
-    if (user?.isAdmin) {
-      fetchStats();
-    }
-  }, [user, isAuthenticated, isAuthLoading]);
-
-  useEffect(() => {
-    if (!user?.isAdmin) return;
-
-    const interval = setInterval(() => {
-      // Do not auto-refresh when on warehouses tab to prevent form reset
-      if (activeTab !== "warehouses") {
-        fetchStats();
-      }
-    }, 15000);
-
-    return () => clearInterval(interval);
-  }, [user, activeTab]);
-
-  useEffect(() => {
-    setSearchTerm("");
-    setDeleteConfirm(null);
-    setPromoteConfirm(null);
-    setRevokeConfirm(null);
-
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      if (activeTab === "overview") {
-        url.searchParams.delete("tab");
-      } else {
-        url.searchParams.set("tab", activeTab);
-      }
-      window.history.replaceState({}, "", url.toString());
-    }
-
-    const contentArea = document.getElementById("admin-content-area");
-    if (contentArea) {
-      contentArea.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [activeTab]);
-
-  const fetchStats = async () => {
-    try {
-      const [res, whRes] = await Promise.all([
-        fetch("/api/admin/stats"),
-        fetch("/api/admin/warehouses")
-      ]);
-
-      if (res.ok && whRes.ok) {
-        const data = await res.json();
-        const whData = await whRes.json();
-        
-        const nextStats = { ...data, warehouses: whData };
-        setStats(nextStats);
-        setFilteredRevenueData(nextStats.revenueData);
-        setFilteredAovData(nextStats.revenueData);
-      }
-    } catch (error) {
-      console.error("Failed to fetch admin stats");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchRevenueData = async (startDate: string, endDate: string) => {
-    setRevenueLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/stats?startDate=${startDate}&endDate=${endDate}`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setFilteredRevenueData(data.revenueData);
-      }
-    } catch (error) {
-      console.error("Failed to fetch revenue data");
-    } finally {
-      setRevenueLoading(false);
-    }
-  };
-
-  const fetchAovData = async (startDate: string, endDate: string) => {
-    setAovLoading(true);
-    try {
-      const res = await fetch(
-        `/api/admin/stats?startDate=${startDate}&endDate=${endDate}`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setFilteredAovData(data.revenueData);
-      }
-    } catch (error) {
-      console.error("Failed to fetch AOV data");
-    } finally {
-      setAovLoading(false);
-    }
-  };
-
-  const applyRevenueFilter = (
-    filter: "week" | "month" | "current-month" | "custom",
-    start?: string,
-    end?: string,
-  ) => {
-    const today = new Date();
-    const fmt = (d: Date) => {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+  }, [d.activeTab, d.fetchStats]);
+  React.useEffect(() => {
+    const handleFocus = () => {
+      if (d.user?.isAdmin) d.fetchStats();
     };
-    if (filter === "week") {
-      const s = new Date(today);
-      s.setDate(s.getDate() - 6);
-      fetchRevenueData(fmt(s), fmt(today));
-    } else if (filter === "month") {
-      const s = new Date(today);
-      s.setDate(s.getDate() - 29);
-      fetchRevenueData(fmt(s), fmt(today));
-    } else if (filter === "current-month") {
-      const s = new Date(today.getFullYear(), today.getMonth(), 1);
-      fetchRevenueData(fmt(s), fmt(today));
-    } else if (filter === "custom" && start && end) {
-      fetchRevenueData(start, end);
-    }
-  };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [d.fetchStats, d.user?.isAdmin]);
 
-  const applyAovFilter = (
-    filter: "week" | "month" | "current-month" | "custom",
-    start?: string,
-    end?: string,
-  ) => {
-    const today = new Date();
-    const fmt = (d: Date) => {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
-    if (filter === "week") {
-      const s = new Date(today);
-      s.setDate(s.getDate() - 6);
-      fetchAovData(fmt(s), fmt(today));
-    } else if (filter === "month") {
-      const s = new Date(today);
-      s.setDate(s.getDate() - 29);
-      fetchAovData(fmt(s), fmt(today));
-    } else if (filter === "current-month") {
-      const s = new Date(today.getFullYear(), today.getMonth(), 1);
-      fetchAovData(fmt(s), fmt(today));
-    } else if (filter === "custom" && start && end) {
-      fetchAovData(start, end);
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    setIsDeleting(true);
-    try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        fetchStats();
-        setDeleteConfirm(null);
-        showToast("User deleted successfully.", "success");
-      } else {
-        showToast("Failed to delete user.", "error");
-      }
-    } catch {
-      showToast("Error deleting user.", "error");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handlePromoteToAdmin = async (userId: string) => {
-    setIsPromoting(true);
-    try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isAdmin: true }),
-      });
-      if (res.ok) {
-        fetchStats();
-        setPromoteConfirm(null);
-        showToast(
-          `${promoteConfirm?.name} has been promoted to Admin.`,
-          "success",
-        );
-      } else {
-        const data = await res.json().catch(() => ({}));
-        showToast(data.message || "Failed to promote user.", "error");
-      }
-    } catch {
-      showToast("Error promoting user.", "error");
-    } finally {
-      setIsPromoting(false);
-    }
-  };
-
-  const handleRevokeAdmin = async (userId: string) => {
-    setIsRevoking(true);
-    try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isAdmin: false }),
-      });
-      if (res.ok) {
-        fetchStats();
-        setRevokeConfirm(null);
-        showToast(
-          `${revokeConfirm?.name}'s admin access has been revoked.`,
-          "success",
-        );
-      } else {
-        const data = await res.json().catch(() => ({}));
-        showToast(data.message || "Failed to revoke admin.", "error");
-      }
-    } catch {
-      showToast("Error revoking admin.", "error");
-    } finally {
-      setIsRevoking(false);
-    }
-  };
-
-  const showToast = (
-    message: string,
-    type: "success" | "error" = "success",
-  ) => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
-  };
-
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
-    setUpdatingOrderId(orderId);
-    try {
-      const res = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (res.ok) {
-        fetchStats();
-        showToast(
-          `Order status updated to "${newStatus}". Customer has been notified via email.`,
-          "success",
-        );
-      } else {
-        showToast("Failed to update order status.", "error");
-      }
-    } catch (error) {
-      showToast("Error updating status.", "error");
-    } finally {
-      setUpdatingOrderId(null);
-    }
-  };
-
-  const handleDeleteProduct = async (id: number) => {
-    setIsDeletingProduct(true);
-    try {
-      const res = await fetch(`/api/admin/products/${id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        await fetchStats();
-        setProductDeleteConfirm(null);
-        showToast("Product deleted successfully.", "success");
-      } else {
-        showToast("Failed to delete product.", "error");
-      }
-    } catch {
-      showToast("Error deleting product.", "error");
-    } finally {
-      setIsDeletingProduct(false);
-    }
-  };
-
-  const handleCancelOrder = async () => {
-    if (!cancelOrderConfirm) return;
-    setIsCancellingOrder(true);
-    try {
-      const res = await fetch(`/api/admin/orders/${cancelOrderConfirm.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "Cancelled" }),
-      });
-      if (res.ok) {
-        await fetchStats();
-        setCancelOrderConfirm(null);
-        showToast("Order cancelled successfully.", "success");
-      } else {
-        showToast("Failed to cancel order.", "error");
-      }
-    } catch {
-      showToast("Error cancelling order.", "error");
-    } finally {
-      setIsCancellingOrder(false);
-    }
-  };
-
-  const handleDeleteCategory = async (id: string) => {
-    setIsDeletingCategory(true);
-    try {
-      const res = await fetch(`/api/admin/categories/${id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        await fetchStats();
-        setCategoryDeleteConfirm(null);
-        showToast("Category deleted successfully.", "success");
-      } else {
-        showToast("Failed to delete category.", "error");
-      }
-    } catch {
-      showToast("Error deleting category.", "error");
-    } finally {
-      setIsDeletingCategory(false);
-    }
-  };
-
-  const handleDeleteWarehouse = async (id: string) => {
-    setIsDeletingWarehouse(true);
-    try {
-      const res = await fetch(`/api/admin/warehouses/${id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        await fetchStats();
-        setWarehouseDeleteConfirm(null);
-        showToast("Warehouse deleted successfully.", "success");
-      } else {
-        const data = await res.json();
-        showToast(data.message || "Failed to delete warehouse.", "error");
-      }
-    } catch {
-      showToast("Error deleting warehouse.", "error");
-    } finally {
-      setIsDeletingWarehouse(false);
-    }
-  };
-
-  const filteredUsers = stats?.users
-    .filter((u) => !u.isAdmin)
-    .filter(
-      (u) =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  const paginatedUsers = filteredUsers?.slice(
-    (userPage - 1) * ITEMS_PER_PAGE,
-    userPage * ITEMS_PER_PAGE,
-  );
-  const totalUserPages =
-    Math.ceil((filteredUsers?.length || 0) / ITEMS_PER_PAGE) || 1;
-
-  const filteredAdmins = stats?.users
-    .filter((u) => u.isAdmin)
-    .filter(
-      (u) =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  const paginatedAdmins = filteredAdmins?.slice(
-    (adminPage - 1) * ITEMS_PER_PAGE,
-    adminPage * ITEMS_PER_PAGE,
-  );
-  const totalAdminPages =
-    Math.ceil((filteredAdmins?.length || 0) / ITEMS_PER_PAGE) || 1;
-
-  const filteredOrders = stats?.recentOrders.filter(
-    (o) =>
-      o.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      o.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      o.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      o.status?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-  const paginatedOrders = filteredOrders?.slice(
-    (orderPage - 1) * ITEMS_PER_PAGE,
-    orderPage * ITEMS_PER_PAGE,
-  );
-  const totalOrderPages =
-    Math.ceil((filteredOrders?.length || 0) / ITEMS_PER_PAGE) || 1;
-
-  const filteredProducts = stats?.products.filter((p) =>
-    p.title?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-  const paginatedProducts = filteredProducts?.slice(
-    (productPage - 1) * ITEMS_PER_PAGE,
-    productPage * ITEMS_PER_PAGE,
-  );
-  const totalProductPages =
-    Math.ceil((filteredProducts?.length || 0) / ITEMS_PER_PAGE) || 1;
-
-  const filteredReviews = stats?.reviews.filter(
-    (r) =>
-      r.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.comment?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
-  if (isAuthLoading || loading || !stats) {
+  if (d.isAuthLoading || d.loading || !d.stats) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans">
         <PageHeader
-          title={mounted ? `Welcome, ${user?.name || "Admin"}` : "Admin Panel"}
+          title={
+            d.mounted ? `Welcome, ${d.user?.name || "Admin"}` : "Admin Panel"
+          }
           breadcrumb="Dashboard"
         />
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-32 flex justify-center items-center">
@@ -620,452 +52,288 @@ export default function AdminDashboard() {
     );
   }
 
+  const filteredUsers = d.stats.users
+    .filter((u) => !u.isAdmin)
+    .filter(
+      (u) =>
+        u.name?.toLowerCase().includes(d.searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(d.searchTerm.toLowerCase()),
+    );
+  const paginatedUsers = filteredUsers.slice(
+    (d.userPage - 1) * d.ITEMS_PER_PAGE,
+    d.userPage * d.ITEMS_PER_PAGE,
+  );
+  const totalUserPages =
+    Math.ceil(filteredUsers.length / d.ITEMS_PER_PAGE) || 1;
+
+  const filteredAdmins = d.stats.users
+    .filter((u) => u.isAdmin)
+    .filter(
+      (u) =>
+        u.name?.toLowerCase().includes(d.searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(d.searchTerm.toLowerCase()),
+    );
+  const paginatedAdmins = filteredAdmins.slice(
+    (d.adminPage - 1) * d.ITEMS_PER_PAGE,
+    d.adminPage * d.ITEMS_PER_PAGE,
+  );
+  const totalAdminPages =
+    Math.ceil(filteredAdmins.length / d.ITEMS_PER_PAGE) || 1;
+  const filteredOrders = d.stats.recentOrders.filter(
+    (o) =>
+      o.id?.toLowerCase().includes(d.searchTerm.toLowerCase()) ||
+      o.customer?.name?.toLowerCase().includes(d.searchTerm.toLowerCase()) ||
+      o.customer?.email?.toLowerCase().includes(d.searchTerm.toLowerCase()) ||
+      o.status?.toLowerCase().includes(d.searchTerm.toLowerCase()),
+  );
+
+  const filteredProducts = d.stats.products.filter((p) => {
+    const s = d.searchTerm.toLowerCase();
+    return (
+      p.title?.toLowerCase().includes(s) ||
+      p.sku?.toLowerCase().includes(s) ||
+      p.category?.toLowerCase().includes(s)
+    );
+  });
+  const filteredReviews = d.stats.reviews.filter(
+    (r) =>
+      r.userName?.toLowerCase().includes(d.searchTerm.toLowerCase()) ||
+      r.comment?.toLowerCase().includes(d.searchTerm.toLowerCase()),
+  );
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans text-slate-800">
       <PageHeader
-        title={mounted ? `Welcome, ${user?.name || "Admin"}` : "Admin Panel"}
+        title={
+          d.mounted ? `Welcome, ${d.user?.name || "Admin"}` : "Admin Panel"
+        }
         breadcrumb="Dashboard"
       />
       <div className="max-w-full mx-auto px-4 lg:px-6 pt-2 pb-12">
-        <div className="lg:hidden mb-6 flex items-center justify-between bg-[#0f172a] p-4 rounded-2xl shadow-lg border border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-purple-600 border border-purple-500/20 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-purple-600/20">
-              {user?.name?.[0]?.toUpperCase() || "A"}
-            </div>
-            <div className="overflow-hidden">
-              <span className="text-xl font-bold text-white tracking-tight truncate block">
-                {user?.name || "Admin User"}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/account"
-              className="text-purple-400 hover:text-purple-300 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700 transition-colors"
-              title="Switch to User View"
-            >
-              <UserIcon size={18} />
-            </Link>
-            <select
-              value={activeTab}
-              onChange={(e) => setActiveTab(e.target.value as any)}
-              className="bg-slate-800 text-purple-400 text-xs font-bold py-2 px-3 rounded-lg border border-slate-700 outline-none"
-            >
-              <option value="overview">Overview</option>
-              <option value="products">Products</option>
-              <option value="reviews">Reviews</option>
-              <option value="users">Users</option>
-              <option value="admins">Admins</option>
-              <option value="orders">Orders</option>
-              <option value="categories">Categories</option>
-              <option value="warehouses">Warehouses</option>
-              <option value="inventory">Inventory</option>
-              {user?.adminRole === "super_admin" && (
-                <option value="logs">Activity Logs</option>
-              )}
-            </select>
-          </div>
-        </div>
+        <DashboardHeader
+          user={d.user}
+          activeTab={d.activeTab}
+          setActiveTab={d.setActiveTab}
+          searchTerm={d.searchTerm}
+          setSearchTerm={d.setSearchTerm}
+          showSearch={[
+            "users",
+            "admins",
+            "orders",
+            "products",
+            "reviews",
+          ].includes(d.activeTab)}
+        />
 
         <div className="flex flex-col lg:flex-row gap-0 lg:gap-8">
           <AdminSidebar
-            user={user}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            stats={stats}
+            user={d.user}
+            activeTab={d.activeTab}
+            setActiveTab={(tab) => {
+              d.setActiveTab(tab);
+              setIsSidebarOpen(false);
+            }}
+            stats={d.stats}
           />
 
-          <div id="admin-content-area" className="flex-1 w-full lg:min-w-0">
-            {["users", "admins", "orders", "products", "reviews"].includes(
-              activeTab,
-            ) && (
-              <div className="mb-6">
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition duration-300" />
-                  <div className="relative bg-white rounded-xl shadow-sm border border-slate-200 group-focus-within:border-purple-400 transition-all duration-300">
-                    <Search
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-600 transition-colors duration-300"
-                      size={20}
-                    />
-                    <input
-                      type="text"
-                      placeholder={`Search ${activeTab}...`}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3.5 bg-transparent rounded-xl focus:outline-none text-slate-800 placeholder:text-slate-400"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={() => setSearchTerm("")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 hover:bg-slate-100 rounded-full transition-colors"
-                      >
-                        <X size={16} className="text-slate-400" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+          <div id="admin-content-area" className="flex-1 w-full lg:min-w-0 max-w-full overflow-x-hidden pb-10">
+            {d.activeTab === "overview" && (
+              <OverviewTab
+                stats={d.stats}
+                filteredRevenueData={d.filteredRevenueData}
+                showRevenueDropdown={d.showRevenueDropdown}
+                setShowRevenueDropdown={d.setShowRevenueDropdown}
+                revenueFilter={d.revenueFilter}
+                setRevenueFilter={d.setRevenueFilter}
+                applyRevenueFilter={d.applyRevenueFilter}
+                customStart={d.customStart}
+                setCustomStart={d.setCustomStart}
+                customEnd={d.customEnd}
+                setCustomEnd={d.setCustomEnd}
+                revenueLoading={d.revenueLoading}
+                filteredAovData={d.filteredAovData}
+                showAovDropdown={d.showAovDropdown}
+                setShowAovDropdown={d.setShowAovDropdown}
+                aovFilter={d.aovFilter}
+                setAovFilter={d.setAovFilter}
+                applyAovFilter={d.applyAovFilter}
+                aovCustomStart={d.aovCustomStart}
+                setAovCustomStart={d.setAovCustomStart}
+                aovCustomEnd={d.aovCustomEnd}
+                setAovCustomEnd={d.setAovCustomEnd}
+                aovLoading={d.aovLoading}
+              />
             )}
-
-            {activeTab === "overview" && (
-              <div
-                key="overview"
-                className="space-y-6 animate-in fade-in duration-300"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <RevenueStatCard
-                    totalRevenue={stats.totalRevenue}
-                    grossRevenue={stats.grossRevenue ?? 0}
-                    cancelledRevenue={stats.cancelledRevenue ?? 0}
-                  />
-                  <OrdersStatCard
-                    totalOrders={stats.totalOrders}
-                    cancelledOrders={stats.cancelledOrders ?? 0}
-                  />
-                  <UsersStatCard
-                    totalUsers={stats.totalUsers}
-                    totalAdmins={stats.totalAdmins ?? 0}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <RevenueChart
-                    filteredRevenueData={filteredRevenueData}
-                    showRevenueDropdown={showRevenueDropdown}
-                    setShowRevenueDropdown={setShowRevenueDropdown}
-                    revenueFilter={revenueFilter}
-                    setRevenueFilter={setRevenueFilter}
-                    applyRevenueFilter={applyRevenueFilter}
-                    customStart={customStart}
-                    setCustomStart={setCustomStart}
-                    customEnd={customEnd}
-                    setCustomEnd={setCustomEnd}
-                    revenueLoading={revenueLoading}
-                  />
-                  <TopSellingProducts stats={stats} />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <OrderStatusChart stats={stats} />
-                  <ReviewRatingChart stats={stats} />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <OrderVelocityChart stats={stats} />
-                  <AverageOrderValueChart
-                    stats={stats}
-                    filteredAovData={filteredAovData}
-                    showAovDropdown={showAovDropdown}
-                    setShowAovDropdown={setShowAovDropdown}
-                    aovFilter={aovFilter}
-                    setAovFilter={setAovFilter}
-                    applyAovFilter={applyAovFilter}
-                    aovCustomStart={aovCustomStart}
-                    setAovCustomStart={setAovCustomStart}
-                    aovCustomEnd={aovCustomEnd}
-                    setAovCustomEnd={setAovCustomEnd}
-                    aovLoading={aovLoading}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <TopReviewedProducts stats={stats} />
-                  <ProductSalesChart stats={stats} />
-                </div>
-                <CategorySalesChart stats={stats} />
-                <SentimentChart stats={stats} />
-              </div>
-            )}
-            {activeTab === "products" && (
-              <ProductsTable
+            {d.activeTab === "products" && (
+              <ProductsTabContent
                 allProducts={filteredProducts || []}
-                categories={stats.categories || []}
-                setProductDeleteConfirm={setProductDeleteConfirm}
-                productPage={productPage}
-                setProductPage={setProductPage}
+                categories={d.stats.categories || []}
+                setProductDeleteConfirm={d.setProductDeleteConfirm}
+                productPage={d.productPage}
+                setProductPage={d.setProductPage}
               />
             )}
-            {activeTab === "reviews" && (
-              <AdminReviewList
-                onReviewDeleted={fetchStats}
+            {d.activeTab === "reviews" && (
+              <ReviewsTabContent
+                onReviewDeleted={d.fetchStats}
                 reviews={filteredReviews || []}
-                products={stats.products}
-                users={stats.users}
+                products={d.stats.products}
+                users={d.stats.users}
               />
             )}
-            {activeTab === "users" && (
-              <UsersTable
+            {d.activeTab === "users" && (
+              <UsersTabContent
                 paginatedUsers={paginatedUsers || []}
-                setSelectedUser={setSelectedUser}
-                setViewType={setViewType}
-                setDeleteConfirm={setDeleteConfirm}
-                onPromoteToAdmin={(id, name) => setPromoteConfirm({ id, name })}
-                userPage={userPage}
-                setUserPage={setUserPage}
+                setSelectedUser={d.setSelectedUser}
+                setViewType={d.setViewType}
+                setDeleteConfirm={d.setDeleteConfirm}
+                onPromoteToAdmin={(id, name) =>
+                  d.setPromoteConfirm({ id, name })
+                }
+                userPage={d.userPage}
+                setUserPage={d.setUserPage}
                 totalUserPages={totalUserPages}
-                isSuperAdmin={user?.adminRole === "super_admin"}
+                isSuperAdmin={d.user?.adminRole === "super_admin"}
               />
             )}
-            {activeTab === "admins" && (
-              <AdminsTable
+            {d.activeTab === "admins" && (
+              <AdminsTabContent
                 paginatedAdmins={paginatedAdmins || []}
-                setSelectedUser={setSelectedUser}
-                setViewType={setViewType}
-                setDeleteConfirm={setDeleteConfirm}
-                onRevokeAdmin={(id, name) => setRevokeConfirm({ id, name })}
-                adminPage={adminPage}
-                setAdminPage={setAdminPage}
+                setSelectedUser={d.setSelectedUser}
+                setViewType={d.setViewType}
+                setDeleteConfirm={d.setDeleteConfirm}
+                onRevokeAdmin={(id, name) => d.setRevokeConfirm({ id, name })}
+                adminPage={d.adminPage}
+                setAdminPage={d.setAdminPage}
                 totalAdminPages={totalAdminPages}
-                onAddAdmin={() => setIsAddAdminModalOpen(true)}
-                isSuperAdmin={user?.adminRole === "super_admin"}
+                onAddAdmin={() => d.setIsAddAdminModalOpen(true)}
+                isSuperAdmin={d.user?.adminRole === "super_admin"}
               />
             )}
-            {activeTab === "orders" && (
-              <OrdersTable
+            {d.activeTab === "orders" && (
+              <OrdersTabContent
                 allOrders={filteredOrders || []}
-                handleStatusChange={handleStatusChange}
-                requestCancelOrder={setCancelOrderConfirm}
-                setSelectedOrder={setSelectedOrder}
-                orderPage={orderPage}
-                setOrderPage={setOrderPage}
-                users={stats.users}
-                updatingOrderId={updatingOrderId}
+                handleStatusChange={d.handleStatusChange}
+                requestCancelOrder={d.setCancelOrderConfirm}
+                setSelectedOrder={d.setSelectedOrder}
+                orderPage={d.orderPage}
+                setOrderPage={d.setOrderPage}
+                users={d.stats.users}
+                updatingOrderId={d.updatingOrderId}
               />
             )}
-            {activeTab === "categories" && (
-              <CategoriesTable
-                categories={stats.categories || []}
+            {d.activeTab === "categories" && (
+              <CategoriesTabContent
+                categories={d.stats.categories || []}
+                products={d.stats.products || []}
                 onAdd={() => {
-                  setEditingCategory(null);
-                  setIsCategoryModalOpen(true);
+                  d.setEditingCategory(null);
+                  d.setIsCategoryModalOpen(true);
                 }}
                 onEdit={(cat) => {
-                  setEditingCategory(cat);
-                  setIsCategoryModalOpen(true);
+                  d.setEditingCategory(cat);
+                  d.setIsCategoryModalOpen(true);
                 }}
-                onDelete={(cat) => setCategoryDeleteConfirm(cat)}
+                onDelete={(cat) => d.setCategoryDeleteConfirm(cat)}
               />
             )}
-            {activeTab === "warehouses" && (
-              <WarehousesTable 
-                warehouseData={stats.warehouses || []}
-                onRefresh={fetchStats}
-                showToast={showToast}
+            {d.activeTab === "warehouses" && (
+              <WarehousesTabContent
+                warehouseData={d.stats.warehouses || []}
+                onRefresh={d.fetchStats}
+                showToast={d.showToast}
                 onCreate={() => {
-                  setEditingWarehouse(null);
-                  setIsWarehouseModalOpen(true);
+                  d.setEditingWarehouse(null);
+                  d.setIsWarehouseModalOpen(true);
                 }}
                 onEdit={(wh) => {
-                  setEditingWarehouse(wh);
-                  setIsWarehouseModalOpen(true);
+                  d.setEditingWarehouse(wh);
+                  d.setIsWarehouseModalOpen(true);
                 }}
-                onDelete={(wh) => setWarehouseDeleteConfirm(wh)}
+                onDelete={(wh) => d.setWarehouseDeleteConfirm(wh)}
               />
             )}
-            {activeTab === "inventory" && (
-              <InventoryTable 
-                products={stats.products || []} 
-                onAdjustStock={setSelectedProductForInventory} 
+            {d.activeTab === "inventory" && (
+              <InventoryTabContent
+                products={d.stats.products || []}
+                onAdjustStock={d.setSelectedProductForInventory}
               />
             )}
-            {activeTab === "logs" && user?.adminRole === "super_admin" && (
-              <ActivityLogsTable />
+            {d.activeTab === "logs" && d.user?.adminRole === "super_admin" && (
+              <ActivityLogsTabContent />
             )}
           </div>
         </div>
       </div>
-      {toast && (
+
+      {d.toast && (
         <div
           className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-semibold animate-in slide-in-from-bottom-4 duration-300 max-w-sm ${
-            toast.type === "success" ? "bg-emerald-600" : "bg-red-600"
+            d.toast.type === "success" ? "bg-emerald-600" : "bg-red-600"
           }`}
         >
-          {toast.type === "success" ? (
+          {d.toast.type === "success" ? (
             <CheckCircle size={18} className="shrink-0" />
           ) : (
             <X size={18} className="shrink-0" />
           )}
-          <span>{toast.message}</span>
+          <span>{d.toast.message}</span>
           <button
-            onClick={() => setToast(null)}
+            onClick={() => d.setToast(null)}
             className="ml-2 opacity-70 hover:opacity-100 transition-opacity shrink-0"
           >
             <X size={14} />
           </button>
         </div>
       )}
-      <AddAdminModal
-        isOpen={isAddAdminModalOpen}
-        onClose={() => setIsAddAdminModalOpen(false)}
-        onSuccess={fetchStats}
-        showToast={showToast}
-      />
 
-      <CategoryModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
-        editingCategory={editingCategory}
-        onSaved={fetchStats}
-        showToast={showToast}
-      />
-      <UserModal
-        selectedUser={selectedUser}
-        onClose={() => setSelectedUser(null)}
-        viewType={viewType}
-      />
-      <OrderModal
-        selectedOrder={selectedOrder}
-        onClose={() => setSelectedOrder(null)}
-      />
-      <DeleteConfirmationModal
-        isOpen={!!productDeleteConfirm}
-        onClose={() => setProductDeleteConfirm(null)}
-        onConfirm={() =>
-          productDeleteConfirm && handleDeleteProduct(productDeleteConfirm.id)
-        }
-        title="Delete Product?"
-        message={`Remove "${productDeleteConfirm?.title}" from store?`}
-        isLoading={isDeletingProduct}
-      />
-      <DeleteConfirmationModal
-        isOpen={!!deleteConfirm}
-        onClose={() => setDeleteConfirm(null)}
-        onConfirm={() => deleteConfirm && handleDeleteUser(deleteConfirm)}
-        title="Delete User?"
-        message={
-          <>
-            Are you sure you want to delete{" "}
-            <span className="font-bold text-slate-900">
-              {stats?.users.find((u) => u.id === deleteConfirm)?.name ||
-                "this user"}
-            </span>
-            ? This action cannot be undone.
-          </>
-        }
-        isLoading={isDeleting}
-      />
-      <DeleteConfirmationModal
-        isOpen={!!promoteConfirm}
-        onClose={() => setPromoteConfirm(null)}
-        onConfirm={() =>
-          promoteConfirm && handlePromoteToAdmin(promoteConfirm.id)
-        }
-        title="Promote to Admin?"
-        message={
-          <>
-            Promote{" "}
-            <span className="font-bold text-slate-900">
-              {promoteConfirm?.name}
-            </span>{" "}
-            to Administrator? They will have full access to the admin dashboard.
-          </>
-        }
-        confirmLabel="Promote"
-        confirmClassName="flex-1 px-4 py-3 bg-linear-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl hover:opacity-90"
-        isLoading={isPromoting}
-        icon={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-        }
-      />
-      <DeleteConfirmationModal
-        isOpen={!!revokeConfirm}
-        onClose={() => setRevokeConfirm(null)}
-        onConfirm={() => revokeConfirm && handleRevokeAdmin(revokeConfirm.id)}
-        title="Revoke Admin Access?"
-        message={
-          <>
-            Remove admin privileges from{" "}
-            <span className="font-bold text-slate-900">
-              {revokeConfirm?.name}
-            </span>
-            ? They will become a regular user but their account will remain.
-          </>
-        }
-        confirmLabel="Revoke"
-        confirmClassName="flex-1 px-4 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600"
-        isLoading={isRevoking}
-        icon={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            <line x1="9" y1="9" x2="15" y2="15" />
-            <line x1="15" y1="9" x2="9" y2="15" />
-          </svg>
-        }
-      />
-      <DeleteConfirmationModal
-        isOpen={!!categoryDeleteConfirm}
-        onClose={() => setCategoryDeleteConfirm(null)}
-        onConfirm={() =>
-          categoryDeleteConfirm &&
-          handleDeleteCategory(categoryDeleteConfirm._id)
-        }
-        title="Delete Category?"
-        message={`Remove the "${categoryDeleteConfirm?.name}" category? Products assigned to this category will become uncategorized.`}
-        isLoading={isDeletingCategory}
-      />
-
-      {cancelOrderConfirm && (
-        <CancelOrderConfirmModal
-          isOpen={!!cancelOrderConfirm}
-          order={cancelOrderConfirm}
-          onClose={() => setCancelOrderConfirm(null)}
-          onConfirm={handleCancelOrder}
-          isLoading={isCancellingOrder}
-        />
-      )}
-      
-      {selectedProductForInventory && (
-        <StockAdjustmentModal
-          product={selectedProductForInventory}
-          onClose={() => setSelectedProductForInventory(null)}
-          onSuccess={() => {
-            fetchStats();
-            setSelectedProductForInventory(null);
-            showToast("Inventory adjusted successfully.", "success");
-          }}
-        />
-      )}
-
-      <WarehouseModal
-        isOpen={isWarehouseModalOpen}
-        onClose={() => setIsWarehouseModalOpen(false)}
-        editingWarehouse={editingWarehouse}
-        onSaved={fetchStats}
-        showToast={showToast}
-      />
-
-      <DeleteConfirmationModal
-        isOpen={!!warehouseDeleteConfirm}
-        onClose={() => setWarehouseDeleteConfirm(null)}
-        onConfirm={() =>
-          warehouseDeleteConfirm &&
-          handleDeleteWarehouse(warehouseDeleteConfirm.id)
-        }
-        title="Delete Warehouse?"
-        message={`Delete "${warehouseDeleteConfirm?.warehouseName}"? Removing this warehouse will completely delete it from the system.`}
-        isLoading={isDeletingWarehouse}
+      <DashboardModals
+        stats={d.stats}
+        fetchStats={d.fetchStats}
+        showToast={d.showToast}
+        isAddAdminModalOpen={d.isAddAdminModalOpen}
+        setIsAddAdminModalOpen={d.setIsAddAdminModalOpen}
+        isCategoryModalOpen={d.isCategoryModalOpen}
+        setIsCategoryModalOpen={d.setIsCategoryModalOpen}
+        editingCategory={d.editingCategory}
+        handleDeleteCategory={d.handleDeleteCategory}
+        isDeletingCategory={d.isDeletingCategory}
+        categoryDeleteConfirm={d.categoryDeleteConfirm}
+        setCategoryDeleteConfirm={d.setCategoryDeleteConfirm}
+        selectedUser={d.selectedUser}
+        setSelectedUser={d.setSelectedUser}
+        viewType={d.viewType}
+        deleteConfirm={d.deleteConfirm}
+        setDeleteConfirm={d.setDeleteConfirm}
+        handleDeleteUser={d.handleDeleteUser}
+        isDeleting={d.isDeleting}
+        promoteConfirm={d.promoteConfirm}
+        setPromoteConfirm={d.setPromoteConfirm}
+        handlePromoteToAdmin={d.handlePromoteToAdmin}
+        isPromoting={d.isPromoting}
+        revokeConfirm={d.revokeConfirm}
+        setRevokeConfirm={d.setRevokeConfirm}
+        handleRevokeAdmin={d.handleRevokeAdmin}
+        isRevoking={d.isRevoking}
+        selectedOrder={d.selectedOrder}
+        setSelectedOrder={d.setSelectedOrder}
+        cancelOrderConfirm={d.cancelOrderConfirm}
+        setCancelOrderConfirm={d.setCancelOrderConfirm}
+        handleCancelOrder={d.handleCancelOrder}
+        isCancellingOrder={d.isCancellingOrder}
+        productDeleteConfirm={d.productDeleteConfirm}
+        setProductDeleteConfirm={d.setProductDeleteConfirm}
+        handleDeleteProduct={d.handleDeleteProduct}
+        isDeletingProduct={d.isDeletingProduct}
+        selectedProductForInventory={d.selectedProductForInventory}
+        setSelectedProductForInventory={d.setSelectedProductForInventory}
+        isWarehouseModalOpen={d.isWarehouseModalOpen}
+        setIsWarehouseModalOpen={d.setIsWarehouseModalOpen}
+        editingWarehouse={d.editingWarehouse}
+        warehouseDeleteConfirm={d.warehouseDeleteConfirm}
+        setWarehouseDeleteConfirm={d.setWarehouseDeleteConfirm}
+        handleDeleteWarehouse={d.handleDeleteWarehouse}
+        isDeletingWarehouse={d.isDeletingWarehouse}
       />
     </div>
   );

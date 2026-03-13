@@ -10,6 +10,7 @@ import { ChevronRight, ShoppingCart, Trash2 } from "lucide-react";
 import db from "@data/db.json";
 import Toast from "@/components/products/Toast";
 import Loading from "@/components/ui/Loading";
+import PageHeader from "@/components/ui/PageHeader";
 const pageConfig = {
   backgroundImage: db.cart.backgroundImage,
   breadcrumbs: {
@@ -31,6 +32,9 @@ const pageConfig = {
 
 export default function WishlistPage() {
   const wishlistItems = useSelector((state: any) => state.wishlist.items);
+  const [isClient, setIsClient] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -41,6 +45,26 @@ export default function WishlistPage() {
     type: "add",
   });
 
+  useEffect(() => {
+    setIsClient(true);
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/public/content?section=products");
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data.products || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+    const interval = setInterval(fetchProducts, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const showToast = (message: string, type: "add" | "remove") => {
     setToast({ show: true, message, type });
     setTimeout(() => {
@@ -48,13 +72,7 @@ export default function WishlistPage() {
     }, 3000);
   };
 
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
+  if (!isClient || loading) {
     return (
       <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
         <Loading />
@@ -64,19 +82,13 @@ export default function WishlistPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
-      <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
-        <Image
-          src={pageConfig.backgroundImage}
-          alt="Hero Background"
-          fill
-          className="object-fill opacity-100"
-          priority
-        />
-        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent" />
-      </div>
+      <PageHeader
+        title={pageConfig.breadcrumbs.current}
+        breadcrumb={pageConfig.breadcrumbs.current}
+        backgroundImage={pageConfig.backgroundImage}
+      />
 
-      <div className="relative z-10 pt-40">
-        <WishlistHeader />
+      <div className="relative z-10">
 
         <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
           {wishlistItems.length === 0 ? (
@@ -99,13 +111,17 @@ export default function WishlistPage() {
                   </span>
                 </div>
                 <div className="space-y-12">
-                  {wishlistItems.map((item: WishlistItem) => (
-                    <WishlistItemComponent
-                      key={item.id}
-                      item={item}
-                      onToast={showToast}
-                    />
-                  ))}
+                  {wishlistItems.map((item: WishlistItem) => {
+                    const productData = products.find((p) => p.id === item.id);
+                    return (
+                      <WishlistItemComponent
+                        key={item.id}
+                        item={item}
+                        stockQuantity={productData?.stockQuantity}
+                        onToast={showToast}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -122,26 +138,6 @@ export default function WishlistPage() {
   );
 }
 
-function WishlistHeader() {
-  return (
-    <div className="w-full pb-20 mt-50 flex flex-col items-center justify-center">
-      <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4">
-        {pageConfig.breadcrumbs.current}
-      </h1>
-      <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
-      <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
-        <Link href="/" className="hover:text-blue-600 transition-colors">
-          {pageConfig.breadcrumbs.home}
-        </Link>
-        <div className="flex text-blue-400">
-          <ChevronRight size={14} strokeWidth={2.5} />
-          <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
-        </div>
-        <span className="text-slate-900">{pageConfig.breadcrumbs.current}</span>
-      </div>
-    </div>
-  );
-}
 
 function EmptyWishlist() {
   return (
@@ -159,9 +155,16 @@ function EmptyWishlist() {
   );
 }
 
-function AddToCartButton({ onAdd }: { onAdd: () => void }) {
+function AddToCartButton({
+  onAdd,
+  disabled,
+}: {
+  onAdd: () => void;
+  disabled?: boolean;
+}) {
   const [adding, setAdding] = useState(false);
   const handleClick = () => {
+    if (disabled || adding) return;
     setAdding(true);
     onAdd();
     setTimeout(() => setAdding(false), 700);
@@ -169,8 +172,12 @@ function AddToCartButton({ onAdd }: { onAdd: () => void }) {
   return (
     <button
       onClick={handleClick}
-      disabled={adding}
-      className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-500 to-cyan-400 text-white text-sm font-bold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all disabled:opacity-80 disabled:cursor-not-allowed"
+      disabled={adding || disabled}
+      className={`flex items-center gap-2 px-5 py-2.5 text-white text-sm font-bold rounded-full shadow-md transition-all ${
+        disabled
+          ? "bg-slate-300 cursor-not-allowed"
+          : "bg-linear-to-r from-blue-500 to-cyan-400 hover:shadow-lg hover:scale-105"
+      } disabled:opacity-80`}
     >
       {adding ? (
         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -178,7 +185,7 @@ function AddToCartButton({ onAdd }: { onAdd: () => void }) {
         <ShoppingCart size={16} />
       )}
       <span className="hidden lg:inline">
-        {adding ? "Adding..." : "Add to Cart"}
+        {disabled ? "Out of Stock" : adding ? "Adding..." : "Add to Cart"}
       </span>
     </button>
   );
@@ -186,9 +193,11 @@ function AddToCartButton({ onAdd }: { onAdd: () => void }) {
 
 function WishlistItemComponent({
   item,
+  stockQuantity,
   onToast,
 }: {
   item: WishlistItem;
+  stockQuantity?: number;
   onToast: (msg: string, type: "add" | "remove") => void;
 }) {
   const dispatch = useDispatch();
@@ -226,11 +235,18 @@ function WishlistItemComponent({
                 src={item.image}
                 alt={item.title}
                 fill
-                className="object-contain p-2"
+                className={`object-contain p-2 ${stockQuantity === 0 ? "grayscale opacity-60" : ""}`}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50">
                 No Img
+              </div>
+            )}
+            {stockQuantity === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                <span className="bg-red-500/90 text-[8px] text-white font-bold px-1 py-0.5 rounded rotate-12">
+                  OUT OF STOCK
+                </span>
               </div>
             )}
           </div>
@@ -253,12 +269,21 @@ function WishlistItemComponent({
         </div>
         <div className="w-full md:w-1/6 flex justify-between md:block">
           <span className="md:hidden text-slate-500 font-medium">Status: </span>
-          <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">
-            In Stock
-          </span>
+          {stockQuantity === 0 ? (
+            <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider">
+              Out Of Stock
+            </span>
+          ) : (
+            <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">
+              In Stock
+            </span>
+          )}
         </div>
         <div className="w-full md:w-1/6 flex items-center justify-between md:justify-end gap-4 mt-4 md:mt-0">
-          <AddToCartButton onAdd={handleAddToCart} />
+          <AddToCartButton
+            onAdd={handleAddToCart}
+            disabled={stockQuantity === 0}
+          />
 
           <button
             onClick={handleRemove}

@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 import {
   Facebook,
@@ -6,6 +9,7 @@ import {
   Linkedin,
   Mail,
   Phone,
+  ChevronDown,
 } from "lucide-react";
 import db from "@data/db.json";
 
@@ -21,48 +25,35 @@ function Footer() {
   };
 
   return (
-    <footer className="relative bg-[#0a0a0a] mt-24 sm:mt-32 px-4 sm:px-8 lg:px-20 pt-60 sm:pt-72 lg:pt-90 pb-12 font-sans">
+    <footer className="relative bg-[#0a0a0a] mt-24 sm:mt-32 px-4 sm:px-8 lg:px-20 pt-32 sm:pt-40 lg:pt-44 pb-12 font-sans">
       <div className="absolute left-0 right-0 -top-32 px-4 md:px-6 z-30">
-        <div className="max-w-6xl mx-auto">
-          <div className="relative bg-linear-to-r from-[#ff6b7a] via-[#c445f5] to-[#4a90f2] rounded-4xl p-8 md:p-12 lg:px-16 lg:py-14 shadow-2xl overflow-visible">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
-              <div className="max-w-lg">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-white mb-4 leading-tight">
-                  {newsletter.titlePart1}
-                  {newsletter.titlePart2}
-                </h2>
-                <p className="text-white/90 mb-8 text-base md:text-lg">
-                  {newsletter.description}
-                </p>
+        <div className="max-w-2xl mx-auto">
+          <div className="relative bg-linear-to-br from-[#6d05ff] to-[#06b3ca] rounded-4xl p-6 md:px-12 md:py-8 lg:py-10 shadow-2xl overflow-hidden shadow-orange-500/20">
+            <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 leading-tight tracking-tight">
+                {newsletter.titlePart1} {newsletter.titlePart2}
+              </h2>
+              <p className="text-white/90 mb-6 text-sm md:text-base max-w-2xl font-medium">
+                {newsletter.description}
+              </p>
 
-                <form className="flex flex-col sm:flex-row gap-3">
-                  <input
-                    type="email"
-                    placeholder={newsletter.placeholder}
-                    className="flex-1 px-6 py-4 rounded-full bg-white/20 border border-white/30 placeholder-white/70 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-md transition-all"
-                  />
-                  <button className="px-8 py-4 bg-[#ff7a6e] hover:bg-[#ff6b5e] text-white font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap text-sm cursor-pointer">
-                    {newsletter.buttonText}
-                  </button>
-                </form>
-              </div>
-            </div>
-            <div className="absolute -top-27 right-0 lg:right-12 w-64 h-80 md:w-80 md:h-112 z-20 hidden md:block pointer-events-none">
-              <Image
-                src={newsletter.modelImage}
-                alt="Subscribe Model"
-                fill
-                className="object-contain object-bottom"
-                sizes="(max-width: 768px) 100vw, 320px"
-                unoptimized
-              />
+              <form className="flex flex-col sm:flex-row gap-4 w-full max-w-lg">
+                <input
+                  type="email"
+                  placeholder={newsletter.placeholder}
+                  className="flex-1 px-8 py-4 rounded-full bg-white/10 border border-white/20 placeholder-white/60 text-white text-base focus:outline-none focus:ring-2 focus:ring-white/40 backdrop-blur-xl transition-all shadow-inner"
+                />
+                <button className="px-10 py-4 bg-white text-[#06b3ca] font-black rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 whitespace-nowrap text-base cursor-pointer">
+                  {newsletter.buttonText}
+                </button>
+              </form>
             </div>
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-6 relative z-10 pt-32 lg:pt-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-16 border-b border-gray-800 pb-12">
-          <div className="lg:col-span-1">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 pt-24 sm:pt-16 lg:pt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10 mb-12 lg:mb-16 border-b border-gray-800 pb-8 lg:pb-12">
+          <div className="md:col-span-2 lg:col-span-1">
             <div className="mb-6 flex items-center gap-2">
               <Image
                 src={brand.logo}
@@ -98,38 +89,7 @@ function Footer() {
             <FooterLinkColumn key={idx} title={col.title} links={col.links} />
           ))}
           <div className="lg:col-span-1">
-            <h4 className="text-white font-bold mb-6">
-              {contact.title}
-              <span className="block w-8 h-0.5 bg-[#ff5e14] mt-2 rounded-full"></span>
-            </h4>
-            <ul className="space-y-4 text-sm text-gray-400">
-              <li className="leading-relaxed">
-                {contact.address.map((line: string, i: number) => (
-                  <span key={i}>
-                    {line}
-                    <br />
-                  </span>
-                ))}
-              </li>
-              <li className="flex items-center gap-2 group">
-                <Mail className="w-4 h-4 text-[#ff5e14]" />
-                <a
-                  href={`mailto:${contact.email}`}
-                  className="hover:text-white transition-colors"
-                >
-                  {contact.email}
-                </a>
-              </li>
-              <li className="flex items-center gap-2 group">
-                <Phone className="w-4 h-4 text-[#ff5e14]" />
-                <a
-                  href={`tel:${contact.phoneLink}`}
-                  className="text-lg text-white font-medium hover:text-[#ff5e14] transition-colors"
-                >
-                  {contact.phone}
-                </a>
-              </li>
-            </ul>
+            <FooterContactColumn contact={contact} />
           </div>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -164,24 +124,107 @@ const FooterLinkColumn = ({
   title: string;
   links: { label: string; url: string }[];
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div>
-      <h4 className="text-white font-bold mb-6">
-        {title}
-        <span className="block w-8 h-0.5 bg-[#ff5e14] mt-2 rounded-full"></span>
-      </h4>
-      <ul className="space-y-3 text-sm text-gray-400">
-        {links.map((item: { label: string; url: string }) => (
-          <li key={item.label}>
+    <div className="border-b border-gray-800/50 md:border-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between md:block py-4 md:py-0 text-left cursor-pointer group"
+      >
+        <h4 className="text-white font-bold md:mb-6 flex flex-col">
+          {title}
+          <span className="hidden md:block w-8 h-0.5 bg-[#ff5e14] mt-2 rounded-full"></span>
+        </h4>
+        <ChevronDown
+          size={18}
+          className={`text-gray-500 transition-transform duration-300 md:hidden ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden md:overflow-visible transition-all duration-300 ${isOpen ? "max-h-64 pb-6" : "max-h-0 md:max-h-none"}`}
+      >
+        <ul className="space-y-3 text-sm text-gray-400">
+          {links.map((item: { label: string; url: string }) => (
+            <li key={item.label}>
+              <a
+                href={item.url}
+                className="relative group transition-colors inline-block"
+              >
+                <span className="text-gray-400 group-hover:text-[#ff5e14] transition-colors">
+                  {item.label}
+                </span>
+                <span className="absolute left-0 bottom-0 w-full h-[1.5px] bg-[#ff5e14] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+const FooterContactColumn = ({ contact }: { contact: any }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-gray-800/50 md:border-0 last:border-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between md:block py-4 md:py-0 text-left cursor-pointer group"
+      >
+        <h4 className="text-white font-bold md:mb-6 flex flex-col">
+          {contact.title}
+          <span className="hidden md:block w-8 h-0.5 bg-[#ff5e14] mt-2 rounded-full"></span>
+        </h4>
+        <ChevronDown
+          size={18}
+          className={`text-gray-500 transition-transform duration-300 md:hidden ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden md:overflow-visible transition-all duration-300 ${isOpen ? "max-h-64 pb-6" : "max-h-0 md:max-h-none"}`}
+      >
+        <ul className="space-y-4 text-sm text-gray-400">
+          <li className="leading-relaxed">
+            {contact.address.map((line: string, i: number) => (
+              <div
+                key={i}
+                className="relative group/addr inline-block w-fit mr-2"
+              >
+                <span className="relative z-10 transition-colors group-hover/addr:text-[#ff5e14]">
+                  {line}
+                </span>
+                <span className="absolute left-0 bottom-0 w-full h-px bg-[#ff5e14] scale-x-0 group-hover/addr:scale-x-100 origin-left transition-transform duration-300 ease-out" />
+              </div>
+            ))}
+          </li>
+          <li className="flex items-center gap-2 group/link">
+            <Mail className="w-4 h-4 text-[#ff5e14]" />
             <a
-              href={item.url}
-              className="hover:text-[#ff5e14] transition-colors inline-block"
+              href={`mailto:${contact.email}`}
+              className="relative transition-colors"
             >
-              {item.label}
+              <span className="hover:text-[#ff5e14] transition-colors">
+                {contact.email}
+              </span>
+              <span className="absolute left-0 bottom-0 w-full h-px bg-[#ff5e14] scale-x-0 group-hover/link:scale-x-100 origin-left transition-transform duration-300 ease-out" />
             </a>
           </li>
-        ))}
-      </ul>
+          <li className="flex items-center gap-2 group/link">
+            <Phone className="w-4 h-4 text-[#ff5e14]" />
+            <a
+              href={`tel:${contact.phoneLink}`}
+              className="relative transition-colors"
+            >
+              <span className="text-lg text-white font-medium hover:text-[#ff5e14] transition-colors">
+                {contact.phone}
+              </span>
+              <span className="absolute left-0 bottom-0 w-full h-[1.5px] bg-[#ff5e14] scale-x-0 group-hover/link:scale-x-100 origin-left transition-transform duration-300 ease-out" />
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 };

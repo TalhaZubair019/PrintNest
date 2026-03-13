@@ -10,6 +10,7 @@ import { addToCart } from "@/redux/CartSlice";
 import { toggleWishlist } from "@/redux/WishListSlice";
 import { RootState } from "@/redux/Store";
 import Toast from "@/components/products/Toast";
+import PageHeader from "@/components/ui/PageHeader";
 
 interface Review {
   id: string;
@@ -98,6 +99,8 @@ export default function ProductPage() {
 
     if (slug) {
       fetchProductAndReviews();
+      const interval = setInterval(fetchProductAndReviews, 30000);
+      return () => clearInterval(interval);
     }
   }, [slug]);
 
@@ -273,20 +276,17 @@ export default function ProductPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-800">
-      <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-linear-to-b from-amber-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
-        <Image
-          src="https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/breadcrumb-bg.webp"
-          alt="Product Background"
-          fill
-          className="object-fill opacity-80"
-          priority
-        />
-        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
-      </div>
+      <PageHeader
+        title={product.title}
+        breadcrumbs={[
+          { label: "Shop", href: "/shop" },
+          { label: product.title },
+        ]}
+        backgroundImage="https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/breadcrumb-bg.webp"
+      />
 
-      <div className="relative z-10 pt-40">
-        <div className="max-w-6xl mx-auto px-4 mb-20">
+      <div className="relative z-10">
+        <div className="max-w-6xl mx-auto px-4 mt-12 mb-8">
           <button
             onClick={() => router.back()}
             className="group flex items-center gap-2 text-slate-600 hover:text-purple-600 font-semibold transition-all duration-300 bg-white/50 backdrop-blur-sm px-5 py-2.5 rounded-full border border-slate-200 shadow-sm hover:shadow-md hover:-translate-x-1"
@@ -299,35 +299,8 @@ export default function ProductPage() {
           </button>
         </div>
 
-        <div className="w-full pb-10 flex flex-col items-center justify-center">
-          <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4 text-center px-4">
-            {product.title}
-          </h1>
-          <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10" />
-          <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
-            <Link href="/" className="hover:text-purple-600 transition-colors">
-              Home
-            </Link>
-            <div className="flex text-purple-400">
-              <ChevronRight size={14} strokeWidth={2.5} />
-            </div>
-            <Link
-              href="/shop"
-              className="hover:text-purple-600 transition-colors"
-            >
-              Shop
-            </Link>
-            <div className="flex text-purple-400">
-              <ChevronRight size={14} strokeWidth={2.5} />
-            </div>
-            <span className="text-slate-900 truncate max-w-[200px]">
-              {product.title}
-            </span>
-          </div>
-        </div>
-
-        <section className="max-w-6xl mx-auto px-4 pb-16 mt-12">
-          <div className="grid md:grid-cols-2 gap-12 mb-12">
+        <section className="max-w-6xl mx-auto px-6 sm:px-8 pb-16 mt-8 md:mt-12">
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mb-12">
             <div className="relative w-full aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
               <Image
                 src={product.image}
@@ -339,7 +312,7 @@ export default function ProductPage() {
             </div>
 
             <div>
-              <h1 className="text-4xl font-bold text-black mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
                 {product.title}
               </h1>
               <div className="flex items-center gap-2 mb-4">
@@ -364,7 +337,7 @@ export default function ProductPage() {
 
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex flex-col">
-                  <span className="text-3xl font-bold text-blue-600">
+                  <span className="text-2xl md:text-3xl font-bold text-blue-600">
                     {product.price}
                   </span>
                 </div>
@@ -396,7 +369,7 @@ export default function ProductPage() {
                 })()}
               </div>
 
-              <p className="text-gray-600 mb-8 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 mb-8 leading-relaxed">
                 {product.description ||
                   "Premium quality product perfect for your needs. Customizable and high-quality printing."}
               </p>
@@ -431,7 +404,7 @@ export default function ProductPage() {
                       +
                     </button>
                   </div>
-                  <span className="text-lg font-semibold text-purple-600">
+                  <span className="text-base sm:text-lg font-semibold text-purple-600">
                     Total: $
                     {(
                       parseFloat(
@@ -441,7 +414,7 @@ export default function ProductPage() {
                   </span>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     onClick={handleAddToCart}
                     disabled={
@@ -449,7 +422,7 @@ export default function ProductPage() {
                       !product.stockQuantity ||
                       product.stockQuantity === 0
                     }
-                    className="flex-1 px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-500"
+                    className="w-full sm:flex-1 px-6 py-3.5 bg-linear-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-full hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-500"
                   >
                     {addingToCart ? (
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -462,9 +435,10 @@ export default function ProductPage() {
                   </button>
                   <button
                     onClick={handleToggleWishlist}
-                    className={`px-6 py-3 font-bold rounded-full transition-all ${isInWishlist ? "bg-red-500 text-white hover:bg-red-600" : "border-2 border-gray-300 text-black hover:border-red-500"}`}
+                    className={`w-full sm:w-auto px-8 py-3.5 font-bold rounded-full transition-all flex items-center justify-center gap-2 ${isInWishlist ? "bg-red-500 text-white hover:bg-red-600 shadow-md" : "border-2 border-gray-300 text-black hover:border-red-500 hover:text-red-500"}`}
                   >
-                    {isInWishlist ? "♥ Wishlist" : "♡ Wishlist"}
+                    <span>{isInWishlist ? "♥" : "♡"}</span>
+                    <span>Wishlist</span>
                   </button>
                 </div>
               </div>
@@ -485,12 +459,12 @@ export default function ProductPage() {
           </div>
 
           <div className="mt-20 pt-12 border-t border-gray-200">
-            <h2 className="text-3xl font-bold text-black mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-black mb-10">
               Customer Reviews
             </h2>
 
-            <div className="grid md:grid-cols-2 gap-12">
-              <div className="order-2 md:order-1">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
+              <div className="order-2 lg:order-1">
                 <h3 className="text-xl font-bold mb-6" id="review-form">
                   {editingReviewId ? "Edit Your Review" : "Write a Review"}
                 </h3>
@@ -509,7 +483,7 @@ export default function ProductPage() {
                 ) : (
                   <form
                     onSubmit={handleSubmitReview}
-                    className="space-y-5 bg-gray-50 p-8 rounded-2xl"
+                    className="space-y-5 bg-gray-50 p-6 sm:p-8 rounded-2xl border border-gray-100"
                   >
                     <div>
                       <label className="block font-semibold mb-3 text-slate-800">
@@ -575,7 +549,7 @@ export default function ProductPage() {
                 )}
               </div>
 
-              <div className="order-1 md:order-2">
+              <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-4 mb-8">
                   <h3 className="text-xl font-bold">
                     {reviews.length}{" "}
@@ -600,11 +574,11 @@ export default function ProductPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-6 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
+                  <div className="space-y-6 max-h-[500px] lg:max-h-[600px] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar">
                     {reviews.map((review) => (
                       <div
                         key={review.id}
-                        className={`bg-white p-6 rounded-2xl border shadow-xs transition-all ${editingReviewId === review.id ? "border-blue-500 ring-2 ring-blue-100" : "border-gray-100"}`}
+                        className={`bg-white p-5 sm:p-6 rounded-2xl border shadow-xs transition-all ${editingReviewId === review.id ? "border-blue-500 ring-2 ring-blue-100" : "border-gray-100"}`}
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div className="font-semibold text-slate-900">

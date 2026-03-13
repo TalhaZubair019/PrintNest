@@ -5,7 +5,6 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Search,
   ShoppingCart,
   User,
   Heart,
@@ -74,8 +73,8 @@ function Navbar() {
 
   return (
     <header className="absolute top-0 left-0 w-full z-50 font-sans bg-transparent">
-      <div className="container mx-auto px-4 sm:px-8 lg:px-16 pt-4 sm:pt-6 pb-3 flex items-center justify-between gap-3 relative">
-        <Link href="/" className="shrink-0">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 pt-4 sm:pt-6 pb-3 flex items-center justify-between gap-4 lg:gap-8 relative w-full">
+        <Link href="/" className="shrink-0 relative z-10">
           <Image
             src={navbarData.assets.logo.src}
             alt={navbarData.assets.logo.alt}
@@ -86,20 +85,26 @@ function Navbar() {
           />
         </Link>
 
-        <div className="hidden sm:flex flex-1 max-w-3xl mx-4 lg:mx-12">
-          <div className="relative group w-full">
-            <input
-              type="text"
-              placeholder={navbarData.search.placeholder}
-              className="w-full bg-[#F8FAFC] border border-transparent hover:bg-white focus:bg-white text-slate-600 rounded-full py-3 sm:py-3.5 px-6 sm:px-8 pr-14 outline-none focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-400 shadow-sm text-sm sm:text-base"
-            />
-            <button className="absolute right-1.5 top-1.5 bg-[#FF6B6B] hover:bg-[#ff5252] text-white p-2 sm:p-2.5 rounded-full transition-colors shadow-md cursor-pointer">
-              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={3} />
-            </button>
-          </div>
+        <div className="hidden min-[830px]:flex flex-1 justify-center px-4">
+          <nav>
+            <ul className="flex flex-wrap items-center justify-center gap-2 min-[830px]:gap-3 lg:gap-8 xl:gap-10">
+              {navbarData.navigation.map(
+                (item: (typeof navbarData.navigation)[0], index: number) => (
+                  <li key={index}>
+                    <Link
+                      href={item.href}
+                      className="text-[15px] lg:text-[18px] text-[#333333] hover:text-blue-800 transition-colors duration-200"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ),
+              )}
+            </ul>
+          </nav>
         </div>
 
-        <div className="hidden sm:flex items-center gap-3 relative">
+        <div className="hidden min-[830px]:flex items-center gap-2 lg:gap-3 relative">
           <div
             className="relative"
             onMouseEnter={() => setIsCartOpen(true)}
@@ -309,7 +314,7 @@ function Navbar() {
             </AnimatePresence>
           </div>
         </div>
-        <div className="flex sm:hidden items-center gap-2">
+        <div className="flex min-[830px]:hidden items-center gap-2">
           <Link
             href="/cart"
             className="relative w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-slate-700"
@@ -330,122 +335,123 @@ function Navbar() {
           </button>
         </div>
       </div>
-      <div className="hidden sm:block container mx-auto px-4 sm:px-8 lg:px-16 py-4">
-        <nav>
-          <ul className="flex flex-wrap items-center justify-center gap-4 md:gap-8 lg:gap-10">
-            {navbarData.navigation.map(
-              (item: (typeof navbarData.navigation)[0], index: number) => (
-                <li key={index}>
-                  <Link
-                    href={item.href}
-                    className="text-[15px] lg:text-[18px] text-[#333333] hover:text-blue-800 transition-colors duration-200"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ),
-            )}
-          </ul>
-        </nav>
-      </div>
 
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-100 bg-white flex flex-col sm:hidden">
-          <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100">
-            <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <Image
-                src={navbarData.assets.logo.src}
-                alt={navbarData.assets.logo.alt}
-                width={navbarData.assets.logo.width}
-                height={navbarData.assets.logo.height}
-                className="h-8 w-auto object-contain"
-              />
-            </Link>
-            <button
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-700"
-              aria-label="Close menu"
+              className="fixed inset-0 bg-black/60 z-100 min-[830px]:hidden backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-[300px] sm:w-[350px] bg-white z-101 flex flex-col min-[830px]:hidden shadow-2xl"
             >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="px-5 py-4 border-b border-slate-100">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={navbarData.search.placeholder}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-600 rounded-full py-3 px-6 pr-14 outline-none focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-400 text-sm"
-              />
-              <button className="absolute right-1.5 top-1.5 bg-[#FF6B6B] text-white p-2 rounded-full">
-                <Search className="w-4 h-4" strokeWidth={3} />
-              </button>
-            </div>
-          </div>
-          <nav className="flex-1 overflow-y-auto px-5 py-6">
-            <ul className="space-y-1">
-              {navbarData.navigation.map(
-                (item: (typeof navbarData.navigation)[0], index: number) => (
-                  <li key={index}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block py-3 px-4 text-lg font-medium text-slate-700 hover:text-blue-700 hover:bg-blue-50 rounded-xl transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ),
-              )}
-            </ul>
-          </nav>
-          <div className="border-t border-slate-100 px-5 py-5 flex items-center gap-4">
-            <Link
-              href="/wishlist"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="relative w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700"
-            >
-              <Heart className="w-5 h-5" />
-              {mounted && wishlistItems.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full">
-                  {wishlistItems.length}
-                </span>
-              )}
-            </Link>
-            {mounted && isAuthenticated ? (
-              <>
-                <Link
-                  href={user?.isAdmin ? "/admin/dashboard" : "/account"}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex-1 flex items-center gap-3 px-4 py-3 bg-slate-100 rounded-full"
-                >
-                  <User className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-700 truncate">
-                    {user?.name}
-                  </span>
+              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+                <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Image
+                    src={navbarData.assets.logo.src}
+                    alt={navbarData.assets.logo.alt}
+                    width={navbarData.assets.logo.width}
+                    height={navbarData.assets.logo.height}
+                    className="h-8 w-auto object-contain"
+                  />
                 </Link>
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  aria-label="Close menu"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <X className="w-5 h-5" />
                 </button>
-              </>
-            ) : (
-              <Link
-                href={`/login?redirect=${encodeURIComponent(pathname)}`}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-full font-medium text-sm"
-              >
-                <User className="w-4 h-4" />
-                Sign In
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+              </div>
+
+              <nav className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
+                <ul className="space-y-1">
+                  {navbarData.navigation.map(
+                    (
+                      item: (typeof navbarData.navigation)[0],
+                      index: number,
+                    ) => (
+                      <li key={index}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block py-3 px-4 text-base font-semibold text-slate-700 hover:text-blue-700 hover:bg-blue-50 rounded-xl transition-all"
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    ),
+                  )}
+                </ul>
+              </nav>
+
+              <div className="border-t border-slate-100 px-6 py-6 bg-slate-50/50">
+                {mounted && isAuthenticated ? (
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-blue-200 transition-all">
+                    <Link
+                      href={user?.isAdmin ? "/admin/dashboard" : "/account"}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex flex-1 items-center gap-3 min-w-0"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                        <User className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate">
+                          {user?.name}
+                        </p>
+                        <p className="text-[11px] text-slate-500 font-medium">
+                          View Dashboard
+                        </p>
+                      </div>
+                    </Link>
+                    <div className="flex items-center gap-2 border-l border-slate-100 pl-3">
+                      <Link
+                        href="/wishlist"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="relative w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 hover:text-[#FF6B6B] transition-colors"
+                      >
+                        <Heart className="w-4 h-4" />
+                        {wishlistItems.length > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full border border-white">
+                            {wishlistItems.length}
+                          </span>
+                        )}
+                      </Link>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition-all"
+                      >
+                        <LogOut className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    href={`/login?redirect=${encodeURIComponent(pathname)}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-blue-600 text-white rounded-2xl font-bold text-sm shadow-lg hover:bg-blue-700 hover:shadow-blue-500/20 transition-all"
+                  >
+                    <User className="w-4 h-4" />
+                    Sign In
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

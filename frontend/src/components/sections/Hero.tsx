@@ -72,7 +72,7 @@ function Hero() {
         style={{ clipPath: "ellipse(55% 90% at 50% 100%)" }}
       ></div>
 
-      <div className="container mx-auto px-4 pt-36 sm:pt-44 lg:pt-60 relative z-20">
+      <div className="container mx-auto px-4 pt-25 sm:pt-35 lg:pt-45 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <motion.div
             className="hidden lg:flex lg:col-span-3 flex-col items-center lg:items-start space-y-4 order-2 lg:order-1 lg:mt-58"
@@ -250,8 +250,6 @@ function Hero() {
           </motion.div>
         </div>
       </div>
-
-      {/* Desktop (lg+): 3-shirt absolute layout */}
       <div className="hidden sm:block relative w-full max-w-4xl mx-auto h-120 mt-4 z-30 pointer-events-none">
         <motion.div
           className="absolute top-16 right-[9%] w-[40%] z-10"
@@ -290,8 +288,6 @@ function Hero() {
           />
         </motion.div>
       </div>
-
-      {/* Mobile / tablet (<lg): single centered product, sits in normal flow — no overflow */}
       <motion.div
         className="sm:hidden w-full max-w-[280px] mx-auto mt-6 mb-4 pointer-events-none"
         initial={{ opacity: 0, y: 40 }}
