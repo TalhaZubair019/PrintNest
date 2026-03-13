@@ -256,6 +256,15 @@ router.get("/", requireAdmin, async (req, res) => {
       categorySalesData: Object.entries(categorySales)
         .map(([c, v]) => ({ category: c, value: v }))
         .sort((a, b) => b.value - a.value),
+      categoryInventoryData: Object.entries(
+        products.reduce((acc, p) => {
+          const cat = p.category || (p.badges && p.badges[0]) || "General";
+          acc[cat] = (acc[cat] || 0) + (p.stockQuantity || 0);
+          return acc;
+        }, {}),
+      )
+        .map(([c, v]) => ({ category: c, value: v }))
+        .sort((a, b) => b.value - a.value),
       orderVelocityData: Object.entries(hourCounts).map(([h, c]) => ({
         hour: h,
         count: c,

@@ -13,7 +13,9 @@ import AverageOrderValueChart from "@/components/admin/charts/AverageOrderValueC
 import TopReviewedProducts from "@/components/admin/charts/TopReviewedProducts";
 import ProductSalesChart from "@/components/admin/charts/ProductSalesChart";
 import CategorySalesChart from "@/components/admin/charts/CategorySalesChart";
+import CategoryInventoryChart from "@/components/admin/charts/CategoryInventoryChart";
 import SentimentChart from "@/components/admin/charts/SentimentChart";
+import WarehouseStockChart from "@/components/admin/charts/WarehouseStockChart";
 import { DashboardStats } from "@/app/admin/types";
 
 interface OverviewTabProps {
@@ -22,7 +24,9 @@ interface OverviewTabProps {
   showRevenueDropdown: boolean;
   setShowRevenueDropdown: Dispatch<SetStateAction<boolean>>;
   revenueFilter: "week" | "month" | "current-month" | "custom";
-  setRevenueFilter: Dispatch<SetStateAction<"week" | "month" | "current-month" | "custom">>;
+  setRevenueFilter: Dispatch<
+    SetStateAction<"week" | "month" | "current-month" | "custom">
+  >;
   applyRevenueFilter: (filter: any, start?: string, end?: string) => void;
   customStart: string;
   setCustomStart: Dispatch<SetStateAction<string>>;
@@ -33,7 +37,9 @@ interface OverviewTabProps {
   showAovDropdown: boolean;
   setShowAovDropdown: Dispatch<SetStateAction<boolean>>;
   aovFilter: "week" | "month" | "current-month" | "custom";
-  setAovFilter: Dispatch<SetStateAction<"week" | "month" | "current-month" | "custom">>;
+  setAovFilter: Dispatch<
+    SetStateAction<"week" | "month" | "current-month" | "custom">
+  >;
   applyAovFilter: (filter: any, start?: string, end?: string) => void;
   aovCustomStart: string;
   setAovCustomStart: Dispatch<SetStateAction<string>>;
@@ -130,7 +136,11 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
         <ProductSalesChart stats={stats} />
       </div>
       <CategorySalesChart stats={stats} />
-      <SentimentChart stats={stats} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <SentimentChart stats={stats} />
+        <CategoryInventoryChart stats={stats} />
+      </div>
+      <WarehouseStockChart stats={stats} />
     </div>
   );
 };

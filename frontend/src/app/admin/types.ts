@@ -77,6 +77,7 @@ export interface DashboardStats {
   }[];
   reviews: any[];
   categorySalesData: { category: string; value: number }[];
+  categoryInventoryData?: { category: string; value: number }[];
   orderVelocityData: { hour: string; count: number }[];
   orderTrendData: { date: string; count: number }[];
   categories: { _id: string; name: string; slug: string; image: string | null }[];
