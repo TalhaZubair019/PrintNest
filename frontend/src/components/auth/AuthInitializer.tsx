@@ -7,7 +7,7 @@ import { initializeCart } from "@/redux/CartSlice";
 import { initializeWishlist } from "@/redux/WishListSlice";
 import { RootState } from "@/redux/Store";
 import { useRouter } from "next/navigation";
-import { X, Crown, ShieldOff } from "lucide-react";
+import { X, Crown, ShieldOff, AlertTriangle, LogOut } from "lucide-react";
 
 function AuthInitializer() {
   const dispatch = useDispatch();
@@ -232,7 +232,7 @@ function AuthInitializer() {
           <>
             <div className="bg-linear-to-br from-slate-700 via-slate-800 to-slate-900 px-8 pt-10 pb-8 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mb-4 shadow-lg">
-                <ShieldOff size={32} className="text-white" />
+                <AlertTriangle size={32} className="text-white" />
               </div>
               <h2 className="text-2xl font-bold text-white tracking-tight">
                 Account Removed
@@ -249,9 +249,10 @@ function AuthInitializer() {
               </p>
               <button
                 onClick={() => handleDismiss("deleted")}
-                className="mt-6 w-full py-3 bg-linear-to-r from-slate-700 to-slate-900 text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-slate-200 text-sm"
+                className="mt-6 w-full py-3 bg-linear-to-r from-slate-700 to-slate-900 text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-slate-200 text-sm flex items-center justify-center gap-2"
               >
-                OK
+                <LogOut size={16} />
+                Return to Login
               </button>
             </div>
           </>
