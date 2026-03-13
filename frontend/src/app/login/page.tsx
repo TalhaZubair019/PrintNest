@@ -22,6 +22,7 @@ export default function LoginPage() {
   const redirect = searchParams.get("redirect");
   const dispatch = useDispatch();
   const { cartItems: localCartItems } = useSelector((state: any) => state.cart);
+  const isDeleted = searchParams.get("msg") === "deleted";
 
   React.useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
@@ -109,6 +110,12 @@ export default function LoginPage() {
         router.push("/");
       }
     } catch (err: any) {
+      if (err.message.includes("not verified")) {
+        router.push(
+          `/signup?email=${encodeURIComponent(formData.email)}&notVerified=true`,
+        );
+        return;
+      }
       setError(err.message);
     } finally {
       setLoading(false);
@@ -132,6 +139,11 @@ export default function LoginPage() {
               {error && (
                 <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">
                   {error}
+                </div>
+              )}
+              {isDeleted && !error && (
+                <div className="text-amber-600 text-sm text-center bg-amber-50 p-3 rounded-lg border border-amber-200 font-medium">
+                  Your account has been deleted by an administrator.
                 </div>
               )}
               <div>

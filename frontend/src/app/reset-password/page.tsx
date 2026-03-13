@@ -27,6 +27,22 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const getMissingRequirements = (pass: string) => {
+    const requirements = [
+      { id: "length", label: "At least 8 characters", met: pass.length >= 8 },
+      { id: "upper", label: "One uppercase letter", met: /[A-Z]/.test(pass) },
+      { id: "number", label: "One number", met: /[0-9]/.test(pass) },
+      { id: "special", label: "One special character", met: /[!@#$%^&*(),.?":{}|<>]/.test(pass) },
+    ];
+    return requirements;
+  };
+
+  const [passwordRequirements, setPasswordRequirements] = useState(getMissingRequirements(""));
+
+  React.useEffect(() => {
+    setPasswordRequirements(getMissingRequirements(formData.password));
+  }, [formData.password]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) {
@@ -39,8 +55,8 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (passwordRequirements.some(req => !req.met)) {
+      setError("Please meet all password requirements.");
       return;
     }
 
@@ -117,7 +133,7 @@ function ResetPasswordForm() {
             required
             disabled={!token}
             className="w-full border border-slate-300 rounded-lg pl-11 pr-12 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-medium disabled:bg-slate-50 disabled:cursor-not-allowed"
-            placeholder="Min 6 characters"
+            placeholder="8+ chars, uppercase, number & symbol"
             value={formData.password}
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
@@ -134,6 +150,23 @@ function ResetPasswordForm() {
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
+        </div>
+        <div className="mt-2 space-y-1 ml-1">
+          {passwordRequirements.map((req) => (
+            <div
+              key={req.id}
+              className={`text-[10px] font-medium flex items-center gap-1.5 transition-colors ${
+                req.met ? "text-teal-500" : "text-slate-400"
+              }`}
+            >
+              <div
+                className={`w-1 h-1 rounded-full ${
+                  req.met ? "bg-teal-500" : "bg-slate-300"
+                }`}
+              />
+              {req.label}
+            </div>
+          ))}
         </div>
       </div>
 

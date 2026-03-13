@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Package, MapPin, Plus, Edit2, Trash2 } from "lucide-react";
+import { Package, MapPin, Plus, Edit2, Trash2, ExternalLink } from "lucide-react";
 import WarehouseAssignModal from "../modals/WarehouseAssignModal";
 
 interface WarehouseItem {
@@ -113,7 +113,17 @@ export default function WarehousesTable({
               </div>
               <div className="flex items-center gap-2 text-xs lg:text-sm text-slate-500 font-medium truncate">
                 <MapPin size={14} className="shrink-0" />
-                {warehouse.location}
+                <span className="truncate">{warehouse.location}</span>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(warehouse.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-1 p-1 text-purple-600 hover:bg-purple-50 rounded-md transition-colors inline-flex items-center gap-1 shrink-0"
+                  title="View on Google Maps"
+                >
+                  <ExternalLink size={12} />
+                  <span className="text-[10px]">Open Map</span>
+                </a>
               </div>
               <button
                 onClick={() =>

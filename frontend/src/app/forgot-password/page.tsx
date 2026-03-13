@@ -66,8 +66,18 @@ export default function ForgotPasswordPage() {
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   {error && (
-                    <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">
-                      {error}
+                    <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
+                      <p className="text-red-600 text-sm text-center font-medium capitalize flex flex-col items-center gap-2">
+                        {error}
+                        {error.toLowerCase().includes("no account found") && (
+                          <Link 
+                            href="/signup" 
+                            className="text-purple-600 font-extrabold hover:text-purple-500 underline decoration-2 underline-offset-4 transition-all"
+                          >
+                            Create an account instead?
+                          </Link>
+                        )}
+                      </p>
                     </div>
                   )}
                   <div>

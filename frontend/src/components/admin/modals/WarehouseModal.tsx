@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { X, Save, Loader2, Building2 } from "lucide-react";
+import { X, Save, Loader2, Building2, ChevronDown } from "lucide-react";
+import { Country, State, City } from "country-state-city";
 
 interface WarehouseModalProps {
   isOpen: boolean;
@@ -17,26 +18,85 @@ export default function WarehouseModal({
   showToast,
 }: WarehouseModalProps) {
   const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
+  const [address, setAddress] = useState("");
+  const [countryCode, setCountryCode] = useState("PK");
+  const [countryName, setCountryName] = useState("Pakistan");
+  const [stateCode, setStateCode] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [city, setCity] = useState("");
+  const [countries] = useState(Country.getAllCountries());
+  const [states, setStates] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       if (editingWarehouse) {
         setName(editingWarehouse.warehouseName || "");
-        setLocation(editingWarehouse.location || "");
+
+        const loc = editingWarehouse.location || "";
+        const parts = loc.split(", ").map((p: string) => p.trim());
+
+        if (parts.length >= 3) {
+          const countryStr = parts.pop() || "";
+          const stateStr = parts.pop() || "";
+          const cityStr = parts.pop() || "";
+          const addressPart = parts.join(", ");
+
+          setCountryName(countryStr);
+          setStateName(stateStr);
+          setCity(cityStr);
+          setAddress(addressPart);
+
+          const foundCountry = countries.find((c) => c.name === countryStr);
+          if (foundCountry) {
+            setCountryCode(foundCountry.isoCode);
+            const countryStates = State.getStatesOfCountry(
+              foundCountry.isoCode,
+            );
+            const foundState = countryStates.find((s) => s.name === stateStr);
+            if (foundState) setStateCode(foundState.isoCode);
+          }
+        } else {
+          setAddress(loc);
+          setCountryCode("PK");
+          setCountryName("Pakistan");
+        }
       } else {
         setName("");
-        setLocation("");
+        setAddress("");
+        setCountryCode("PK");
+        setCountryName("Pakistan");
+        setStateCode("");
+        setStateName("");
+        setCity("");
       }
     }
-  }, [isOpen, editingWarehouse]);
+  }, [isOpen, editingWarehouse, countries]);
+
+  useEffect(() => {
+    if (countryCode) {
+      setStates(State.getStatesOfCountry(countryCode));
+    } else {
+      setStates([]);
+    }
+  }, [countryCode]);
+
+  useEffect(() => {
+    if (countryCode && stateCode) {
+      setCities(City.getCitiesOfState(countryCode, stateCode));
+    } else {
+      setCities([]);
+    }
+  }, [countryCode, stateCode]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    const fullLocation = `${address}${city ? `, ${city}` : ""}${stateName ? `, ${stateName}` : ""}, ${countryName}`;
 
     try {
       const isEditing = !!editingWarehouse;
@@ -48,13 +108,15 @@ export default function WarehouseModal({
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, location }),
+        body: JSON.stringify({ name, location: fullLocation }),
       });
 
       if (res.ok) {
         showToast(
-          isEditing ? "Warehouse updated successfully." : "Warehouse created successfully.",
-          "success"
+          isEditing
+            ? "Warehouse updated successfully."
+            : "Warehouse created successfully.",
+          "success",
         );
         onSaved();
         onClose();
@@ -69,6 +131,11 @@ export default function WarehouseModal({
     }
   };
 
+  const InputClass =
+    "w-full border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-sm appearance-none bg-white";
+  const LabelClass =
+    "block text-xs font-bold mb-1.5 text-slate-600 uppercase tracking-wider";
+
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
       <div
@@ -76,7 +143,7 @@ export default function WarehouseModal({
         onClick={onClose}
       />
 
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-2xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-lg border shadow-sm flex items-center justify-center text-purple-600">
@@ -101,62 +168,163 @@ export default function WarehouseModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-xs font-bold mb-1.5 text-slate-600 uppercase tracking-wider">
-              Warehouse Name
-            </label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., East Coast Hub"
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-sm"
-            />
-          </div>
+        <div className="overflow-y-auto max-h-[70vh]">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div>
+              <label className={LabelClass}>Warehouse Name</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., East Coast Hub"
+                className={InputClass}
+              />
+            </div>
 
-          <div>
-            <label className="block text-xs font-bold mb-1.5 text-slate-600 uppercase tracking-wider">
-              Location
-            </label>
-            <input
-              type="text"
-              required
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., New York, NY"
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-sm"
-            />
-          </div>
-          
-          <div className="flex items-start gap-2 p-3 bg-blue-50 text-blue-700 text-xs rounded-lg mt-4">
-            <span className="font-bold shrink-0 mt-0.5">Note:</span>
-            <span>If you change the name of an existing warehouse, it will automatically update the records of all mapped products.</span>
-          </div>
+            <div className="relative">
+              <label className={LabelClass}>Country</label>
+              <div className="relative">
+                <select
+                  required
+                  value={countryCode}
+                  onChange={(e) => {
+                    const country = countries.find(
+                      (c: any) => c.isoCode === e.target.value,
+                    );
+                    setCountryCode(e.target.value);
+                    setCountryName(country?.name || "");
+                    setStateCode("");
+                    setStateName("");
+                    setCity("");
+                  }}
+                  className={InputClass}
+                >
+                  <option value="">Select Country...</option>
+                  {countries.map((c: any) => (
+                    <option key={c.isoCode} value={c.isoCode}>
+                      {c.flag} {c.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className="absolute right-3 top-2.5 text-slate-400 pointer-events-none"
+                  size={16}
+                />
+              </div>
+            </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center gap-2"
-            >
-              {isSubmitting ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Save size={16} />
-              )}
-              {editingWarehouse ? "Save Changes" : "Create Warehouse"}
-            </button>
-          </div>
-        </form>
+            <div>
+              <label className={LabelClass}>Street Address</label>
+              <input
+                type="text"
+                required
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Building, street name"
+                className={InputClass}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative">
+                <label className={LabelClass}>Province / State</label>
+                <div className="relative">
+                  <select
+                    required
+                    disabled={!countryCode}
+                    value={stateCode}
+                    onChange={(e) => {
+                      const state = states.find(
+                        (s: any) => s.isoCode === e.target.value,
+                      );
+                      setStateCode(e.target.value);
+                      setStateName(state?.name || "");
+                      setCity("");
+                    }}
+                    className={`${InputClass} ${!countryCode ? "bg-slate-50 cursor-not-allowed" : ""}`}
+                  >
+                    <option value="">Select State...</option>
+                    {states.map((s: any) => (
+                      <option key={s.isoCode} value={s.isoCode}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className="absolute right-3 top-2.5 text-slate-400 pointer-events-none"
+                    size={16}
+                  />
+                </div>
+              </div>
+              <div className="relative">
+                <label className={LabelClass}>City</label>
+                <div className="relative">
+                  {cities.length > 0 ? (
+                    <select
+                      required
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className={InputClass}
+                    >
+                      <option value="">Select City...</option>
+                      {cities.map((c: any) => (
+                        <option key={c.name} value={c.name}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      required
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Enter city"
+                      className={InputClass}
+                    />
+                  )}
+                  {cities.length > 0 && (
+                    <ChevronDown
+                      className="absolute right-3 top-2.5 text-slate-400 pointer-events-none"
+                      size={16}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2 p-3 bg-blue-50 text-blue-700 text-[10px] rounded-lg">
+              <span className="font-bold shrink-0 mt-0.5">Note:</span>
+              <span>
+                Changes to the warehouse location will be concatenated into a
+                single searchable string for maps and internal tracking.
+              </span>
+            </div>
+
+            <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSubmitting ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Save size={16} />
+                )}
+                {editingWarehouse ? "Save Changes" : "Create Warehouse"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

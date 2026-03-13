@@ -22,6 +22,9 @@ const userSchema = new mongoose.Schema(
     promotedBy: { type: String, default: null },
     promotionPending: { type: Boolean, default: false },
     demotionPending: { type: Boolean, default: false },
+    isVerified: { type: Boolean, default: false },
+    otp: { type: String, default: null },
+    otpExpiresAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

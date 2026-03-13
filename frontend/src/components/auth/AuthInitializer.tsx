@@ -21,6 +21,7 @@ function AuthInitializer() {
   const isFirstRender = useRef(true);
   const [showPromotionModal, setShowPromotionModal] = useState(false);
   const [showDemotionModal, setShowDemotionModal] = useState(false);
+  const [showDeletedModal, setShowDeletedModal] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -60,7 +61,11 @@ function AuthInitializer() {
             setShowDemotionModal(true);
           }
         } else if (res.status === 401) {
+          const data = await res.json().catch(() => ({}));
           dispatch(logout());
+          if (data.isDeleted) {
+            router.push("/login?msg=deleted");
+          }
         }
       } catch (err) {
         console.warn("Session check skipped due to network error", err);
@@ -86,6 +91,12 @@ function AuthInitializer() {
             setShowPromotionModal(true);
           } else if (data.user.demotionPending) {
             setShowDemotionModal(true);
+          }
+        } else if (res.status === 401) {
+          const data = await res.json().catch(() => ({}));
+          dispatch(logout());
+          if (data.isDeleted) {
+            setShowDeletedModal(true);
           }
         }
       } catch {}
@@ -121,25 +132,29 @@ function AuthInitializer() {
     return () => clearTimeout(timeoutId);
   }, [cart.cartItems, wishlist.items, auth.isAuthenticated, isLoaded]);
 
-  const handleDismiss = async (type: "promotion" | "demotion") => {
-    try {
-      await fetch("/api/auth/me", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          [type === "promotion" ? "promotionPending" : "demotionPending"]:
-            false,
-        }),
-      });
-    } catch {}
+  const handleDismiss = async (type: "promotion" | "demotion" | "deleted") => {
+    if (type !== "deleted") {
+      try {
+        await fetch("/api/auth/me", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            [type === "promotion" ? "promotionPending" : "demotionPending"]:
+              false,
+          }),
+        });
+      } catch {}
+    }
     await fetch("/api/auth/logout", { method: "POST" });
     dispatch(logout());
     setShowPromotionModal(false);
     setShowDemotionModal(false);
-    router.push("/login");
+    setShowDeletedModal(false);
+    router.push(type === "deleted" ? "/login?msg=deleted" : "/login");
   };
 
-  if (!showPromotionModal && !showDemotionModal) return null;
+  if (!showPromotionModal && !showDemotionModal && !showDeletedModal)
+    return null;
 
   return (
     <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
@@ -147,7 +162,13 @@ function AuthInitializer() {
       <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
         <button
           onClick={() =>
-            handleDismiss(showPromotionModal ? "promotion" : "demotion")
+            handleDismiss(
+              showDeletedModal
+                ? "deleted"
+                : showPromotionModal
+                  ? "promotion"
+                  : "demotion",
+            )
           }
           className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors z-10"
         >
@@ -181,7 +202,7 @@ function AuthInitializer() {
               </button>
             </div>
           </>
-        ) : (
+        ) : showDemotionModal ? (
           <>
             <div className="bg-linear-to-br from-red-500 via-rose-500 to-orange-500 px-8 pt-10 pb-8 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mb-4 shadow-lg">
@@ -202,6 +223,33 @@ function AuthInitializer() {
               <button
                 onClick={() => handleDismiss("demotion")}
                 className="mt-6 w-full py-3 bg-linear-to-r from-red-500 to-rose-500 text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-red-200 text-sm"
+              >
+                OK
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="bg-linear-to-br from-slate-700 via-slate-800 to-slate-900 px-8 pt-10 pb-8 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mb-4 shadow-lg">
+                <ShieldOff size={32} className="text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                Account Removed
+              </h2>
+            </div>
+            <div className="px-8 py-6 text-center">
+              <p className="text-slate-700 text-sm leading-relaxed font-medium">
+                Your account has been{" "}
+                <span className="text-red-600 font-bold">deleted</span> by an
+                administrator.
+              </p>
+              <p className="text-slate-500 text-xs mt-3">
+                You have been logged out. For more info, contact support.
+              </p>
+              <button
+                onClick={() => handleDismiss("deleted")}
+                className="mt-6 w-full py-3 bg-linear-to-r from-slate-700 to-slate-900 text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-slate-200 text-sm"
               >
                 OK
               </button>

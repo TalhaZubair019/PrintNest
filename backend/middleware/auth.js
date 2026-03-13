@@ -3,8 +3,10 @@ const jwt = require("jsonwebtoken");
 const ADMIN_EMAIL = process.env.EMAIL_USER;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-function extractToken(req) {
+const { connectDB } = require("../lib/db");
+const { UserModel } = require("../lib/models");
 
+function extractToken(req) {
   const authHeader = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
     return authHeader.slice(7);
@@ -15,11 +17,20 @@ function extractToken(req) {
   return match ? match[1] : null;
 }
 
-function requireAuth(req, res, next) {
+async function requireAuth(req, res, next) {
   const token = extractToken(req);
   if (!token) return res.status(401).json({ message: "Unauthorized" });
   try {
-    req.user = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    await connectDB();
+    const userExists = await UserModel.findOne({ id: decoded.id }).lean();
+    if (!userExists) {
+      return res.status(401).json({ 
+        message: "Account not found or deleted", 
+        isDeleted: true 
+      });
+    }
+    req.user = decoded;
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });

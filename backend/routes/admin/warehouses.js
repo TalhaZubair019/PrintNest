@@ -165,12 +165,12 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       const products = await ProductModel.find({ "warehouseInventory.warehouseName": oldName });
       for (const p of products) {
         let changed = false;
-        p.warehouseInventory = p.warehouseInventory.map(w => {
+        p.warehouseInventory.forEach(w => {
           if (w.warehouseName === oldName) {
             changed = true;
-            return { ...w, warehouseName: warehouse.name, location: warehouse.location };
+            w.warehouseName = warehouse.name;
+            w.location = warehouse.location;
           }
-          return w;
         });
         if (changed) {
           await p.save();
