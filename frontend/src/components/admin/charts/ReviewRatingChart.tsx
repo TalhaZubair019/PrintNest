@@ -7,6 +7,16 @@ interface ReviewRatingChartProps {
 }
 
 const ReviewRatingChart = ({ stats }: ReviewRatingChartProps) => {
+  const totalReviews = Object.values(stats.ratingDistribution || {}).reduce(
+    (a: number, b: number) => a + b,
+    0,
+  );
+  const totalStars = Object.entries(stats.ratingDistribution || {}).reduce(
+    (acc: number, [stars, count]: [string, number]) => acc + Number(stars) * count,
+    0,
+  );
+  const averageRating = totalReviews > 0 ? totalStars / totalReviews : 0;
+
   return (
     <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500">
       <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
@@ -16,9 +26,6 @@ const ReviewRatingChart = ({ stats }: ReviewRatingChartProps) => {
       <div className="space-y-4">
         {[5, 4, 3, 2, 1].map((rating) => {
           const count = stats.ratingDistribution?.[rating] || 0;
-          const totalReviews = Object.values(
-            stats.ratingDistribution || {},
-          ).reduce((a, b) => a + b, 0);
           const percentage = totalReviews ? (count / totalReviews) * 100 : 0;
 
           return (
@@ -41,42 +48,31 @@ const ReviewRatingChart = ({ stats }: ReviewRatingChartProps) => {
         })}
         <div className="pt-4 text-center">
           <div className="text-3xl font-bold text-slate-700 dark:text-slate-200">
-            {(
-              Object.entries(stats.ratingDistribution || {}).reduce(
-                (acc, [stars, count]) => acc + Number(stars) * count,
-                0,
-              ) /
-              (Object.values(stats.ratingDistribution || {}).reduce(
-                (a, b) => a + b,
-                0,
-              ) || 1)
-            ).toFixed(1)}
+            {averageRating.toFixed(1)}
           </div>
 
-          <div className="flex justify-center text-yellow-400 gap-0.5 my-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                size={14}
-                className={
-                  i <
-                  Math.round(
-                    Object.entries(stats.ratingDistribution || {}).reduce(
-                      (acc, [stars, count]) => acc + Number(stars) * count,
-                      0,
-                    ) /
-                      (Object.values(stats.ratingDistribution || {}).reduce(
-                        (a, b) => a + b,
-                        0,
-                      ) || 1),
-                  )
-                    ? "fill-current"
-                    : "text-gray-300"
-                }
-              />
-            ))}
+          <div className="flex justify-center items-center gap-0.5 my-1">
+            {[...Array(5)].map((_, i) => {
+              const fillPercentage = Math.max(0, Math.min(100, (averageRating - i) * 100));
+              
+              return (
+                <div key={i} className="relative leading-none">
+                  <Star size={14} className="text-gray-300 dark:text-slate-700" />
+                  {fillPercentage > 0 && (
+                    <div 
+                      className="absolute inset-0 overflow-hidden" 
+                      style={{ width: `${fillPercentage}%` }}
+                    >
+                      <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <p className="text-xs text-slate-400 dark:text-slate-500 transition-colors">Average Rating</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 transition-colors">
+            Average Rating
+          </p>
         </div>
       </div>
     </div>
