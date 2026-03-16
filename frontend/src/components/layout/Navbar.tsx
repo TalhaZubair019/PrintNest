@@ -363,7 +363,7 @@ function Navbar() {
                     alt={navbarData.assets.logo.alt}
                     width={navbarData.assets.logo.width}
                     height={navbarData.assets.logo.height}
-                    className="h-8 w-auto object-contain"
+                    className="h-8 w-auto object-contain dark:brightness-0 dark:invert"
                   />
                 </Link>
                 <button
@@ -398,33 +398,37 @@ function Navbar() {
 
               <div className="border-t border-slate-100 dark:border-slate-800 px-6 py-6 bg-slate-50/50 dark:bg-slate-800/50">
                 {mounted && isAuthenticated ? (
-                  <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:border-blue-200 dark:hover:border-blue-800 transition-all">
-                    <Link
-                      href={user?.isAdmin ? "/admin/dashboard" : "/account"}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex flex-1 items-center gap-3 min-w-0"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
-                        <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
-                          {user?.name}
-                        </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                          View Dashboard
-                        </p>
-                      </div>
-                    </Link>
-                    <div className="flex items-center gap-2 border-l border-slate-100 dark:border-slate-800 pl-3">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4 px-4 py-4 bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 rounded-[24px] shadow-sm">
+                      <Link
+                        href={user?.isAdmin ? "/admin/dashboard" : "/account"}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex flex-1 items-center gap-4 min-w-0"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-blue-600 dark:bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
+                          <User className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[15px] font-bold text-slate-900 dark:text-white truncate">
+                            {user?.name}
+                          </p>
+                          <p className="text-[12px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">
+                            {user?.isAdmin ? "Admin Access" : "Customer Panel"}
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
                       <Link
                         href="/wishlist"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="relative w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-[#FF6B6B] dark:hover:text-[#FF8E8E] transition-colors"
+                        className="flex items-center justify-center gap-3 py-4 bg-white dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl text-slate-700 dark:text-slate-300 font-bold text-sm hover:border-red-200 dark:hover:border-red-900/30 transition-all relative"
                       >
-                        <Heart className="w-4 h-4" />
+                        <Heart className="w-4 h-4 text-red-500" />
+                        Wishlist
                         {wishlistItems.length > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full border border-white dark:border-slate-900">
+                          <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-900">
                             {wishlistItems.length}
                           </span>
                         )}
@@ -434,9 +438,10 @@ function Navbar() {
                           handleLogout();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all"
+                        className="flex items-center justify-center gap-3 py-4 bg-red-50/50 dark:bg-red-950/20 border border-red-100/50 dark:border-red-900/20 rounded-2xl text-red-600 dark:text-red-400 font-bold text-sm hover:bg-red-50 dark:hover:bg-red-950/40 transition-all"
                       >
                         <LogOut className="w-4 h-4" />
+                        Sign Out
                       </button>
                     </div>
                   </div>
