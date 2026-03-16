@@ -79,15 +79,15 @@ const CategoryModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b flex justify-between items-center bg-slate-50">
-          <h3 className="text-xl font-black">
+    <div className="fixed inset-0 bg-black/60 dark:bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-white dark:border-slate-800 transition-colors">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/30 transition-colors">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white transition-colors">
             {editingCategory ? "Edit Category" : "Add New Category"}
           </h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-200 rounded-lg"
+            className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
           >
             <X size={20} />
           </button>
@@ -95,7 +95,7 @@ const CategoryModal = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-bold mb-1.5 text-slate-700">
+            <label className="block text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300 transition-colors">
               Category Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -104,30 +104,30 @@ const CategoryModal = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., T-Shirts"
-              className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+              className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
             />
             {name.trim() && (
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 transition-colors">
                 Slug:{" "}
-                <span className="font-mono text-slate-600">{previewSlug}</span>
+                <span className="font-mono text-slate-600 dark:text-slate-300">{previewSlug}</span>
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-1.5 text-slate-700">
+            <label className="block text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300 transition-colors">
               Image URL{" "}
-              <span className="text-slate-400 font-normal">(optional)</span>
+              <span className="text-slate-400 dark:text-slate-500 font-normal">(optional)</span>
             </label>
             <input
               type="url"
               value={image}
               onChange={(e) => setImage(e.target.value)}
               placeholder="https://example.com/category-image.webp"
-              className="w-full px-4 py-3 border rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+              className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
             />
             {image && (
-              <div className="mt-3 w-20 h-20 rounded-xl border overflow-hidden relative bg-slate-100">
+              <div className="mt-3 w-20 h-20 rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden relative bg-slate-100 dark:bg-slate-800 transition-colors">
                 <Image
                   src={image}
                   alt="Preview"
@@ -138,8 +138,8 @@ const CategoryModal = ({
               </div>
             )}
             {!image && (
-              <div className="mt-3 w-20 h-20 rounded-xl border bg-slate-50 flex items-center justify-center">
-                <Tag className="w-8 h-8 text-slate-300" />
+              <div className="mt-3 w-20 h-20 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center transition-colors">
+                <Tag className="w-8 h-8 text-slate-300 dark:text-slate-600" />
               </div>
             )}
           </div>
@@ -148,14 +148,14 @@ const CategoryModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200"
+              className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 dark:hover:bg-purple-500 disabled:opacity-50 transition-all active:scale-95 shadow-lg shadow-purple-600/20"
             >
               {isSubmitting ? "Saving..." : "Save Category"}
             </button>

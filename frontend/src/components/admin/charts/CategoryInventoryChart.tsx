@@ -11,8 +11,8 @@ const CategoryInventoryChart = ({ stats }: CategoryInventoryChartProps) => {
   const totalStock = data.reduce((acc, d) => acc + d.value, 0);
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-      <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2 text-lg">
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
+      <h3 className="font-bold text-slate-800 dark:text-white transition-colors mb-6 flex items-center gap-2 text-lg">
         Inventory by Category
         <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-300" />
       </h3>
@@ -24,14 +24,14 @@ const CategoryInventoryChart = ({ stats }: CategoryInventoryChartProps) => {
             return (
               <div key={i} className="group">
                 <div className="flex justify-between items-end mb-1.5 px-1">
-                  <span className="text-[13px] font-bold text-slate-700 group-hover:text-emerald-600 transition-colors truncate max-w-[70%]">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 transition-colors truncate max-w-[70%]">
                     {item.category || "General"}
                   </span>
-                  <span className="text-xs font-black text-slate-900 tabular-nums">
+                  <span className="text-xs font-black text-slate-900 dark:text-white tabular-nums">
                     {item.value.toLocaleString()}
                   </span>
                 </div>
-                <div className="relative h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
+                <div className="relative h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-700">
                   <div
                     className="absolute inset-y-0 left-0 bg-linear-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000 ease-out shadow-sm"
                     style={{ width: `${percentage}%` }}
@@ -51,12 +51,12 @@ const CategoryInventoryChart = ({ stats }: CategoryInventoryChartProps) => {
       </div>
 
       {data.length > 0 && (
-        <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between px-1 shrink-0">
+        <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between px-1 shrink-0">
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">
               Storewide Stock
             </span>
-            <span className="text-xl font-black text-slate-900 tabular-nums">
+            <span className="text-xl font-black text-slate-900 dark:text-white tabular-nums">
               {totalStock.toLocaleString()}
               <span className="text-xs ml-1 text-slate-400">units</span>
             </span>

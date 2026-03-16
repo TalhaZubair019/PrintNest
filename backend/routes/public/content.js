@@ -42,8 +42,59 @@ router.get("/", async (req, res) => {
       return res.json({ ...db.products, products: uniqueProducts });
     }
 
+    if (section === "categories") {
+      const { all } = req.query;
+
+      if (all === "true") {
+        await connectDB();
+        const { CategoryModel } = require("../../lib/models");
+        const dbCategories = await CategoryModel.find({}).lean();
+
+        const formattedCategories = dbCategories.map((cat) => ({
+          id: cat._id,
+          title: cat.name,
+          name: cat.name,
+          image: cat.image,
+          link: `/product-category/${cat.slug}/`,
+        }));
+
+        return res.json({
+          ...db.categories,
+          categories:
+            formattedCategories.length > 0
+              ? formattedCategories
+              : db.categories.categories,
+        });
+      }
+
+      return res.json(db.categories);
+    }
+
     if (section && section in db) {
       return res.json(db[section]);
+    }
+
+    const { all } = req.query;
+    if (all === "true") {
+      await connectDB();
+      const { CategoryModel } = require("../../lib/models");
+      const dbCategories = await CategoryModel.find({}).lean();
+      if (dbCategories.length > 0) {
+        const formattedCategories = dbCategories.map((cat) => ({
+          id: cat._id,
+          title: cat.name,
+          name: cat.name,
+          image: cat.image,
+          link: `/product-category/${cat.slug}/`,
+        }));
+        return res.json({
+          ...db,
+          categories: {
+            ...db.categories,
+            categories: formattedCategories,
+          },
+        });
+      }
     }
 
     return res.json(db);

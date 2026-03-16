@@ -1,17 +1,9 @@
 "use client";
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Loader2,
-  ChevronRight,
-  Eye,
-  EyeOff,
-  Lock,
-  CheckCircle2,
-} from "lucide-react";
-import db from "@data/db.json";
+import { Loader2, Eye, EyeOff, Lock, CheckCircle2 } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -32,12 +24,18 @@ function ResetPasswordForm() {
       { id: "length", label: "At least 8 characters", met: pass.length >= 8 },
       { id: "upper", label: "One uppercase letter", met: /[A-Z]/.test(pass) },
       { id: "number", label: "One number", met: /[0-9]/.test(pass) },
-      { id: "special", label: "One special character", met: /[!@#$%^&*(),.?":{}|<>]/.test(pass) },
+      {
+        id: "special",
+        label: "One special character",
+        met: /[!@#$%^&*(),.?":{}|<>]/.test(pass),
+      },
     ];
     return requirements;
   };
 
-  const [passwordRequirements, setPasswordRequirements] = useState(getMissingRequirements(""));
+  const [passwordRequirements, setPasswordRequirements] = useState(
+    getMissingRequirements(""),
+  );
 
   React.useEffect(() => {
     setPasswordRequirements(getMissingRequirements(formData.password));
@@ -55,7 +53,7 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (passwordRequirements.some(req => !req.met)) {
+    if (passwordRequirements.some((req) => !req.met)) {
       setError("Please meet all password requirements.");
       return;
     }
@@ -88,14 +86,14 @@ function ResetPasswordForm() {
     return (
       <div className="text-center py-8">
         <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center">
+          <div className="w-20 h-20 bg-teal-50 dark:bg-teal-900/20 rounded-full flex items-center justify-center">
             <CheckCircle2 className="text-teal-500" size={48} />
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-4">
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
           Password Reset!
         </h2>
-        <p className="text-slate-500 mb-8">
+        <p className="text-slate-500 dark:text-slate-400 mb-8">
           Your password has been successfully updated. Redirecting you to the
           login page...
         </p>
@@ -112,19 +110,19 @@ function ResetPasswordForm() {
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       {error && (
-        <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-100 italic">
+        <div className="text-red-500 dark:text-red-400 text-sm text-center bg-red-50 dark:bg-red-900/10 p-3 rounded-lg border border-red-100 dark:border-red-900/30 italic">
           {error}
         </div>
       )}
 
       {!token && (
-        <div className="text-amber-600 text-sm text-center bg-amber-50 p-3 rounded-lg border border-amber-100 mb-4 font-medium">
+        <div className="text-amber-600 dark:text-amber-400 text-sm text-center bg-amber-50 dark:bg-amber-900/10 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30 mb-4 font-medium">
           Invalid or missing reset token. Please request another link.
         </div>
       )}
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           New Password
         </label>
         <div className="relative">
@@ -132,7 +130,7 @@ function ResetPasswordForm() {
             type={showPassword ? "text" : "password"}
             required
             disabled={!token}
-            className="w-full border border-slate-300 rounded-lg pl-11 pr-12 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-medium disabled:bg-slate-50 disabled:cursor-not-allowed"
+            className="w-full border border-slate-300 dark:border-slate-700 rounded-lg pl-11 pr-12 py-3 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all font-medium disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:cursor-not-allowed"
             placeholder="8+ chars, uppercase, number & symbol"
             value={formData.password}
             onChange={(e) =>
@@ -146,7 +144,7 @@ function ResetPasswordForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -156,12 +154,16 @@ function ResetPasswordForm() {
             <div
               key={req.id}
               className={`text-[10px] font-medium flex items-center gap-1.5 transition-colors ${
-                req.met ? "text-teal-500" : "text-slate-400"
+                req.met
+                  ? "text-teal-500 dark:text-teal-400"
+                  : "text-slate-400 dark:text-slate-500"
               }`}
             >
               <div
                 className={`w-1 h-1 rounded-full ${
-                  req.met ? "bg-teal-500" : "bg-slate-300"
+                  req.met
+                    ? "bg-teal-500 dark:bg-teal-400"
+                    : "bg-slate-300 dark:bg-slate-700"
                 }`}
               />
               {req.label}
@@ -171,7 +173,7 @@ function ResetPasswordForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           Confirm New Password
         </label>
         <div className="relative">
@@ -179,7 +181,7 @@ function ResetPasswordForm() {
             type={showPassword ? "text" : "password"}
             required
             disabled={!token}
-            className="w-full border border-slate-300 rounded-lg pl-11 pr-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-medium disabled:bg-slate-50 disabled:cursor-not-allowed"
+            className="w-full border border-slate-300 dark:border-slate-700 rounded-lg pl-11 pr-4 py-3 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all font-medium disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:cursor-not-allowed"
             placeholder="Repeat your new password"
             value={formData.confirmPassword}
             onChange={(e) =>
@@ -210,53 +212,22 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
-      <div className="absolute top-0 left-0 w-full h-175 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-linear-to-b from-purple-50/50 via-teal-50/30 to-white z-10 mix-blend-multiply" />
-        <Image
-          src={db.shop.backgroundImage}
-          alt="Background"
-          fill
-          className="object-cover opacity-80"
-          priority
-        />
-        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-white to-transparent z-20" />
-      </div>
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
+      <PageHeader
+        title="Reset Password"
+        breadcrumbs={[
+          { label: "Login", href: "/login" },
+          { label: "Security" },
+        ]}
+      />
 
-      <div className="relative z-10 pt-80">
-        <div className="w-full pb-10 flex flex-col items-center justify-center">
-          <h1 className="text-6xl font-bold text-slate-900 tracking-tight mb-4">
-            Security
-          </h1>
-          <div className="h-1.5 w-20 bg-linear-to-r from-purple-500 to-teal-400 rounded-full mb-10"></div>
-          <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 bg-white px-6 py-2.5 rounded-full shadow-sm border border-slate-100">
-            <Link href="/" className="hover:text-purple-600 transition-colors">
-              Home
-            </Link>
-            <div className="flex text-purple-400">
-              <ChevronRight size={14} strokeWidth={2.5} />
-              <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
-            </div>
-            <Link
-              href="/login"
-              className="hover:text-purple-600 transition-colors"
-            >
-              Login
-            </Link>
-            <div className="flex text-purple-400">
-              <ChevronRight size={14} strokeWidth={2.5} />
-              <ChevronRight size={14} className="-ml-2" strokeWidth={2.5} />
-            </div>
-            <span className="text-slate-900">Reset Password</span>
-          </div>
-        </div>
-
+      <div className="relative z-10 pt-10">
         <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-          <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">
+          <div className="max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 transition-colors">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 text-center transition-colors">
               New Password
             </h2>
-            <p className="text-slate-500 text-center mb-8">
+            <p className="text-slate-500 dark:text-slate-400 text-center mb-8 transition-colors">
               Please enter and confirm your new password below.
             </p>
 
@@ -270,12 +241,12 @@ export default function ResetPasswordPage() {
               <ResetPasswordForm />
             </Suspense>
 
-            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-              <p className="text-sm text-slate-500">
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Remember your password?{" "}
                 <Link
                   href="/login"
-                  className="font-bold text-purple-600 hover:underline"
+                  className="font-bold text-purple-600 dark:text-purple-400 hover:underline"
                 >
                   Sign in
                 </Link>

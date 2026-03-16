@@ -61,7 +61,7 @@ export default function MyAccountPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
         </div>
       }
@@ -257,9 +257,9 @@ function AccountContent() {
 
   if (!isAuthenticated) {
     return (
-      <div className="relative min-h-screen bg-white font-sans text-slate-800">
+      <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors">
         <PageHeader title="My Account" breadcrumb="Account" />
-        <div className="max-w-7xl mx-auto px-4 lg:px-8 pb-32 pt-20">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 pb-32 pt-10">
           <LoginForm
             handleLogin={handleLogin}
             loginForm={loginForm}
@@ -276,7 +276,7 @@ function AccountContent() {
 
   if (selectedOrder) {
     return (
-      <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors">
         <PageHeader
           title={`Order #${selectedOrder.id.slice(-8).toUpperCase()}`}
           breadcrumb="Order Details"
@@ -290,7 +290,7 @@ function AccountContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors">
       <QuickViewModal
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
@@ -302,13 +302,13 @@ function AccountContent() {
       />
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
-        <div className="lg:hidden mb-6 flex items-center justify-between bg-[#0f172a] p-3 sm:p-4 rounded-2xl shadow-lg border border-slate-800">
+        <div className="lg:hidden mb-6 flex items-center justify-between bg-white dark:bg-[#0f172a] p-3 sm:p-4 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 transition-colors">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="h-8 w-8 rounded-full bg-purple-600 border border-purple-500/20 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-purple-600/20 shrink-0">
               {user?.name?.[0]?.toUpperCase() || "U"}
             </div>
             <div className="overflow-hidden">
-              <span className="text-base sm:text-xl font-bold text-white tracking-tight truncate block">
+              <span className="text-base sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate block transition-colors">
                 {user?.name || "User"}
               </span>
             </div>
@@ -317,7 +317,7 @@ function AccountContent() {
             {user?.isAdmin && (
               <Link
                 href="/admin/dashboard"
-                className="text-purple-400 hover:text-purple-300 p-1.5 sm:p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700 transition-colors"
+                className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 p-1.5 sm:p-2 rounded-lg bg-purple-50 dark:bg-slate-800/50 hover:bg-purple-100 dark:hover:bg-slate-700 transition-colors"
                 title="Switch to Admin View"
               >
                 <Shield size={16} />
@@ -325,7 +325,7 @@ function AccountContent() {
             )}
             <button
               onClick={handleLogout}
-              className="text-red-400 hover:text-red-300 p-1.5 sm:p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700 transition-colors"
+              className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 p-1.5 sm:p-2 rounded-lg bg-red-50 dark:bg-slate-800/50 hover:bg-red-100 dark:hover:bg-slate-700 transition-colors"
               title="Logout"
             >
               <LogOut size={16} />
@@ -333,7 +333,7 @@ function AccountContent() {
             <select
               value={activeTab}
               onChange={(e) => setActiveTab(e.target.value)}
-              className="bg-slate-800 text-purple-400 text-[10px] sm:text-xs font-bold py-1.5 px-1.5 sm:py-2 sm:px-3 rounded-lg border border-slate-700 outline-none max-w-[90px] sm:max-w-none"
+              className="bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-purple-400 text-[10px] sm:text-xs font-bold py-1.5 px-1.5 sm:py-2 sm:px-3 rounded-lg border border-slate-200 dark:border-slate-700 outline-none max-w-[90px] sm:max-w-none transition-colors"
             >
               <option value="dashboard">Dashboard</option>
               <option value="profile">Edit Profile</option>

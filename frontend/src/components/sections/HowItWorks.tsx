@@ -33,7 +33,7 @@ function HowItWorks() {
   } = howItWorksData;
 
   return (
-    <section className="py-16 sm:py-20 lg:py-32 bg-[#F8FAFC] overflow-hidden font-sans">
+    <section className="py-16 sm:py-20 lg:py-32 bg-[#F8FAFC] dark:bg-slate-950 overflow-hidden font-sans">
       <div className="container mx-auto px-4 sm:px-8 max-w-7xl relative">
         <div className="max-w-3xl mb-12 lg:mb-24 relative z-10">
           <motion.p
@@ -41,7 +41,7 @@ function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-base text-blue-900 uppercase mb-3"
+            className="text-base text-blue-900 dark:text-blue-400 uppercase mb-3"
           >
             {sectionLabel}
           </motion.p>
@@ -51,7 +51,7 @@ function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-2xl sm:text-3xl lg:text-5xl font-medium text-slate-900 leading-[1.15]"
+            className="text-2xl sm:text-3xl lg:text-5xl font-medium text-slate-900 dark:text-white leading-[1.15]"
           >
             {headingMain} <br />
             <span className="relative inline-block text-[#FF7F7F] mt-2 pb-2 border-b-4 border-[#FF7F7F] rounded-sm">
@@ -65,7 +65,7 @@ function HowItWorks() {
             <StepCard key={step.id} data={step} index={idx} desktop={false} />
           ))}
           <div className="mt-4 text-center">
-            <p className="text-slate-500 text-base leading-relaxed mb-6">
+            <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed mb-6">
               {footerContent.text}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -114,7 +114,7 @@ function HowItWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-slate-500 text-lg leading-relaxed mb-8"
+              className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed mb-8"
             >
               {footerContent.text}
             </motion.p>
@@ -184,7 +184,7 @@ const VideoButton = ({ label }: { label: string }) => (
         <Play size={14} fill="white" className="text-white ml-0.5" />
       </div>
     </div>
-    <span className="font-bold text-base sm:text-lg text-slate-800 group-hover:text-blue-600 transition-colors">
+    <span className="font-bold text-base sm:text-lg text-slate-800 dark:text-slate-200 group-hover:text-blue-600 transition-colors">
       {label}
     </span>
   </button>
@@ -223,23 +223,25 @@ const StepCard = ({
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="p-8 sm:p-10 rounded-4xl border border-transparent transition-all duration-300 text-center z-10 group cursor-pointer"
-      style={{
-        ...(desktop && pos
-          ? {
-              position: "absolute" as const,
-              top: pos.top,
-              left: pos.left,
-              width: "320px",
-            }
-          : {}),
-        backgroundColor: colors.cardBg,
-        opacity: 0,
-        scale: 0.9,
-      }}
+      className="p-8 sm:p-10 rounded-4xl border border-transparent dark:border-slate-800 transition-all duration-300 text-center z-10 group cursor-pointer bg-(--card-bg) dark:bg-slate-900"
+      style={
+        {
+          "--card-bg": colors.cardBg,
+          ...(desktop && pos
+            ? {
+                position: "absolute" as const,
+                top: pos.top,
+                left: pos.left,
+                width: "320px",
+              }
+            : {}),
+          opacity: 0,
+          scale: 0.9,
+        } as any
+      }
     >
       <div
-        className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 rounded-full flex items-center justify-center text-white shadow-lg border-8 border-white group-hover:scale-110 transition-transform duration-300"
+        className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 rounded-full flex items-center justify-center text-white shadow-lg border-8 border-white dark:border-slate-800 group-hover:scale-110 transition-transform duration-300"
         style={{ backgroundColor: colors.iconBg }}
       >
         <motion.div variants={iconBounceVariant}>
@@ -247,10 +249,10 @@ const StepCard = ({
         </motion.div>
       </div>
 
-      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3">
+      <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-3">
         {data.title}
       </h3>
-      <p className="text-slate-500 text-sm leading-relaxed">
+      <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
         {data.description}
       </p>
     </motion.div>

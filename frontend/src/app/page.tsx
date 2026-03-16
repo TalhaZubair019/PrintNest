@@ -12,7 +12,7 @@ import Blog from "@/components/sections/Blog";
 
 export default function Home() {
   return (
-    <main className="min-h-screen font-sans text-slate-800">
+    <main className="min-h-screen font-sans text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-950 transition-colors duration-300">
       <Hero />
       <Social />
       <About />

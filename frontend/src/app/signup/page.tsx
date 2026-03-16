@@ -185,14 +185,14 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors">
       <PageHeader
         title={isVerifying ? "Verify Email" : "Create Account"}
         breadcrumb={isVerifying ? "Verify" : "Signup"}
       />
       <div className="relative z-10">
-        <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-          <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+        <div className="max-w-7xl mx-auto mt-10 px-4 lg:px-8 pb-32">
+          <div className="max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all">
             {isVerifying ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -208,7 +208,7 @@ export default function SignupPage() {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="w-20 h-20 bg-linear-to-tr from-purple-600 to-indigo-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-200 relative group cursor-pointer"
+                    className="w-20 h-20 bg-linear-to-tr from-purple-600 to-indigo-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-200 dark:shadow-purple-900/40 relative group cursor-pointer"
                     onClick={() => {
                       setIsVerifying(false);
                       setOtp("");
@@ -226,12 +226,12 @@ export default function SignupPage() {
                     />
                   </motion.div>
 
-                  <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">
+                  <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight transition-colors">
                     Secure Access
                   </h2>
-                  <p className="text-slate-500 text-sm max-w-[280px] mx-auto leading-relaxed font-medium">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm max-w-[280px] mx-auto leading-relaxed font-medium transition-colors">
                     Please enter the 6-digit code sent to
-                    <span className="block font-extrabold text-slate-800 mt-1 bg-slate-100 py-1 px-3 rounded-full border border-slate-200/50">
+                    <span className="block font-extrabold text-slate-800 dark:text-slate-200 mt-1 bg-slate-100 dark:bg-slate-800 py-1 px-3 rounded-full border border-slate-200/50 dark:border-slate-700/50 transition-colors">
                       {formData.email}
                     </span>
                   </p>
@@ -241,7 +241,7 @@ export default function SignupPage() {
                   <motion.div
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="mb-8 p-4 bg-red-50/50 backdrop-blur-sm border-l-4 border-red-500 text-red-700 text-sm rounded-r-2xl flex items-center gap-3 font-medium"
+                    className="mb-8 p-4 bg-red-50/50 dark:bg-red-900/10 backdrop-blur-sm border-l-4 border-red-500 text-red-700 dark:text-red-400 text-sm rounded-r-2xl flex items-center gap-3 font-medium transition-colors"
                   >
                     <div className="shrink-0 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-black shadow-lg shadow-red-200">
                       !
@@ -254,7 +254,7 @@ export default function SignupPage() {
                   <motion.div
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="mb-8 p-4 bg-emerald-50/50 backdrop-blur-sm border-l-4 border-emerald-500 text-emerald-700 text-sm rounded-r-2xl flex items-center gap-3 font-medium"
+                    className="mb-8 p-4 bg-emerald-50/50 dark:bg-emerald-900/10 backdrop-blur-sm border-l-4 border-emerald-500 text-emerald-700 dark:text-emerald-400 text-sm rounded-r-2xl flex items-center gap-3 font-medium transition-colors"
                   >
                     <CheckCircle2
                       size={20}
@@ -297,10 +297,10 @@ export default function SignupPage() {
                             }
                             className={`w-11 h-16 sm:w-14 sm:h-20 border-2 rounded-2xl text-3xl font-black text-center flex items-center justify-center transition-all duration-300 ${
                               digit
-                                ? "border-purple-600 bg-white ring-8 ring-purple-600/5 shadow-[0_10px_40px_-10px_rgba(147,51,234,0.3)] text-slate-900"
+                                ? "border-purple-600 bg-white dark:bg-slate-900 ring-8 ring-purple-600/5 shadow-[0_10px_40px_-10px_rgba(147,51,234,0.3)] text-slate-900 dark:text-white"
                                 : isFocused
-                                  ? "border-purple-400 bg-white ring-8 ring-purple-600/10"
-                                  : "border-slate-100 bg-slate-50/50 text-slate-300"
+                                  ? "border-purple-400 bg-white dark:bg-slate-900 ring-8 ring-purple-600/10"
+                                  : "border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 text-slate-300 dark:text-slate-600"
                             }`}
                           >
                             {digit}
@@ -321,8 +321,8 @@ export default function SignupPage() {
                     <div
                       className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
                         timeLeft < 60
-                          ? "bg-red-50 text-red-500 animate-pulse"
-                          : "bg-slate-50 text-slate-500"
+                          ? "bg-red-50 dark:bg-red-900/20 text-red-500 animate-pulse"
+                          : "bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                       }`}
                     >
                       <RefreshCw
@@ -364,7 +364,7 @@ export default function SignupPage() {
                         type="button"
                         onClick={handleResendOTP}
                         disabled={resendLoading}
-                        className="group flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors disabled:opacity-50"
+                        className="group flex items-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors disabled:opacity-50"
                       >
                         {resendLoading ? (
                           <RefreshCw className="animate-spin h-4 w-4" />
@@ -387,7 +387,7 @@ export default function SignupPage() {
                           setIsExpired(false);
                           setError("");
                         }}
-                        className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full"
+                        className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-full"
                       >
                         <ArrowLeft size={14} />
                         Wrong email? Go back
@@ -399,27 +399,27 @@ export default function SignupPage() {
             ) : (
               <div className="animate-in fade-in duration-700">
                 <div className="text-center mb-10">
-                  <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">
+                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight transition-colors">
                     Join PrintNest
                   </h2>
-                  <p className="text-slate-500 font-medium">
+                  <p className="text-slate-500 dark:text-slate-400 font-medium transition-colors">
                     Start your journey today
                   </p>
                 </div>
 
                 {error && (
-                  <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-r-lg flex items-center gap-3">
-                    <div className="shrink-0 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center text-[10px] font-bold">
+                  <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 text-red-700 dark:text-red-400 text-sm rounded-r-lg flex items-center gap-3 transition-colors">
+                    <div className="shrink-0 w-5 h-5 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center text-[10px] font-bold">
                       !
                     </div>
                     {error}
                   </div>
                 )}
                 {successMessage && !error && (
-                  <div className="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 text-sm rounded-r-lg flex items-center gap-3 animate-in fade-in duration-300">
+                  <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/10 border-l-4 border-emerald-500 text-emerald-700 dark:text-emerald-400 text-sm rounded-r-lg flex items-center gap-3 animate-in fade-in duration-300 transition-colors">
                     <ShieldCheck
                       size={18}
-                      className="shrink-0 text-emerald-600"
+                      className="shrink-0 text-emerald-600 dark:text-emerald-400"
                     />
                     {successMessage}
                   </div>
@@ -427,13 +427,13 @@ export default function SignupPage() {
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                       Full Name
                     </label>
                     <input
                       type="text"
                       required
-                      className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-medium placeholder:text-slate-300"
+                      className="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all font-medium placeholder:text-slate-300 dark:placeholder:text-slate-600 bg-white dark:bg-slate-800"
                       placeholder="e.g. Alexander Pierce"
                       value={formData.name}
                       onChange={(e) =>
@@ -442,13 +442,13 @@ export default function SignupPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                       Email Address
                     </label>
                     <input
                       type="email"
                       required
-                      className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-medium placeholder:text-slate-300"
+                      className="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all font-medium placeholder:text-slate-300 dark:placeholder:text-slate-600 bg-white dark:bg-slate-800"
                       placeholder="alex@example.com"
                       value={formData.email}
                       onChange={(e) =>
@@ -457,14 +457,14 @@ export default function SignupPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                       Password
                     </label>
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
                         required
-                        className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all pr-12 font-medium placeholder:text-slate-300"
+                        className="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all pr-12 font-medium placeholder:text-slate-300 dark:placeholder:text-slate-600 bg-white dark:bg-slate-800"
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={(e) =>
@@ -488,7 +488,9 @@ export default function SignupPage() {
                         <div
                           key={req.id}
                           className={`text-[11px] font-bold flex items-center gap-2 transition-colors ${
-                            req.met ? "text-emerald-500" : "text-slate-300"
+                            req.met
+                              ? "text-emerald-500"
+                              : "text-slate-300 dark:text-slate-600"
                           }`}
                         >
                           <motion.div
@@ -496,7 +498,7 @@ export default function SignupPage() {
                             className={`w-1.5 h-1.5 rounded-full ${
                               req.met
                                 ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                                : "bg-slate-200"
+                                : "bg-slate-200 dark:bg-slate-700"
                             }`}
                           />
                           {req.label}
@@ -525,12 +527,12 @@ export default function SignupPage() {
                   </div>
                 </form>
 
-                <div className="text-center text-sm mt-10 pt-8 border-t border-slate-100">
-                  <p className="text-slate-500 font-medium">
+                <div className="text-center text-sm mt-10 pt-8 border-t border-slate-100 dark:border-slate-800 transition-colors">
+                  <p className="text-slate-500 dark:text-slate-400 font-medium transition-colors">
                     Already have an account?{" "}
                     <Link
                       href="/login"
-                      className="font-bold text-purple-600 hover:text-purple-500 hover:underline ml-1"
+                      className="font-bold text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 hover:underline ml-1"
                     >
                       Sign In
                     </Link>

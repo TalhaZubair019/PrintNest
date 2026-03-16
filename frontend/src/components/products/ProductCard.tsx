@@ -25,7 +25,7 @@ function ProductCard({
     <Link href={`/product/${encodeURIComponent(slug)}`}>
       <motion.div
         whileHover={{ y: -8, transition: { duration: 0.2 } }}
-        className="relative min-w-70 md:min-w-75 bg-white hover:bg-[#F9FAFF] border border-slate-100 rounded-4xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 snap-center group overflow-hidden"
+        className="relative min-w-70 md:min-w-75 bg-white dark:bg-slate-900 hover:bg-[#F9FAFF] dark:hover:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-4xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 snap-center group overflow-hidden"
       >
         <div className="absolute top-4 right-4 z-20 flex flex-col gap-3 opacity-100 lg:opacity-0 translate-x-0 lg:translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out delay-75">
           <button
@@ -34,7 +34,7 @@ function ProductCard({
               e.stopPropagation();
               onCompare(product);
             }}
-            className="w-10 h-10 rounded-full bg-white shadow-md text-slate-400 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-colors"
+            className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-md text-slate-400 dark:text-slate-500 hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors"
           >
             <Maximize2 size={18} />
           </button>
@@ -44,7 +44,7 @@ function ProductCard({
               e.stopPropagation();
               onQuickView(product);
             }}
-            className="w-10 h-10 rounded-full bg-white shadow-md text-slate-400 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-colors"
+            className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-md text-slate-400 dark:text-slate-500 hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors"
           >
             <Eye size={18} />
           </button>
@@ -57,17 +57,17 @@ function ProductCard({
             className={`w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all ${
               activeWishlist
                 ? "bg-red-500 text-white"
-                : "bg-white text-slate-400 hover:bg-blue-500 hover:text-white"
+                : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white"
             }`}
           >
             <Heart size={18} fill={activeWishlist ? "currentColor" : "none"} />
           </button>
         </div>
         <div className="mb-4">
-          <h4 className="font-bold text-xl text-slate-900 mb-1">
+          <h4 className="font-bold text-xl text-slate-900 dark:text-white mb-1">
             {product.title}
           </h4>
-          <p className="text-sm text-slate-500 font-light">
+          <p className="text-sm text-slate-500 dark:text-slate-400 font-light">
             {product.printText}
           </p>
         </div>
@@ -76,7 +76,7 @@ function ProductCard({
             src={product.image}
             alt={product.title}
             fill
-            className={`object-contain transition-transform duration-500 ${isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-105"}`}
+            className={`object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-500 ${isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-105"}`}
           />
           {isOutOfStock && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -87,7 +87,7 @@ function ProductCard({
           )}
         </div>
         <div className="flex justify-between items-center mb-2">
-          <span className="text-2xl font-bold text-slate-900">
+          <span className="text-2xl font-bold text-slate-900 dark:text-white">
             {product.price}
           </span>
           <div className="flex flex-wrap gap-2">
@@ -95,7 +95,7 @@ function ProductCard({
               (badge: string, idx: number) => (
                 <span
                   key={idx}
-                  className="px-4 py-1 rounded-full border border-red-300 text-red-500 text-sm font-semibold bg-white"
+                  className="px-4 py-1 rounded-full border border-red-300 dark:border-red-900 text-red-500 dark:text-red-400 text-sm font-semibold bg-white dark:bg-slate-900 shadow-sm"
                 >
                   {badge}
                 </span>
@@ -118,7 +118,7 @@ function ProductCard({
             disabled={addingToCart || isOutOfStock}
             className={`w-full h-full text-white font-bold text-lg flex items-center justify-between px-8 transition-colors ${
               isOutOfStock
-                ? "bg-slate-300 cursor-not-allowed"
+                ? "bg-slate-300 dark:bg-slate-700 cursor-not-allowed"
                 : "bg-linear-to-r from-[#6366F1] to-[#22D3EE] cursor-pointer"
             }`}
           >

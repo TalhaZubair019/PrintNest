@@ -329,7 +329,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
       {showAuthModal && (
         <AuthPromptModal
           onClose={() => {
@@ -340,11 +340,10 @@ export default function CheckoutPage() {
       <PageHeader
         title="Checkout"
         breadcrumb="Checkout"
-        backgroundImage={checkoutConfig.backgroundImage}
       />
 
       <div className="relative z-10">
-        <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
+        <div className="max-w-7xl mx-auto mt-16 px-4 lg:px-8 pb-32">
           <div
             className={`transition-all duration-300 ${
               hasMounted && (showAuthModal || isLoading)
@@ -361,11 +360,11 @@ export default function CheckoutPage() {
                 {hasMounted ? (
                   <OrderSummary cartItems={cartItems} subtotal={subtotal} />
                 ) : (
-                  <div className="bg-white border border-slate-200 rounded-lg p-6 lg:p-8 animate-pulse">
-                    <div className="h-6 w-32 bg-slate-100 rounded mb-6" />
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 lg:p-8 animate-pulse transition-colors">
+                    <div className="h-6 w-32 bg-slate-100 dark:bg-slate-800/50 rounded mb-6" />
                     <div className="space-y-6">
-                      <div className="h-16 bg-slate-50 rounded" />
-                      <div className="h-16 bg-slate-50 rounded" />
+                      <div className="h-16 bg-slate-50 dark:bg-slate-800/30 rounded" />
+                      <div className="h-16 bg-slate-50 dark:bg-slate-800/30 rounded" />
                     </div>
                   </div>
                 )}
@@ -396,7 +395,7 @@ export default function CheckoutPage() {
                 <div className="pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
                   <Link
                     href="/cart"
-                    className="flex items-center gap-2 text-slate-600 font-bold hover:text-slate-900 transition-colors"
+                    className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-bold hover:text-slate-900 dark:hover:text-white transition-colors"
                   >
                     <ChevronLeft size={16} /> Return to Cart
                   </Link>

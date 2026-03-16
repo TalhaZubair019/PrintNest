@@ -155,7 +155,7 @@ const DashboardModals: React.FC<DashboardModalsProps> = ({
         message={
           <>
             Are you sure you want to delete{" "}
-            <span className="font-bold text-slate-900">
+            <span className="font-bold text-slate-900 dark:text-white">
               {stats?.users.find((u) => u.id === deleteConfirm)?.name ||
                 "this user"}
             </span>
@@ -175,7 +175,7 @@ const DashboardModals: React.FC<DashboardModalsProps> = ({
         message={
           <>
             Promote{" "}
-            <span className="font-bold text-slate-900">
+            <span className="font-bold text-slate-900 dark:text-white">
               {promoteConfirm?.name}
             </span>{" "}
             to Administrator? They will have full access to the admin dashboard.
@@ -209,7 +209,7 @@ const DashboardModals: React.FC<DashboardModalsProps> = ({
         message={
           <>
             Remove admin privileges from{" "}
-            <span className="font-bold text-slate-900">
+            <span className="font-bold text-slate-900 dark:text-white">
               {revokeConfirm?.name}
             </span>
             ? They will become a regular user but their account will remain.

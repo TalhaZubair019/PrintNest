@@ -38,15 +38,15 @@ export default function BillingSection({
 
   return (
     <section>
-      <h2 className="text-lg font-bold text-slate-700 mb-4">Billing address</h2>
+      <h2 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 transition-colors">Billing address</h2>
 
       {hasMounted && isAuthenticated && (
         <div className="mb-6 space-y-3">
           <label
-            className={`flex items-center gap-3 cursor-pointer p-3 border rounded-lg transition-colors bg-white ${
+            className={`flex items-center gap-3 cursor-pointer p-3 border rounded-lg transition-colors bg-white dark:bg-slate-900 ${
               !hasProfileAddress
-                ? "opacity-60 cursor-not-allowed border-slate-200"
-                : "border-slate-200 hover:border-blue-300"
+                ? "opacity-60 cursor-not-allowed border-slate-200 dark:border-slate-800"
+                : "border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500"
             }`}
           >
             <input
@@ -55,15 +55,15 @@ export default function BillingSection({
               disabled={!hasProfileAddress}
               checked={isUsingSavedAddress}
               onChange={() => onAddressModeChange(true)}
-              className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 focus:ring-blue-500 dark:focus:ring-blue-600 bg-white dark:bg-slate-800"
             />
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="block text-sm font-bold text-slate-700">
+                  <span className="block text-sm font-bold text-slate-700 dark:text-slate-200">
                     Use saved address
                   </span>
-                  <span className="block text-xs text-slate-500 mt-1">
+                  <span className="block text-xs text-slate-500 dark:text-slate-400 mt-1">
                     {hasProfileAddress
                       ? `${user.address}, ${user.city}`
                       : "No address saved in your profile yet"}
@@ -77,7 +77,7 @@ export default function BillingSection({
                       e.stopPropagation();
                       setIsViewingSavedAddress(true);
                     }}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-700 px-3 py-1 bg-blue-50 rounded-md transition-colors"
+                    className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-md transition-colors"
                   >
                     View
                   </button>
@@ -86,7 +86,7 @@ export default function BillingSection({
             </div>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer p-3 border rounded-lg border-slate-200 hover:border-blue-300 transition-colors bg-white">
+          <label className="flex items-center gap-3 cursor-pointer p-3 border rounded-lg border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500 transition-colors bg-white dark:bg-slate-900">
             <input
               type="radio"
               name="addressMode"
@@ -94,15 +94,15 @@ export default function BillingSection({
               onChange={() => {
                 onAddressModeChange(false);
               }}
-              className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-700 focus:ring-blue-500 dark:focus:ring-blue-600 bg-white dark:bg-slate-800"
             />
-            <span className="block text-sm font-bold text-slate-700">
+            <span className="block text-sm font-bold text-slate-700 dark:text-slate-200">
               Use a different address
             </span>
           </label>
 
           {!isUsingSavedAddress && hasProfileAddress && (
-            <label className="flex items-center gap-2 mt-3 p-2 cursor-pointer bg-blue-50/50 rounded-md">
+            <label className="flex items-center gap-2 mt-3 p-2 cursor-pointer bg-blue-50/50 dark:bg-blue-900/10 rounded-md transition-colors">
               <input
                 type="checkbox"
                 checked={copyProfileAddress}
@@ -135,9 +135,9 @@ export default function BillingSection({
                     });
                   }
                 }}
-                className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 dark:text-blue-500 border-slate-300 dark:border-slate-700 rounded focus:ring-blue-500 dark:focus:ring-blue-600 bg-white dark:bg-slate-800"
               />
-              <span className="text-sm font-medium text-blue-800">
+              <span className="text-sm font-medium text-blue-800 dark:text-blue-300">
                 Copy my saved address data here
               </span>
             </label>
@@ -159,5 +159,6 @@ export default function BillingSection({
           />
         )}
     </section>
+
   );
 }

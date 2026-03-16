@@ -6,13 +6,11 @@ import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { addToCart } from "@/redux/CartSlice";
 import { toggleWishlist, WishlistItem } from "@/redux/WishListSlice";
-import { ChevronRight, ShoppingCart, Trash2 } from "lucide-react";
-import db from "@data/db.json";
+import { ShoppingCart, Trash2 } from "lucide-react";
 import Toast from "@/components/products/Toast";
 import Loading from "@/components/ui/Loading";
 import PageHeader from "@/components/ui/PageHeader";
 const pageConfig = {
-  backgroundImage: db.cart.backgroundImage,
   breadcrumbs: {
     home: "Home",
     current: "Wishlist",
@@ -74,39 +72,37 @@ export default function WishlistPage() {
 
   if (!isClient || loading) {
     return (
-      <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
+      <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center bg-white dark:bg-slate-950 transition-colors">
         <Loading />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
       <PageHeader
         title={pageConfig.breadcrumbs.current}
         breadcrumb={pageConfig.breadcrumbs.current}
-        backgroundImage={pageConfig.backgroundImage}
       />
 
       <div className="relative z-10">
-
-        <div className="max-w-7xl mx-auto mt-30 px-4 lg:px-8 pb-32">
+        <div className="max-w-7xl mx-auto mt-16 px-4 lg:px-8 pb-32">
           {wishlistItems.length === 0 ? (
             <EmptyWishlist />
           ) : (
             <div className="grid grid-cols-1 gap-16 items-start">
               <div className="w-full">
-                <div className="hidden md:flex justify-between border-b border-slate-200 pb-4 mb-8">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest w-1/2">
+                <div className="hidden md:flex justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-8 transition-colors">
+                  <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-1/2">
                     {pageConfig.columns.product}
                   </span>
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest w-1/6">
+                  <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-1/6">
                     {pageConfig.columns.price}
                   </span>
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest w-1/6">
+                  <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-1/6">
                     {pageConfig.columns.status}
                   </span>
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest w-1/6 text-right">
+                  <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-1/6 text-right">
                     {pageConfig.columns.action}
                   </span>
                 </div>
@@ -138,16 +134,15 @@ export default function WishlistPage() {
   );
 }
 
-
 function EmptyWishlist() {
   return (
-    <div className="text-center py-32 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
-      <h2 className="text-2xl font-bold text-slate-400 mb-6">
+    <div className="text-center py-32 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 transition-colors">
+      <h2 className="text-2xl font-bold text-slate-400 dark:text-slate-500 mb-6 transition-colors">
         {pageConfig.emptyState.message}
       </h2>
       <Link
         href={pageConfig.emptyState.redirectUrl}
-        className="px-10 py-4 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+        className="px-10 py-4 bg-blue-600 dark:bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 dark:hover:bg-blue-500 transition-all shadow-lg shadow-blue-200 dark:shadow-blue-900/20"
       >
         {pageConfig.emptyState.buttonText}
       </Link>
@@ -175,7 +170,7 @@ function AddToCartButton({
       disabled={adding || disabled}
       className={`flex items-center gap-2 px-5 py-2.5 text-white text-sm font-bold rounded-full shadow-md transition-all ${
         disabled
-          ? "bg-slate-300 cursor-not-allowed"
+          ? "bg-slate-300 dark:bg-slate-700 cursor-not-allowed"
           : "bg-linear-to-r from-blue-500 to-cyan-400 hover:shadow-lg hover:scale-105"
       } disabled:opacity-80`}
     >
@@ -229,7 +224,7 @@ function WishlistItemComponent({
     <div className="group">
       <div className="flex flex-col md:flex-row items-center gap-8">
         <div className="flex items-center gap-6 w-full md:w-1/2">
-          <div className="relative w-24 h-24 bg-white border border-slate-100 rounded-xl overflow-hidden shrink-0 shadow-sm">
+          <div className="relative w-24 h-24 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden shrink-0 shadow-sm transition-colors">
             {item.image ? (
               <Image
                 src={item.image}
@@ -251,15 +246,19 @@ function WishlistItemComponent({
             )}
           </div>
           <div>
-            <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">
+            <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wide mb-1 transition-colors">
               Product
             </h3>
-            <p className="font-bold text-slate-900 text-lg">{item.title}</p>
+            <p className="font-bold text-slate-900 dark:text-white text-lg transition-colors">
+              {item.title}
+            </p>
           </div>
         </div>
         <div className="w-full md:w-1/6 flex justify-between md:block">
-          <span className="md:hidden text-slate-500 font-medium">Price: </span>
-          <span className="text-slate-900 font-bold text-lg">
+          <span className="md:hidden text-slate-500 dark:text-slate-400 font-medium transition-colors">
+            Price:{" "}
+          </span>
+          <span className="text-slate-900 dark:text-white font-bold text-lg transition-colors">
             {typeof item.price === "number"
               ? `$${item.price.toFixed(2)}`
               : item.price.startsWith("$")
@@ -268,13 +267,15 @@ function WishlistItemComponent({
           </span>
         </div>
         <div className="w-full md:w-1/6 flex justify-between md:block">
-          <span className="md:hidden text-slate-500 font-medium">Status: </span>
+          <span className="md:hidden text-slate-500 dark:text-slate-400 font-medium transition-colors">
+            Status:{" "}
+          </span>
           {stockQuantity === 0 ? (
-            <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider">
+            <span className="inline-block px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-full uppercase tracking-wider transition-colors">
               Out Of Stock
             </span>
           ) : (
-            <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">
+            <span className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold rounded-full uppercase tracking-wider transition-colors">
               In Stock
             </span>
           )}
@@ -287,14 +288,14 @@ function WishlistItemComponent({
 
           <button
             onClick={handleRemove}
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all"
             title="Remove from wishlist"
           >
             <Trash2 size={18} />
           </button>
         </div>
       </div>
-      <div className="h-px w-full bg-slate-100 mt-8"></div>
+      <div className="h-px w-full bg-slate-100 dark:bg-slate-800 mt-8 transition-colors"></div>
     </div>
   );
 }

@@ -38,7 +38,7 @@ export default function AdminDashboard() {
 
   if (d.isAuthLoading || d.loading || !d.stats) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 dark:from-slate-950 dark:via-purple-900/10 dark:to-slate-950 font-sans transition-colors duration-300">
         <PageHeader
           title={
             d.mounted ? `Welcome, ${d.user?.name || "Admin"}` : "Admin Panel"
@@ -102,14 +102,14 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans text-slate-800">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 font-sans text-slate-800 dark:text-slate-200">
       <PageHeader
         title={
           d.mounted ? `Welcome, ${d.user?.name || "Admin"}` : "Admin Panel"
         }
         breadcrumb="Dashboard"
       />
-      <div className="max-w-full mx-auto px-4 lg:px-6 pt-2 pb-12">
+      <div className="max-w-full mx-auto px-4 lg:px-6 pt-8 pb-12">
         <DashboardHeader
           user={d.user}
           activeTab={d.activeTab}

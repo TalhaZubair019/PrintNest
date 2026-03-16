@@ -7,8 +7,8 @@ interface OrderStatusChartProps {
 
 const OrderStatusChart = ({ stats }: OrderStatusChartProps) => {
   return (
-    <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-      <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500">
+      <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
         Order Status Distribution
         <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse shadow-lg shadow-purple-300" />
       </h3>
@@ -74,6 +74,7 @@ const OrderStatusChart = ({ stats }: OrderStatusChartProps) => {
                   r="80"
                   fill="none"
                   stroke="#e2e8f0"
+                  className="dark:stroke-slate-800"
                   strokeWidth="40"
                 />
                 {data.map((item, i) => {
@@ -99,10 +100,10 @@ const OrderStatusChart = ({ stats }: OrderStatusChartProps) => {
           })()}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-3xl font-bold text-slate-900">
+              <p className="text-3xl font-bold text-slate-900 dark:text-white transition-colors">
                 {stats.totalOrders}
               </p>
-              <p className="text-xs text-slate-500">Total</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors">Total</p>
             </div>
           </div>
         </div>
@@ -144,7 +145,7 @@ const OrderStatusChart = ({ stats }: OrderStatusChartProps) => {
             return (
               <div key={idx} className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                <span className="text-slate-600 truncate">
+                <span className="text-slate-600 dark:text-slate-400 truncate">
                   {item.label} ({count})
                 </span>
               </div>

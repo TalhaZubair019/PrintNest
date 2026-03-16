@@ -25,10 +25,10 @@ function Footer() {
   };
 
   return (
-    <footer className="relative bg-[#0a0a0a] mt-24 sm:mt-32 px-4 sm:px-8 lg:px-20 pt-32 sm:pt-40 lg:pt-44 pb-12 font-sans">
+    <footer className="relative bg-[#020617] mt-32 sm:mt-40 lg:mt-48 px-4 sm:px-8 lg:px-20 pt-32 sm:pt-40 lg:pt-44 pb-12 font-sans">
       <div className="absolute left-0 right-0 -top-32 px-4 md:px-6 z-30">
         <div className="max-w-2xl mx-auto">
-          <div className="relative bg-linear-to-br from-[#6d05ff] to-[#06b3ca] rounded-4xl p-6 md:px-12 md:py-8 lg:py-10 shadow-2xl overflow-hidden shadow-orange-500/20">
+          <div className="relative bg-linear-to-br from-[#6d05ff] to-[#06b3ca] rounded-4xl p-6 md:px-12 md:py-8 lg:py-10 shadow-2xl overflow-hidden shadow-blue-500/20">
             <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 leading-tight tracking-tight">
                 {newsletter.titlePart1} {newsletter.titlePart2}
@@ -41,7 +41,7 @@ function Footer() {
                 <input
                   type="email"
                   placeholder={newsletter.placeholder}
-                  className="flex-1 px-8 py-4 rounded-full bg-white/10 border border-white/20 placeholder-white/60 text-white text-base focus:outline-none focus:ring-2 focus:ring-white/40 backdrop-blur-xl transition-all shadow-inner"
+                  className="flex-1 px-8 py-4 rounded-full bg-white/20 border border-white/30 placeholder-white/70 text-white text-base focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-xl transition-all shadow-inner"
                 />
                 <button className="px-10 py-4 bg-white text-[#06b3ca] font-black rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 whitespace-nowrap text-base cursor-pointer">
                   {newsletter.buttonText}
@@ -60,7 +60,7 @@ function Footer() {
                 alt="Brand Logo"
                 width={140}
                 height={40}
-                className="h-8 w-auto brightness-0 invert"
+                className="h-8 w-auto dark:brightness-0 dark:invert"
                 unoptimized
               />
             </div>

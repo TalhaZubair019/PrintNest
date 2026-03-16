@@ -123,21 +123,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors">
       <PageHeader title="Login" breadcrumb="Login" />
       <div className="relative z-10">
-        <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-          <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">
+        <div className="max-w-7xl mx-auto mt-10 px-4 lg:px-8 pb-32">
+          <div className="max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 transition-all">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 text-center">
               Welcome Back
             </h2>
-            <p className="text-slate-500 text-center mb-8">
+            <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
               Sign in to your account
             </p>
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
-                <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">
+                <div className="text-red-500 text-sm text-center bg-red-50 dark:bg-red-900/10 p-2 rounded border border-red-100 dark:border-red-900/20">
                   {error}
                 </div>
               )}
@@ -147,14 +147,14 @@ export default function LoginPage() {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Email Address
                 </label>
                 <input
                   type="email"
                   name="email"
                   required
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                  className="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 bg-white dark:bg-slate-800 transition-all"
                   placeholder="name@example.com"
                   value={formData.email}
                   onChange={(e) =>
@@ -163,7 +163,7 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Password
                 </label>
                 <div className="relative">
@@ -171,7 +171,7 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     required
-                    className="w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all pr-12"
+                    className="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 bg-white dark:bg-slate-800 transition-all pr-12"
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) =>
@@ -181,7 +181,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -193,7 +193,7 @@ export default function LoginPage() {
                   <div className="relative flex items-center justify-center">
                     <input
                       type="checkbox"
-                      className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all checked:border-purple-500 checked:bg-purple-500 focus:ring-2 focus:ring-purple-100"
+                      className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 transition-all checked:border-purple-500 checked:bg-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
@@ -210,14 +210,14 @@ export default function LoginPage() {
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                     Remember me
                   </span>
                 </label>
 
                 <Link
                   href="/forgot-password"
-                  className="text-sm font-bold text-purple-600 hover:text-purple-500 hover:underline"
+                  className="text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -226,7 +226,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-lg bg-linear-to-r from-purple-600 to-teal-400 text-white font-bold shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.01] transition-all disabled:opacity-70 disabled:scale-100 flex justify-center items-center gap-2"
+                className="w-full py-3.5 rounded-lg bg-linear-to-r from-purple-600 to-teal-400 text-white font-bold shadow-lg shadow-purple-200 dark:shadow-purple-900/20 hover:shadow-xl hover:scale-[1.01] transition-all disabled:opacity-70 disabled:scale-100 flex justify-center items-center gap-2"
               >
                 {loading ? (
                   <Loader2 className="animate-spin h-5 w-5" />
@@ -236,11 +236,11 @@ export default function LoginPage() {
               </button>
             </form>
             <div className="text-center text-sm mt-6">
-              <p className="text-slate-600">
+              <p className="text-slate-600 dark:text-slate-400">
                 Don't have an account?{" "}
                 <Link
                   href="/signup"
-                  className="font-bold text-purple-600 hover:text-purple-500 hover:underline"
+                  className="font-bold text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 hover:underline"
                 >
                   Sign up
                 </Link>

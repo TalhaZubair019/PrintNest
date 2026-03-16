@@ -42,7 +42,7 @@ const BlindsImage = ({
         {bars.map((_, i) => (
           <motion.div
             key={i}
-            className="flex-1 w-full bg-slate-200 border-b border-white/50"
+            className="flex-1 w-full bg-slate-200 dark:bg-slate-800 border-b border-white/50 dark:border-slate-700/50"
             initial={{ opacity: 1, scaleY: 1 }}
             whileInView={{ opacity: 0, scaleY: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -202,7 +202,7 @@ function FeaturedProducts() {
   return (
     <section
       id="products"
-      className="scroll-mt-24 py-16 sm:py-20 mx-4 sm:mx-8 lg:mx-20 lg:py-28 bg-white overflow-hidden relative"
+      className="scroll-mt-24 py-16 sm:py-20 mx-4 sm:mx-8 lg:mx-20 lg:py-28 bg-white dark:bg-slate-950 overflow-hidden relative transition-colors duration-300"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col min-[500px]:flex-row justify-between items-center min-[500px]:items-end mb-12 gap-8 text-center min-[500px]:text-left">
@@ -212,7 +212,7 @@ function FeaturedProducts() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-base text-blue-800 uppercase mb-3"
+              className="text-base text-blue-800 dark:text-blue-400 uppercase mb-3"
             >
               {productsData.sectionLabel}
             </motion.p>
@@ -222,7 +222,7 @@ function FeaturedProducts() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-2xl sm:text-3xl lg:text-5xl font-medium text-slate-900 leading-tight"
+              className="text-2xl sm:text-3xl lg:text-5xl font-medium text-slate-900 dark:text-white leading-tight"
             >
               {productsData.headingMain} <br />
               <span className="text-[#FF7F7F] border-b-4 border-[#FF7F7F] pb-1">
@@ -236,7 +236,7 @@ function FeaturedProducts() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-black font-light"
+              className="text-black dark:text-slate-300 font-light"
             >
               {productsData.description}
             </motion.p>
@@ -250,7 +250,7 @@ function FeaturedProducts() {
               transition={{ delay: 0.4, type: "spring" }}
             >
               <span
-                className="absolute inset-0 rounded-full border-2 border-transparent translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0 [background:linear-gradient(white,white)_padding-box,linear-gradient(to_right,#7f22fe,#26C6DA)_border-box] mask[linear-gradient(#fff_0_0)_padding-box,linear-gradient(#fff_0_0)] mask-exclude"
+                className="absolute inset-0 rounded-full border-2 border-transparent translate-x-1.5 translate-y-1.5 transition-transform duration-200 ease-in-out group-hover:translate-x-0 group-hover:translate-y-0 [background:linear-gradient(white,white)_padding-box,linear-gradient(to_right,#7f22fe,#26C6DA)_border-box] dark:[background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(to_right,#7f22fe,#26C6DA)_border-box] mask[linear-gradient(#fff_0_0)_padding-box,linear-gradient(#fff_0_0)] mask-exclude"
                 style={{
                   background:
                     "linear-gradient(to right, #7f22fe, #26C6DA) border-box",
@@ -288,7 +288,7 @@ function FeaturedProducts() {
               {loading ? (
                 <div className="flex gap-6 w-full items-center justify-center py-20">
                   <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-slate-400 font-medium">
+                  <p className="text-slate-400 dark:text-slate-500 font-medium">
                     Loading products...
                   </p>
                 </div>
@@ -320,7 +320,7 @@ function FeaturedProducts() {
                     e.stopPropagation();
                     scroll("prev");
                   }}
-                  className="w-12 h-12 rounded-full border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-white hover:text-indigo-600 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/10 transition-all bg-white shadow-sm group cursor-pointer active:scale-90 touch-manipulation relative z-50"
+                  className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-white dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-100 dark:hover:border-indigo-900/50 hover:shadow-xl hover:shadow-indigo-500/10 transition-all bg-white dark:bg-slate-900 shadow-sm group cursor-pointer active:scale-90 touch-manipulation relative z-50"
                   aria-label="Previous products"
                 >
                   <ChevronsLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform pointer-events-none" />
@@ -331,14 +331,14 @@ function FeaturedProducts() {
                     e.stopPropagation();
                     scroll("next");
                   }}
-                  className="w-12 h-12 rounded-full border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-white hover:text-indigo-600 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/10 transition-all bg-white shadow-sm group cursor-pointer active:scale-90 touch-manipulation relative z-50"
+                  className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-white dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-100 dark:hover:border-indigo-900/50 hover:shadow-xl hover:shadow-indigo-500/10 transition-all bg-white dark:bg-slate-900 shadow-sm group cursor-pointer active:scale-90 touch-manipulation relative z-50"
                   aria-label="Next products"
                 >
                   <ChevronsRight className="w-5 h-5 group-hover:translate-x-1 transition-transform pointer-events-none" />
                 </button>
               </div>
 
-              <div className="grow h-1 bg-slate-100 rounded-full overflow-hidden relative">
+              <div className="grow h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden relative">
                 <div
                   className="h-full bg-indigo-600 rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(79,70,229,0.5)]"
                   style={{ width: `${Math.max(10, scrollProgress)}%` }}

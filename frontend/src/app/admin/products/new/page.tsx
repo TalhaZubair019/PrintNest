@@ -146,18 +146,18 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/20 to-slate-50 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans transition-colors duration-300">
       <PageHeader
         title="Add New Product"
         breadcrumb="Add Product"
       />
 
-      <div className="max-w-5xl mx-auto px-4 lg:px-8 py-12">
+      <div className="max-w-5xl mx-auto px-4 lg:px-8 pt-8 pb-12">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3 space-y-5">
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <label className="block text-sm font-bold mb-2 text-slate-700">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+                <label className="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-200">
                   Product Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -171,11 +171,11 @@ export default function NewProductPage() {
                     }))
                   }
                   placeholder="e.g., Premium Cotton T-Shirt"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 text-slate-800 transition-all"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/40 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all"
                 />
               </div>
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <label className="block text-sm font-bold mb-2 text-slate-700">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+                <label className="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-200">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -187,7 +187,7 @@ export default function NewProductPage() {
                       category: e.target.value,
                     }))
                   }
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 bg-white transition-all"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/40 transition-all text-slate-800 dark:text-slate-100"
                 >
                   <option value="" disabled>
                     Select a Category
@@ -200,16 +200,16 @@ export default function NewProductPage() {
                 </select>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
                 <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-bold text-slate-700">
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
                     Description
                   </label>
                   <button
                     type="button"
                     onClick={handleGenerateDescription}
                     disabled={isGenerating || !productForm.title}
-                    className="text-xs flex items-center gap-1.5 bg-linear-to-r from-purple-600 to-violet-600 text-white px-3 py-1.5 rounded-full font-bold hover:opacity-90 transition-opacity disabled:opacity-40 shadow-sm shadow-purple-200"
+                    className="text-xs flex items-center gap-1.5 bg-linear-to-r from-purple-600 to-violet-600 dark:from-purple-500 dark:to-violet-500 text-white px-3 py-1.5 rounded-full font-bold hover:opacity-90 transition-opacity disabled:opacity-40 shadow-sm shadow-purple-200 dark:shadow-none"
                   >
                     {isGenerating ? (
                       <>
@@ -233,16 +233,16 @@ export default function NewProductPage() {
                     }))
                   }
                   placeholder="Enter a product description or click AI Generate to create one from the title and category..."
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 resize-none text-sm text-slate-700 transition-all"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/40 resize-none text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all"
                 />
               </div>
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <h3 className="text-sm font-bold text-slate-700 mb-4">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+                <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-4">
                   Pricing
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold mb-1.5 text-slate-500 uppercase tracking-wide">
+                    <label className="block text-xs font-semibold mb-1.5 text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                       Price ($) <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -258,11 +258,11 @@ export default function NewProductPage() {
                         }))
                       }
                       placeholder="0.00"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/40 text-slate-800 dark:text-slate-100 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold mb-1.5 text-slate-500 uppercase tracking-wide">
+                    <label className="block text-xs font-semibold mb-1.5 text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                       Old Price ($)
                     </label>
                     <input
@@ -277,14 +277,14 @@ export default function NewProductPage() {
                         }))
                       }
                       placeholder="0.00"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/40 text-slate-800 dark:text-slate-100 transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <label className="block text-sm font-bold mb-3 text-slate-700">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+                <label className="block text-sm font-bold mb-3 text-slate-700 dark:text-slate-200">
                   Product Badges{" "}
                   <span className="text-xs text-slate-400 font-normal">
                     (Select all that apply)
@@ -298,8 +298,8 @@ export default function NewProductPage() {
                     }
                     className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border-2 ${
                       productForm.badges.length === 0
-                        ? "bg-slate-900 border-slate-900 text-white shadow-md shadow-slate-100"
-                        : "bg-slate-50 border-slate-100 text-slate-600 hover:border-slate-200 hover:bg-slate-100"
+                        ? "bg-slate-900 dark:bg-slate-100 border-slate-900 dark:border-slate-100 text-white dark:text-slate-900 shadow-md shadow-slate-100 dark:shadow-none"
+                        : "bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
                     }`}
                   >
                     None
@@ -327,8 +327,8 @@ export default function NewProductPage() {
                         }}
                         className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border-2 ${
                           isSelected
-                            ? "bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-100"
-                            : "bg-slate-50 border-slate-100 text-slate-600 hover:border-purple-200 hover:bg-slate-100"
+                            ? "bg-purple-600 dark:bg-purple-500 border-purple-600 dark:border-purple-500 text-white shadow-md shadow-purple-100 dark:shadow-none"
+                            : "bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-purple-200 dark:hover:border-purple-500/50 hover:bg-slate-100 dark:hover:bg-slate-700"
                         }`}
                       >
                         {badge}
@@ -339,8 +339,8 @@ export default function NewProductPage() {
               </div>
             </div>
             <div className="lg:col-span-2 space-y-5">
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <label className="block text-sm font-bold mb-3 text-slate-700">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+                <label className="block text-sm font-bold mb-3 text-slate-700 dark:text-slate-200">
                   Product Image <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -352,7 +352,7 @@ export default function NewProductPage() {
                 />
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full aspect-square bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center relative overflow-hidden cursor-pointer hover:border-purple-400 hover:bg-purple-50/30 transition-all group mb-4"
+                  className="w-full aspect-square bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center relative overflow-hidden cursor-pointer hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50/30 dark:hover:bg-purple-900/20 transition-all group mb-4"
                 >
                   {productForm.image ? (
                     <Image
@@ -363,7 +363,7 @@ export default function NewProductPage() {
                       unoptimized
                     />
                   ) : (
-                    <div className="flex flex-col items-center gap-2 text-slate-400 group-hover:text-purple-500 transition-colors">
+                    <div className="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 group-hover:text-purple-500 transition-colors">
                       <Upload size={32} strokeWidth={1.5} />
                       <span className="text-xs font-medium">
                         Click to upload
@@ -375,17 +375,17 @@ export default function NewProductPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full px-4 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2 mb-3"
+                  className="w-full px-4 py-2.5 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-purple-600 dark:hover:bg-purple-500 transition-colors flex items-center justify-center gap-2 mb-3 border border-transparent dark:border-slate-700"
                 >
                   <Upload size={15} /> Choose File
                 </button>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-100" />
+                    <div className="w-full border-t border-slate-100 dark:border-slate-800" />
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-white px-2 text-xs text-slate-400">
+                    <span className="bg-white dark:bg-slate-900 px-2 text-xs text-slate-400 dark:text-slate-500 transition-colors">
                       or paste URL
                     </span>
                   </div>
@@ -402,14 +402,14 @@ export default function NewProductPage() {
                     }));
                   }}
                   placeholder="https://example.com/image.png"
-                  className="w-full mt-3 px-3 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                  className="w-full mt-3 px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/40 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all"
                 />
               </div>
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-3">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-3">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3.5 bg-linear-to-r from-purple-600 to-violet-600 text-white font-bold rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-opacity shadow-lg shadow-purple-200"
+                  className="w-full px-4 py-3.5 bg-linear-to-r from-purple-600 to-violet-600 dark:from-purple-500 dark:to-violet-500 text-white font-bold rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-opacity shadow-lg shadow-purple-200 dark:shadow-none"
                 >
                   {isSubmitting ? (
                     <>
@@ -423,16 +423,16 @@ export default function NewProductPage() {
                 </button>
                 <Link
                   href="/admin/dashboard?tab=products"
-                  className="w-full px-4 py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200 text-center transition-colors text-slate-700 text-sm flex items-center justify-center"
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-800 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-center transition-colors text-slate-700 dark:text-slate-200 text-sm flex items-center justify-center"
                 >
                   Cancel
                 </Link>
               </div>
-              <div className="bg-linear-to-br from-purple-50 to-violet-50 rounded-2xl border border-purple-100 p-5">
-                <p className="text-xs font-bold text-purple-700 mb-2 uppercase tracking-wide">
+              <div className="bg-linear-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-2xl border border-purple-100 dark:border-purple-800/50 p-5">
+                <p className="text-xs font-bold text-purple-700 dark:text-purple-400 mb-2 uppercase tracking-wide">
                   ✦ Tips
                 </p>
-                <ul className="text-xs text-slate-600 space-y-1.5 leading-relaxed">
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
                   <li>• Use a square image for best results</li>
                   <li>• Add a badge like "New" or "Sale" to highlight deals</li>
                   <li>• Type a title first to use AI description generation</li>

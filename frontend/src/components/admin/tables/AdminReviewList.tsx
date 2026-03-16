@@ -174,22 +174,22 @@ export default function AdminReviewList({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-      <div className="p-6 border-b border-slate-100 space-y-4">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors">
+      <div className="p-6 border-b border-slate-100 dark:border-slate-800 space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
               Review Management
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Manage and filter customer feedback
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-purple-100">
+            <span className="bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-purple-100 dark:ring-purple-800/50">
               {filteredReviews.length} Showing
             </span>
-            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold">
+            <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-3 py-1 rounded-full text-xs font-bold">
               {reviews.length} Total
             </span>
           </div>
@@ -203,11 +203,11 @@ export default function AdminReviewList({
             <select
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 dark:text-slate-100 font-medium"
             >
               <option value="all">All Users</option>
               {(users.length > 0 ? users : uniqueUsersInReviews).map((u) => (
-                <option key={u.id} value={u.id}>
+                <option key={u.id} value={u.id} className="dark:bg-slate-800">
                   {u.name}
                   {u.name && nameFrequencies[u.name] > 1 && u.email
                     ? ` (${u.email})`
@@ -224,11 +224,15 @@ export default function AdminReviewList({
             <select
               value={selectedProductId}
               onChange={(e) => setSelectedProductId(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 dark:text-slate-100 font-medium"
             >
               <option value="all">All Products</option>
               {products.map((p) => (
-                <option key={p.id} value={p.id.toString()}>
+                <option
+                  key={p.id}
+                  value={p.id.toString()}
+                  className="dark:bg-slate-800"
+                >
                   {p.title}
                 </option>
               ))}
@@ -242,13 +246,23 @@ export default function AdminReviewList({
             <select
               value={selectedDateRange}
               onChange={(e) => setSelectedDateRange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 dark:text-slate-100 font-medium"
             >
-              <option value="all">Total Timeline</option>
-              <option value="week">Last 7 Days</option>
-              <option value="month">Last 30 Days</option>
-              <option value="current-month">Current Month</option>
-              <option value="custom">Custom Range</option>
+              <option value="all" className="dark:bg-slate-800">
+                Total Timeline
+              </option>
+              <option value="week" className="dark:bg-slate-800">
+                Last 7 Days
+              </option>
+              <option value="month" className="dark:bg-slate-800">
+                Last 30 Days
+              </option>
+              <option value="current-month" className="dark:bg-slate-800">
+                Current Month
+              </option>
+              <option value="custom" className="dark:bg-slate-800">
+                Custom Range
+              </option>
             </select>
           </div>
 
@@ -259,11 +273,17 @@ export default function AdminReviewList({
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 font-medium"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all appearance-none text-slate-700 dark:text-slate-100 font-medium"
             >
-              <option value="all">Any Status</option>
-              <option value="edited">Edited Reviews</option>
-              <option value="unedited">Unedited Reviews</option>
+              <option value="all" className="dark:bg-slate-800">
+                Any Status
+              </option>
+              <option value="edited" className="dark:bg-slate-800">
+                Edited Reviews
+              </option>
+              <option value="unedited" className="dark:bg-slate-800">
+                Unedited Reviews
+              </option>
             </select>
           </div>
 
@@ -280,7 +300,7 @@ export default function AdminReviewList({
                 setCustomStart("");
                 setCustomEnd("");
               }}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
             >
               <FilterX size={16} />
               Clear
@@ -289,9 +309,9 @@ export default function AdminReviewList({
         </div>
 
         {selectedDateRange === "custom" && (
-          <div className="flex flex-wrap items-center gap-3 pt-2 bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex flex-wrap items-center gap-3 pt-2 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                 From
               </label>
               <input
@@ -299,11 +319,11 @@ export default function AdminReviewList({
                 value={customStart}
                 max={customEnd || undefined}
                 onChange={(e) => setCustomStart(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white dark:bg-slate-900"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                 To
               </label>
               <input
@@ -311,15 +331,15 @@ export default function AdminReviewList({
                 value={customEnd}
                 min={customStart || undefined}
                 onChange={(e) => setCustomEnd(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white dark:bg-slate-900"
               />
             </div>
           </div>
         )}
       </div>
-      <div className="lg:hidden divide-y divide-slate-100 border-t border-slate-100">
+      <div className="lg:hidden divide-y divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800">
         {filteredReviews.length === 0 ? (
-          <div className="px-6 py-10 text-center text-slate-500 italic">
+          <div className="px-6 py-10 text-center text-slate-500 dark:text-slate-400 italic">
             No reviews found.
           </div>
         ) : (
@@ -328,33 +348,33 @@ export default function AdminReviewList({
             return (
               <div
                 key={review.id}
-                className="p-4 space-y-4 hover:bg-slate-50 transition-colors"
+                className="p-4 space-y-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-bold shrink-0 border border-slate-200">
+                    <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-white text-sm font-bold shrink-0 border border-slate-200 dark:border-slate-700">
                       {review.userName?.[0]?.toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-slate-900 text-sm truncate">
+                      <div className="font-bold text-slate-900 dark:text-slate-100 text-sm truncate">
                         {review.userName}
                       </div>
-                      <div className="text-[10px] text-slate-500 font-medium whitespace-nowrap">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
                         {review.date}
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDelete(review.id)}
-                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all border border-slate-100 bg-white"
+                    className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
 
                 {product && (
-                  <div className="flex items-center gap-3 p-2.5 bg-white rounded-xl border border-slate-100">
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border border-slate-50">
+                  <div className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border border-slate-50 dark:border-slate-800">
                       <Image
                         src={product.image}
                         alt={product.title}
@@ -363,10 +383,10 @@ export default function AdminReviewList({
                       />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                      <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">
                         Product Reviewed
                       </div>
-                      <div className="text-xs font-bold text-slate-700 truncate max-w-[180px]">
+                      <div className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate max-w-[180px]">
                         {product.title}
                       </div>
                     </div>
@@ -383,7 +403,7 @@ export default function AdminReviewList({
                           className={
                             i < review.rating
                               ? "fill-current"
-                              : "text-slate-200"
+                              : "text-slate-200 dark:text-slate-700"
                           }
                         />
                       ))}
@@ -395,7 +415,7 @@ export default function AdminReviewList({
                             expandedEditId === review.id ? null : review.id,
                           )
                         }
-                        className="text-[9px] uppercase text-blue-500 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100"
+                        className="text-[9px] uppercase text-blue-500 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800"
                       >
                         {expandedEditId === review.id
                           ? "Close Edit Hist."
@@ -403,14 +423,14 @@ export default function AdminReviewList({
                       </button>
                     )}
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-3 rounded-lg border border-slate-100/50">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium bg-slate-50/50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100/50 dark:border-slate-700/50">
                     "{review.comment}"
                   </p>
                 </div>
 
                 {expandedEditId === review.id && review.previousReview && (
-                  <div className="mt-2 p-3 bg-white rounded-xl border border-dashed border-slate-200 animate-in fade-in slide-in-from-top-1">
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  <div className="mt-2 p-3 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-top-1">
+                    <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">
                       Original Version
                     </div>
                     <div className="flex items-center gap-3 mb-2">
@@ -422,16 +442,16 @@ export default function AdminReviewList({
                             className={
                               i < review.previousReview!.rating
                                 ? "fill-current"
-                                : "text-slate-200"
+                                : "text-slate-200 dark:text-slate-700"
                             }
                           />
                         ))}
                       </div>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500">
                         {review.previousReview.date}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 italic">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
                       "{review.previousReview.comment}"
                     </p>
                   </div>
@@ -443,7 +463,7 @@ export default function AdminReviewList({
       </div>
       <div className="hidden lg:block overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-slate-50/50 text-slate-500 text-xs uppercase tracking-wider">
+          <thead className="bg-slate-50/50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
             <tr>
               <th className="px-6 py-4 font-bold">User</th>
               <th className="px-6 py-4 font-bold">Product</th>
@@ -453,18 +473,18 @@ export default function AdminReviewList({
               <th className="px-6 py-4 font-bold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {filteredReviews.map((review) => {
               const product = getProductDetails(review.productId);
               return (
                 <Fragment key={review.id}>
-                  <tr className="hover:bg-slate-50/50 transition-colors group">
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-bold">
+                        <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-bold">
                           {review.userName?.[0]?.toUpperCase()}
                         </div>
-                        <div className="font-bold text-slate-900">
+                        <div className="font-bold text-slate-900 dark:text-slate-100">
                           {review.userName}
                         </div>
                       </div>
@@ -472,7 +492,7 @@ export default function AdminReviewList({
                     <td className="px-6 py-4">
                       {product ? (
                         <div className="flex items-center gap-3">
-                          <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-slate-100">
+                          <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800">
                             <Image
                               src={product.image}
                               alt={product.title}
@@ -480,7 +500,7 @@ export default function AdminReviewList({
                               className="object-cover"
                             />
                           </div>
-                          <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate max-w-[120px]">
                             {product.title}
                           </span>
                         </div>
@@ -499,18 +519,18 @@ export default function AdminReviewList({
                             className={
                               i < review.rating
                                 ? "fill-current"
-                                : "text-slate-200"
+                                : "text-slate-200 dark:text-slate-700"
                             }
                           />
                         ))}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-slate-600 line-clamp-2 max-w-[200px]">
+                      <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 max-w-[200px]">
                         {review.comment}
                       </p>
                     </td>
-                    <td className="px-6 py-4 text-xs font-medium text-slate-500">
+                    <td className="px-6 py-4 text-xs font-medium text-slate-500 dark:text-slate-400">
                       {review.date}
                       {review.isEdited && (
                         <button
@@ -519,7 +539,7 @@ export default function AdminReviewList({
                               expandedEditId === review.id ? null : review.id,
                             )
                           }
-                          className="block mt-1 text-[10px] uppercase text-blue-500 hover:text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 transition-colors w-max px-1.5 py-0.5 rounded cursor-pointer"
+                          className="block mt-1 text-[10px] uppercase text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-bold bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors w-max px-1.5 py-0.5 rounded cursor-pointer"
                           title="View previous version"
                         >
                           Edited
@@ -530,7 +550,7 @@ export default function AdminReviewList({
                       <div className="flex justify-end gap-1">
                         <button
                           onClick={() => handleDelete(review.id)}
-                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                           title="Delete Review"
                         >
                           <Trash2 size={16} />
@@ -539,10 +559,10 @@ export default function AdminReviewList({
                     </td>
                   </tr>
                   {expandedEditId === review.id && review.previousReview && (
-                    <tr className="bg-slate-50/50">
+                    <tr className="bg-slate-50/50 dark:bg-slate-800/20">
                       <td colSpan={6} className="px-6 py-4">
-                        <div className="flex flex-col gap-2 p-4 bg-white rounded-xl border border-dashed border-slate-200 ml-12 animate-in fade-in slide-in-from-top-1">
-                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <div className="flex flex-col gap-2 p-4 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 ml-12 animate-in fade-in slide-in-from-top-1">
+                          <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                             Original Version Before Edit
                           </div>
                           <div className="flex items-center gap-4">
@@ -554,16 +574,16 @@ export default function AdminReviewList({
                                   className={
                                     i < review.previousReview!.rating
                                       ? "fill-current"
-                                      : "text-slate-200"
+                                      : "text-slate-200 dark:text-slate-700"
                                   }
                                 />
                               ))}
                             </div>
-                            <span className="text-xs font-medium text-slate-400">
+                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
                               {review.previousReview.date}
                             </span>
                           </div>
-                          <p className="text-sm text-slate-500 italic bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+                          <p className="text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50/50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
                             "{review.previousReview.comment}"
                           </p>
                         </div>
@@ -577,13 +597,13 @@ export default function AdminReviewList({
         </table>
         {filteredReviews.length === 0 && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-300 dark:text-slate-600 mb-4">
               <Filter size={32} />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
               No reviews found
             </h3>
-            <p className="text-slate-500 mt-1 max-w-xs mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
               No reviews match your current filter selection. Try adjusting your
               filters.
             </p>
@@ -595,7 +615,7 @@ export default function AdminReviewList({
                 setCustomStart("");
                 setCustomEnd("");
               }}
-              className="mt-6 text-sm font-bold text-purple-600 hover:text-purple-700"
+              className="mt-6 text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
             >
               Clear all filters
             </button>

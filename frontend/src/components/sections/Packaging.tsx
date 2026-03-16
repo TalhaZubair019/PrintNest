@@ -21,7 +21,7 @@ function PackagingHero() {
   };
 
   return (
-    <section className="relative bg-white min-h-screen font-sans">
+    <section className="relative bg-white dark:bg-slate-950 min-h-screen font-sans">
       <div
         className="pt-16 pb-48 lg:pb-64 px-6 bg-cover bg-center bg-no-repeat relative"
         style={{

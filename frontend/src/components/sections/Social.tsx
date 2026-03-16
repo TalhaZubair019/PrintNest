@@ -10,20 +10,20 @@ function Social() {
   const { title, logos } = socialData;
 
   return (
-    <section className="py-16 bg-white w-full flex justify-center">
+    <section className="py-16 bg-white dark:bg-slate-950 w-full flex justify-center">
       <div className="container max-w-6xl px-4">
         <div className="text-center mb-8">
-          <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
+          <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             {title}
           </h3>
         </div>
 
         <div className="relative flex items-center justify-center mb-10 w-full max-w-4xl mx-auto">
-          <div className="grow border-t border-slate-200"></div>
-          <span className="shrink-0 mx-4 text-slate-300">
+          <div className="grow border-t border-slate-200 dark:border-slate-800"></div>
+          <span className="shrink-0 mx-4 text-slate-300 dark:text-slate-700">
             <Sparkles size={20} strokeWidth={2.5} fill="currentColor" />
           </span>
-          <div className="grow border-t border-slate-200"></div>
+          <div className="grow border-t border-slate-200 dark:border-slate-800"></div>
         </div>
         <div className="flex flex-wrap   gap-8 md:gap-12 lg:gap-16">
           {logos.map((brand: { name: string; url: string }, index: number) => (
@@ -45,7 +45,7 @@ function Social() {
                   src={brand.url}
                   alt={`${brand.name} logo`}
                   fill
-                  className="object-contain"
+                  className="object-contain dark:brightness-0 dark:invert transition-all duration-300"
                   sizes="(max-width: 768px) 144px, 176px"
                 />
               </div>

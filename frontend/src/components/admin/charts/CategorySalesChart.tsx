@@ -23,9 +23,9 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
   let currentOffset = 0;
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl p-8 rounded-[32px] shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500 flex flex-col h-full">
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-8 rounded-[32px] shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-8">
-        <h3 className="font-bold text-xl text-slate-800 tracking-tight">
+        <h3 className="font-bold text-xl text-slate-800 dark:text-white tracking-tight">
           Sales by Category
         </h3>
         <div className="h-2 w-2 bg-purple-500 rounded-full" />
@@ -61,10 +61,10 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
             })}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 transition-colors">
               Total
             </span>
-            <span className="text-2xl font-black text-slate-900 leading-tight">
+            <span className="text-2xl font-black text-slate-900 dark:text-white leading-tight transition-colors">
               $
               {totalValue.toLocaleString(undefined, {
                 minimumFractionDigits: 0,
@@ -85,19 +85,19 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
                       className="w-2.5 h-2.5 rounded-full shadow-sm ring-2 ring-white"
                       style={{ backgroundColor: categoryColor }}
                     />
-                    <span className="text-[14px] font-bold text-slate-600 group-hover:text-slate-900 transition-colors">
+                    <span className="text-[14px] font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                       {item.category || "General"}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <span className="text-[14px] font-black text-slate-900 tabular-nums">
+                    <span className="text-[14px] font-black text-slate-900 dark:text-white tabular-nums">
                       ${item.value.toLocaleString()}
                     </span>
                     <div
                       className="px-2 py-0.5 rounded-md text-[10px] font-bold min-w-[45px] text-center border"
                       style={{
-                        backgroundColor: `${categoryColor}10`,
+                        backgroundColor: `${categoryColor}${i % 2 === 0 ? "10" : "20"}`,
                         borderColor: `${categoryColor}30`,
                         color: categoryColor,
                       }}
@@ -106,7 +106,7 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
                     </div>
                   </div>
                 </div>
-                <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100/50 mt-1">
+                <div className="h-1.5 w-full bg-slate-50 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-100/50 dark:border-slate-700 mt-1">
                   <div
                     className="h-full rounded-full transition-all duration-1000 ease-out"
                     style={{
@@ -122,61 +122,61 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t border-slate-100 mt-auto">
-        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-purple-200 transition-colors">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-purple-500">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t border-slate-100 dark:border-slate-800 mt-auto">
+        <div className="bg-slate-50/50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100/50 dark:border-slate-800/50 group hover:border-purple-200 dark:hover:border-purple-800 transition-colors">
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 group-hover:text-purple-500 transition-colors">
             Top Seller
           </p>
           <div className="flex flex-col gap-0.5">
-            <p className="text-lg font-black text-slate-800 tabular-nums leading-none">
+            <p className="text-lg font-black text-slate-800 dark:text-slate-200 tabular-nums leading-none transition-colors">
               ${stats.categoryPerformance?.topSeller.value.toLocaleString()}
             </p>
-            <p className="text-[10px] font-medium text-slate-400 truncate">
+            <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 truncate transition-colors">
               {stats.categoryPerformance?.topSeller.label}
             </p>
           </div>
         </div>
-        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-blue-200 transition-colors">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-blue-500">
+        <div className="bg-slate-50/50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100/50 dark:border-slate-800/50 group hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 group-hover:text-blue-500 transition-colors">
             Most Popular
           </p>
           <div className="flex flex-col gap-0.5">
-            <p className="text-lg font-black text-slate-800 tabular-nums leading-none">
+            <p className="text-lg font-black text-slate-800 dark:text-slate-200 tabular-nums leading-none transition-colors">
               {stats.categoryPerformance?.mostPopular.value.toLocaleString()}
-              <span className="text-[10px] ml-1 font-bold text-slate-400">
+              <span className="text-[10px] ml-1 font-bold text-slate-400 dark:text-slate-500">
                 units
               </span>
             </p>
-            <p className="text-[10px] font-medium text-slate-400 truncate">
+            <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 truncate transition-colors">
               {stats.categoryPerformance?.mostPopular.label}
             </p>
           </div>
         </div>
-        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-amber-200 transition-colors">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-amber-500">
+        <div className="bg-slate-50/50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100/50 dark:border-slate-800/50 group hover:border-amber-200 dark:hover:border-amber-800 transition-colors">
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 group-hover:text-amber-500 transition-colors">
             Highest Value
           </p>
           <div className="flex flex-col gap-0.5">
-            <p className="text-lg font-black text-slate-800 tabular-nums leading-none">
+            <p className="text-lg font-black text-slate-800 dark:text-slate-200 tabular-nums leading-none transition-colors">
               $
               {Math.round(
                 stats.categoryPerformance?.highestValue.value || 0,
               ).toLocaleString()}
             </p>
-            <p className="text-[10px] font-medium text-slate-400 truncate">
+            <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 truncate transition-colors">
               {stats.categoryPerformance?.highestValue.label} (AOV)
             </p>
           </div>
         </div>
-        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 group hover:border-emerald-200 transition-colors">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-emerald-500">
+        <div className="bg-slate-50/50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100/50 dark:border-slate-800/50 group hover:border-emerald-200 dark:hover:border-emerald-800 transition-colors">
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 group-hover:text-emerald-500 transition-colors">
             Best Fulfillment
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-lg border border-emerald-100">
+            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-lg border border-emerald-100 dark:border-emerald-800 transition-colors">
               {stats.categoryPerformance?.bestFulfillment.value}%
             </span>
-            <span className="text-[10px] font-medium text-slate-400 truncate">
+            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 truncate transition-colors">
               {stats.categoryPerformance?.bestFulfillment.label}
             </span>
           </div>

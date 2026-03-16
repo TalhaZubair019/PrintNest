@@ -144,7 +144,7 @@ export function useAdminDashboard() {
   useEffect(() => {
     if (!user?.isAdmin) return;
     const interval = setInterval(() => {
-      if (activeTab !== "warehouses") {
+      if (activeTab !== "warehouses" && activeTab !== "overview") {
         fetchStats();
       }
     }, 15000);

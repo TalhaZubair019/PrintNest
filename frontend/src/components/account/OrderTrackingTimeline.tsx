@@ -69,8 +69,8 @@ const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-full">
-      <h3 className="font-bold text-slate-900 text-lg mb-6 flex items-center gap-2">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 h-full transition-colors">
+      <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-6 flex items-center gap-2 transition-colors">
         <span className="text-xl">📍</span> Tracking Status
       </h3>
       <div className="space-y-0">
@@ -91,17 +91,17 @@ const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 border-2 transition-all ${
                     isCurrent
-                      ? "bg-purple-600 border-purple-600 shadow-lg shadow-purple-200 ring-4 ring-purple-100"
+                      ? "bg-purple-600 border-purple-600 shadow-lg shadow-purple-200 dark:shadow-purple-900/40 ring-4 ring-purple-100 dark:ring-purple-900/20"
                       : isCompleted
                         ? "bg-emerald-500 border-emerald-500"
-                        : "bg-white border-slate-200"
+                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                   }`}
                 >
                   {isCompleted ? (
                     <span className="text-white text-xs font-black">✓</span>
                   ) : (
                     <span
-                      className={isCurrent ? "text-white" : "text-slate-300"}
+                      className={isCurrent ? "text-white" : "text-slate-300 dark:text-slate-600"}
                     >
                       {step.icon}
                     </span>
@@ -109,35 +109,35 @@ const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                 </div>
                 {!isLast && (
                   <div
-                    className={`w-0.5 flex-1 my-1 min-h-[32px] rounded-full ${
-                      isCompleted ? "bg-emerald-400" : "bg-slate-100"
+                    className={`w-0.5 flex-1 my-1 min-h-[32px] rounded-full transition-colors ${
+                      isCompleted ? "bg-emerald-400 dark:bg-emerald-600" : "bg-slate-100 dark:bg-slate-800"
                     }`}
                   />
                 )}
               </div>
               <div className={`pb-6 ${isLast ? "pb-0" : ""} flex-1 pt-0.5`}>
                 <p
-                  className={`text-sm font-bold leading-tight ${
+                  className={`text-sm font-bold leading-tight transition-colors ${
                     isCurrent
-                      ? "text-purple-700"
+                      ? "text-purple-700 dark:text-purple-400"
                       : isCompleted
-                        ? "text-slate-800"
-                        : "text-slate-400"
+                        ? "text-slate-800 dark:text-slate-200"
+                        : "text-slate-400 dark:text-slate-600"
                   }`}
                 >
                   {label}
                   {isCurrent && (
-                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">
+                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-bold transition-colors">
                       Current
                     </span>
                   )}
                 </p>
                 {historyEntry && (
                   <div className="mt-1">
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed transition-colors">
                       {historyEntry.message}
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 transition-colors">
                       {formatDate(historyEntry.timestamp)}
                     </p>
                   </div>
@@ -148,7 +148,7 @@ const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
         })}
       </div>
       {isCancelled && (
-        <div className="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 text-xs text-red-600 font-medium">
+        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30 text-xs text-red-600 dark:text-red-400 font-medium transition-colors">
           Your order was cancelled. Contact support for help.
         </div>
       )}

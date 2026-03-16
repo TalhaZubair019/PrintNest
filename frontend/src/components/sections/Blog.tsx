@@ -33,7 +33,7 @@ const BlindsImage = ({
         {bars.map((_, i) => (
           <motion.div
             key={i}
-            className="flex-1 w-full bg-slate-200 border-b border-white/50"
+            className="flex-1 w-full bg-slate-200 dark:bg-slate-800 border-b border-white/50 dark:border-slate-700/50"
             initial={{ opacity: 1, scaleY: 1 }}
             whileInView={{ opacity: 0, scaleY: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -69,7 +69,7 @@ const LatestNews = () => {
   return (
     <section
       id="blog"
-      className="scroll-mt-24 py-16 sm:py-20 px-4 sm:px-8 lg:px-20 bg-white"
+      className="scroll-mt-24 py-16 sm:py-20 px-4 sm:px-8 lg:px-20 bg-white dark:bg-slate-950"
     >
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12">
@@ -80,7 +80,7 @@ const LatestNews = () => {
               whileInView="visible"
               viewport={{ once: true }}
               variants={headerVariants}
-              className="inline-block text-s tracking-widest text-blue-800 uppercase mb-3"
+              className="inline-block text-s tracking-widest text-blue-800 dark:text-blue-400 uppercase mb-3"
             >
               {sectionInfo.label}
             </motion.span>
@@ -91,7 +91,7 @@ const LatestNews = () => {
               whileInView="visible"
               viewport={{ once: true }}
               variants={headerVariants}
-              className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight"
+              className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight"
             >
               {sectionInfo.headingMain}
               <br />
@@ -107,7 +107,7 @@ const LatestNews = () => {
               whileInView="visible"
               viewport={{ once: true }}
               variants={headerVariants}
-              className="text-gray-600 text-sm md:text-[17px] leading-relaxed mb-6 max-w-sm lg:ml-auto"
+              className="text-gray-600 dark:text-slate-400 text-sm md:text-[17px] leading-relaxed mb-6 max-w-sm lg:ml-auto"
             >
               {sectionInfo.description}
             </motion.p>
@@ -152,7 +152,7 @@ const BlogCard = ({ post, index }: { post: any; index: number }) => {
   return (
     <Link href={`/blog/${slug}`}>
       <article className="group cursor-pointer h-full flex flex-col">
-        <div className="relative overflow-hidden rounded-2xl mb-5 aspect-4/3 bg-gray-100 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl mb-5 aspect-4/3 bg-gray-100 dark:bg-slate-800 shadow-sm">
           <BlindsImage
             src={post.image}
             alt={post.title}
@@ -162,12 +162,12 @@ const BlogCard = ({ post, index }: { post: any; index: number }) => {
           />
         </div>
         <div className="flex flex-col grow">
-          <h3 className="text-lg font-bold text-gray-900 mb-4 leading-snug group-hover:text-rose-400 transition-colors">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 leading-snug group-hover:text-rose-400 transition-colors">
             {post.title}
           </h3>
-          <div className="w-full h-px bg-gray-200 mb-4" />
+          <div className="w-full h-px bg-gray-200 dark:bg-slate-800 mb-4" />
           <div className="flex items-center gap-3 mt-auto">
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-slate-800 shrink-0">
               <Image
                 src={post.author.avatar}
                 alt={post.author.name}
@@ -177,10 +177,10 @@ const BlogCard = ({ post, index }: { post: any; index: number }) => {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-900">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
                 {post.author.name}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 {post.date} · {post.readTime}
               </span>
             </div>

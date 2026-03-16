@@ -55,7 +55,7 @@ function Hero() {
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-slate-50 min-h-screen flex flex-col justify-between font-sans px-4 sm:px-8 lg:px-16">
+    <section className="relative w-full overflow-hidden bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col justify-between font-sans px-4 sm:px-8 lg:px-16">
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <Image
           src={assets.background}
@@ -68,7 +68,7 @@ function Hero() {
       </div>
 
       <div
-        className="absolute bottom-0 left-0 w-full h-24 lg:h-56 bg-white z-10"
+        className="absolute bottom-0 left-0 w-full h-24 lg:h-56 bg-white dark:bg-slate-950 z-10"
         style={{ clipPath: "ellipse(55% 90% at 50% 100%)" }}
       ></div>
 
@@ -85,7 +85,7 @@ function Hero() {
               {assets.avatars.map((url, index) => (
                 <div
                   key={index}
-                  className="relative w-14 h-14 rounded-full border-2 border-white overflow-hidden shadow-sm bg-slate-300"
+                  className="relative w-14 h-14 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-300 dark:bg-slate-700"
                 >
                   <Image
                     src={url}
@@ -97,7 +97,7 @@ function Hero() {
                 </div>
               ))}
             </div>
-            <div className="text-center lg:text-left text-black">
+            <div className="text-center lg:text-left text-black dark:text-white">
               <h3 className="text-4xl font-extrabold tracking-tight">
                 {content.statsLeft.count}
               </h3>
@@ -107,7 +107,7 @@ function Hero() {
             </div>
           </motion.div>
 
-          <div className="lg:col-span-6 flex flex-col items-center text-center text-black space-y-8 order-1 lg:order-2">
+          <div className="lg:col-span-6 flex flex-col items-center text-center text-black dark:text-white space-y-8 order-1 lg:order-2">
             <div className="relative w-fit mx-auto">
               {assets.floating.map((item, idx) => (
                 <motion.div
@@ -188,7 +188,7 @@ function Hero() {
             </div>
 
             <motion.p
-              className="text-[14px] md:text-[16px] font-normal text-slate-900 max-w-2xl mx-auto leading-relaxed"
+              className="text-[14px] md:text-[16px] font-normal text-slate-900 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -301,7 +301,7 @@ function Hero() {
         />
       </motion.div>
 
-      <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 lg:bottom-3 lg:right-[10%] z-40 hidden md:flex items-center justify-center w-28 h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-[#ff6b6b] border-10 border-white hover:scale-110 transition-transform cursor-pointer">
+      <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 lg:bottom-3 lg:right-[10%] z-40 hidden md:flex items-center justify-center w-28 h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-[#ff6b6b] border-10 border-white dark:border-slate-800 hover:scale-110 transition-transform cursor-pointer">
         <ChevronDown
           className="absolute text-white w-8 h-8 z-10"
           strokeWidth={3}

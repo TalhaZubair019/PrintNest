@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
 } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 import db from "@data/db.json";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/Store";
@@ -72,7 +73,7 @@ function Navbar() {
   };
 
   return (
-    <header className="absolute top-0 left-0 w-full z-50 font-sans bg-transparent">
+    <header className="absolute top-0 left-0 w-full z-50 font-sans bg-transparent dark:bg-transparent">
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 pt-4 sm:pt-6 pb-3 flex items-center justify-between gap-4 lg:gap-8 relative w-full">
         <Link href="/" className="shrink-0 relative z-10">
           <Image
@@ -80,7 +81,7 @@ function Navbar() {
             alt={navbarData.assets.logo.alt}
             width={navbarData.assets.logo.width}
             height={navbarData.assets.logo.height}
-            className="h-8 sm:h-10 w-auto object-contain"
+            className="h-8 sm:h-10 w-auto object-contain dark:brightness-0 dark:invert transition-all"
             priority
           />
         </Link>
@@ -93,7 +94,7 @@ function Navbar() {
                   <li key={index}>
                     <Link
                       href={item.href}
-                      className="text-[15px] lg:text-[18px] text-[#333333] hover:text-blue-800 transition-colors duration-200"
+                      className="text-[15px] lg:text-[18px] text-[#333333] dark:text-slate-200 hover:text-blue-800 dark:hover:text-blue-400 transition-colors duration-200"
                     >
                       {item.label}
                     </Link>
@@ -105,6 +106,7 @@ function Navbar() {
         </div>
 
         <div className="hidden min-[830px]:flex items-center gap-2 lg:gap-3 relative">
+          <ThemeToggle />
           <div
             className="relative"
             onMouseEnter={() => setIsCartOpen(true)}
@@ -112,7 +114,7 @@ function Navbar() {
           >
             <Link
               href="/cart"
-              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
+              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition-all"
             >
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
               {mounted && totalQuantity > 0 && (
@@ -128,10 +130,10 @@ function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50"
+                  className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-50"
                 >
-                  <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-                    <span className="font-bold text-slate-800">
+                  <div className="flex justify-between items-center mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <span className="font-bold text-slate-800 dark:text-slate-100">
                       My Cart ({mounted ? totalQuantity : 0})
                     </span>
                   </div>
@@ -146,7 +148,7 @@ function Navbar() {
                           key={item.id}
                           className="flex gap-3 items-center group"
                         >
-                          <div className="relative w-12 h-12 bg-slate-50 border border-slate-100 rounded-md overflow-hidden shrink-0">
+                          <div className="relative w-12 h-12 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-md overflow-hidden shrink-0">
                             {item.image ? (
                               <Image
                                 src={item.image}
@@ -161,10 +163,10 @@ function Navbar() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-slate-700 line-clamp-1">
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200 line-clamp-1">
                               {item.name}
                             </p>
-                            <p className="text-xs text-blue-500 font-semibold">
+                            <p className="text-xs text-blue-500 dark:text-blue-400 font-semibold">
                               {item.quantity} x ${item.price}
                             </p>
                           </div>
@@ -178,7 +180,7 @@ function Navbar() {
                       ))}
                     </div>
                   )}
-                  <div className="mt-4 pt-3 border-t border-slate-100">
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 transition-colors">
                     <Link
                       href="/cart"
                       className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 rounded-lg transition-colors shadow-lg"
@@ -194,26 +196,26 @@ function Navbar() {
             <div className="relative group">
               <Link
                 href={user?.isAdmin ? "/admin/dashboard" : "/account"}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition-all"
               >
                 <User className="w-4 h-4 sm:w-5 sm:h-5" />
               </Link>
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 p-2 z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
-                <div className="px-3 py-2 text-xs text-slate-500 font-bold border-b border-slate-100 mb-1">
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-800 p-2 z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
+                <div className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 font-bold border-b border-slate-100 dark:border-slate-800 mb-1">
                   Signed in as <br />
-                  <span className="text-slate-800 text-sm">{user?.name}</span>
+                  <span className="text-slate-800 dark:text-slate-100 text-sm">{user?.name}</span>
                 </div>
                 {user?.isAdmin ? (
                   <>
                     <Link
                       href="/admin/dashboard"
-                      className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                      className="block px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors"
                     >
                       Admin Dashboard
                     </Link>
                     <Link
                       href="/account"
-                      className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                      className="block px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors"
                     >
                       User Dashboard
                     </Link>
@@ -221,14 +223,14 @@ function Navbar() {
                 ) : (
                   <Link
                     href="/account"
-                    className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                    className="block px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md transition-colors"
                   >
                     My Account
                   </Link>
                 )}
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-md transition-colors mt-1"
+                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors mt-1"
                 >
                   <LogOut size={14} /> Logout
                 </button>
@@ -237,7 +239,7 @@ function Navbar() {
           ) : (
             <Link
               href={`/login?redirect=${encodeURIComponent(pathname)}`}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition-all"
             >
               <User className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
@@ -249,7 +251,7 @@ function Navbar() {
           >
             <Link
               href="/wishlist"
-              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-slate-700 hover:text-blue-600 hover:shadow-md transition-all"
+              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-md transition-all"
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
               {mounted && wishlistItems.length > 0 && (
@@ -265,10 +267,10 @@ function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 p-4 z-50"
+                  className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-800 p-4 z-50 transition-colors"
                 >
-                  <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-                    <span className="font-bold text-slate-800">
+                  <div className="flex justify-between items-center mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <span className="font-bold text-slate-800 dark:text-slate-100">
                       Wishlist ({mounted ? wishlistItems.length : 0})
                     </span>
                   </div>
@@ -283,7 +285,7 @@ function Navbar() {
                           key={item.id}
                           className="flex gap-3 items-center group"
                         >
-                          <div className="relative w-10 h-10 bg-slate-50 border border-slate-100 rounded overflow-hidden shrink-0">
+                          <div className="relative w-10 h-10 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded overflow-hidden shrink-0">
                             <Image
                               src={item.image}
                               alt={item.title}
@@ -292,7 +294,7 @@ function Navbar() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-slate-700 line-clamp-1">
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200 line-clamp-1">
                               {item.title}
                             </p>
                             <p className="text-xs text-slate-500">
@@ -315,9 +317,10 @@ function Navbar() {
           </div>
         </div>
         <div className="flex min-[830px]:hidden items-center gap-2">
+          <ThemeToggle />
           <Link
             href="/cart"
-            className="relative w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-slate-700"
+            className="relative w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-700 dark:text-slate-300"
           >
             <ShoppingCart className="w-4 h-4" />
             {mounted && totalQuantity > 0 && (
@@ -328,7 +331,7 @@ function Navbar() {
           </Link>
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-slate-700"
+            className="w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-700 dark:text-slate-300"
             aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
@@ -351,9 +354,9 @@ function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[300px] sm:w-[350px] bg-white z-101 flex flex-col min-[830px]:hidden shadow-2xl"
+              className="fixed top-0 right-0 h-full w-[300px] sm:w-[350px] bg-white dark:bg-slate-900 z-101 flex flex-col min-[830px]:hidden shadow-2xl"
             >
-              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100 dark:border-slate-800">
                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                   <Image
                     src={navbarData.assets.logo.src}
@@ -365,7 +368,7 @@ function Navbar() {
                 </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-500 transition-colors"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -383,7 +386,7 @@ function Navbar() {
                         <Link
                           href={item.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="block py-3 px-4 text-base font-semibold text-slate-700 hover:text-blue-700 hover:bg-blue-50 rounded-xl transition-all"
+                          className="block py-3 px-4 text-base font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
                         >
                           {item.label}
                         </Link>
@@ -393,35 +396,35 @@ function Navbar() {
                 </ul>
               </nav>
 
-              <div className="border-t border-slate-100 px-6 py-6 bg-slate-50/50">
+              <div className="border-t border-slate-100 dark:border-slate-800 px-6 py-6 bg-slate-50/50 dark:bg-slate-800/50">
                 {mounted && isAuthenticated ? (
-                  <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-blue-200 transition-all">
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:border-blue-200 dark:hover:border-blue-800 transition-all">
                     <Link
                       href={user?.isAdmin ? "/admin/dashboard" : "/account"}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="flex flex-1 items-center gap-3 min-w-0"
                     >
-                      <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                        <User className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+                        <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-800 truncate">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
                           {user?.name}
                         </p>
-                        <p className="text-[11px] text-slate-500 font-medium">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                           View Dashboard
                         </p>
                       </div>
                     </Link>
-                    <div className="flex items-center gap-2 border-l border-slate-100 pl-3">
+                    <div className="flex items-center gap-2 border-l border-slate-100 dark:border-slate-800 pl-3">
                       <Link
                         href="/wishlist"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="relative w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-700 hover:text-[#FF6B6B] transition-colors"
+                        className="relative w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-[#FF6B6B] dark:hover:text-[#FF8E8E] transition-colors"
                       >
                         <Heart className="w-4 h-4" />
                         {wishlistItems.length > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full border border-white">
+                          <span className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full border border-white dark:border-slate-900">
                             {wishlistItems.length}
                           </span>
                         )}
@@ -431,7 +434,7 @@ function Navbar() {
                           handleLogout();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition-all"
+                        className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all"
                       >
                         <LogOut className="w-4 h-4" />
                       </button>

@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
       <PageHeader
         title="Reset Password"
         breadcrumbs={[
@@ -51,28 +51,27 @@ export default function ForgotPasswordPage() {
         ]}
       />
       <div className="relative z-10">
-
-        <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-          <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+        <div className="max-w-7xl mx-auto mt-10 px-4 lg:px-8 pb-32">
+          <div className="max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 transition-colors">
             {!submitted ? (
               <>
-                <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 text-center transition-colors">
                   Forgot Password?
                 </h2>
-                <p className="text-slate-500 text-center mb-8">
+                <p className="text-slate-500 dark:text-slate-400 text-center mb-8 transition-colors">
                   Enter your email address and we'll send you a link to reset
                   your password.
                 </p>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   {error && (
-                    <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-                      <p className="text-red-600 text-sm text-center font-medium capitalize flex flex-col items-center gap-2">
+                    <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl p-4 mb-6">
+                      <p className="text-red-600 dark:text-red-400 text-sm text-center font-medium capitalize flex flex-col items-center gap-2">
                         {error}
                         {error.toLowerCase().includes("no account found") && (
-                          <Link 
-                            href="/signup" 
-                            className="text-purple-600 font-extrabold hover:text-purple-500 underline decoration-2 underline-offset-4 transition-all"
+                          <Link
+                            href="/signup"
+                            className="text-purple-600 dark:text-purple-400 font-extrabold hover:text-purple-500 underline decoration-2 underline-offset-4 transition-all"
                           >
                             Create an account instead?
                           </Link>
@@ -81,7 +80,7 @@ export default function ForgotPasswordPage() {
                     </div>
                   )}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 transition-colors">
                       Email Address
                     </label>
                     <div className="relative">
@@ -89,7 +88,7 @@ export default function ForgotPasswordPage() {
                         type="email"
                         name="email"
                         required
-                        className="w-full border border-slate-300 rounded-lg pl-11 pr-4 py-3 text-slate-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-medium"
+                        className="w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg pl-11 pr-4 py-3 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all font-medium"
                         placeholder="name@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -104,7 +103,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3.5 rounded-lg bg-linear-to-r from-purple-600 to-teal-400 text-white font-bold shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.01] transition-all disabled:opacity-70 disabled:scale-100 flex justify-center items-center gap-2"
+                    className="w-full py-3.5 rounded-lg bg-linear-to-r from-purple-600 to-teal-400 text-white font-bold shadow-lg shadow-purple-200 dark:shadow-none hover:shadow-xl hover:scale-[1.01] transition-all disabled:opacity-70 disabled:scale-100 flex justify-center items-center gap-2"
                   >
                     {loading ? (
                       <Loader2 className="animate-spin h-5 w-5" />
@@ -117,19 +116,21 @@ export default function ForgotPasswordPage() {
             ) : (
               <div className="text-center py-4">
                 <div className="flex justify-center mb-6">
-                  <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center">
+                  <div className="w-20 h-20 bg-teal-50 dark:bg-teal-900/20 rounded-full flex items-center justify-center">
                     <CheckCircle2 className="text-teal-500" size={48} />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
                   Check your email
                 </h2>
-                <p className="text-slate-500 mb-8 leading-relaxed">
+                <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
                   If an account exists for{" "}
-                  <span className="font-bold text-slate-700">{email}</span>, you
-                  will receive a password reset link shortly.
+                  <span className="font-bold text-slate-700 dark:text-slate-300">
+                    {email}
+                  </span>
+                  , you will receive a password reset link shortly.
                 </p>
-                <div className="bg-slate-50 p-4 rounded-xl text-xs text-slate-500 text-left mb-8 flex gap-3">
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-xs text-slate-500 dark:text-slate-400 text-left mb-8 flex gap-3">
                   <div className="shrink-0 pt-0.5">💡</div>
                   <p>
                     Don't forget to check your spam folder if you don't see the
@@ -138,17 +139,17 @@ export default function ForgotPasswordPage() {
                 </div>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="text-purple-600 font-bold hover:text-purple-500 transition-colors"
+                  className="text-purple-600 dark:text-purple-400 font-bold hover:text-purple-500 transition-colors"
                 >
                   Didn't receive the email? Try again
                 </button>
               </div>
             )}
 
-            <div className="mt-8 pt-6 border-t border-slate-100 flex justify-center">
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-center">
               <Link
                 href="/login"
-                className="flex items-center gap-2 text-slate-600 font-bold hover:text-slate-900 transition-all group"
+                className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-bold hover:text-slate-900 dark:hover:text-white transition-all group"
               >
                 <ArrowLeft
                   size={16}

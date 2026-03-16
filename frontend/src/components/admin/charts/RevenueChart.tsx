@@ -42,16 +42,16 @@ const RevenueChart = ({
   }, [filteredRevenueData]);
 
   return (
-    <div className="lg:col-span-2 bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
+    <div className="lg:col-span-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <h3 className="font-bold text-slate-800 flex items-center gap-2">
+        <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
           Revenue Overview
           <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-300" />
         </h3>
         <div className="relative">
           <button
             onClick={() => setShowRevenueDropdown((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition-all shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 transition-all shadow-sm"
           >
             <span>
               {revenueFilter === "week"
@@ -77,14 +77,14 @@ const RevenueChart = ({
             </svg>
           </button>
           {showRevenueDropdown && (
-            <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               <button
                 onClick={() => {
                   setRevenueFilter("week");
                   setShowRevenueDropdown(false);
                   applyRevenueFilter("week");
                 }}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "week" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "week" ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
               >
                 <span className="text-base">📅</span> Last 7 Days
                 {revenueFilter === "week" && (
@@ -97,7 +97,7 @@ const RevenueChart = ({
                   setShowRevenueDropdown(false);
                   applyRevenueFilter("month");
                 }}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "month" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "month" ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
               >
                 <span className="text-base">🗓️</span> Last 30 Days
                 {revenueFilter === "month" && (
@@ -110,19 +110,19 @@ const RevenueChart = ({
                   setShowRevenueDropdown(false);
                   applyRevenueFilter("current-month");
                 }}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "current-month" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "current-month" ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
               >
                 <span className="text-base">📅</span> Current Month
                 {revenueFilter === "current-month" && (
                   <span className="ml-auto w-2 h-2 bg-purple-500 rounded-full" />
                 )}
               </button>
-              <div className="border-t border-slate-100" />
+              <div className="border-t border-slate-100 dark:border-slate-700" />
               <button
                 onClick={() => {
                   setRevenueFilter("custom");
                 }}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "custom" ? "bg-purple-50 text-purple-700" : "text-slate-700 hover:bg-slate-50"}`}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${revenueFilter === "custom" ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
               >
                 <span className="text-base">📆</span> Custom Range
                 {revenueFilter === "custom" && (
@@ -135,7 +135,7 @@ const RevenueChart = ({
       </div>
 
       {revenueFilter === "custom" && (
-        <div className="flex flex-wrap items-center gap-3 mb-5 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+        <div className="flex flex-wrap items-center gap-3 mb-5 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
               From
@@ -145,7 +145,7 @@ const RevenueChart = ({
               value={customStart}
               max={customEnd || undefined}
               onChange={(e) => setCustomStart(e.target.value)}
-              className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+              className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white dark:bg-slate-900 transition-colors cursor-pointer"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -157,7 +157,7 @@ const RevenueChart = ({
               value={customEnd}
               min={customStart || undefined}
               onChange={(e) => setCustomEnd(e.target.value)}
-              className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+              className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white dark:bg-slate-900 transition-colors cursor-pointer"
             />
           </div>
           <button
@@ -211,7 +211,7 @@ const RevenueChart = ({
                     minWidth: isLong ? "28px" : undefined,
                   }}
                 >
-                  <div className="w-full bg-slate-50/50 rounded-t-lg relative flex items-end h-[85%] border-b border-slate-100">
+                  <div className="w-full bg-slate-50/50 dark:bg-slate-800/50 rounded-t-lg relative flex items-end h-[85%] border-b border-slate-100 dark:border-slate-800">
                     <div
                       className="w-full bg-linear-to-t from-purple-600 to-blue-500 rounded-t-lg transition-all duration-300 ease-out group-hover:scale-x-105 group-hover:brightness-110 shadow-lg group-hover:shadow-purple-200/50"
                       style={{
@@ -245,7 +245,7 @@ const RevenueChart = ({
                   </div>
                   {isLong ? (
                     <span
-                      className="text-xs text-slate-500 font-medium whitespace-nowrap origin-top-right"
+                      className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap origin-top-right"
                       style={{
                         transform: "rotate(-45deg)",
                         display: "block",
@@ -259,7 +259,7 @@ const RevenueChart = ({
                       })}
                     </span>
                   ) : (
-                    <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
                       {new Date(d.date).toLocaleDateString(undefined, {
                         weekday: "short",
                       })}

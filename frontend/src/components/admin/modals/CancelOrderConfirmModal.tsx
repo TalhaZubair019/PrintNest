@@ -23,46 +23,46 @@ const CancelOrderConfirmModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden animate-in fade-in duration-200">
       <div
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm transition-opacity"
         onClick={() => !isLoading && onClose()}
       />
       
       <div className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-full animate-in zoom-in-95 duration-200">
-        <div className="bg-red-50 p-6 sm:p-8 flex flex-col items-center text-center shrink-0">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 ring-8 ring-red-50">
-            <AlertTriangle className="w-8 h-8 text-red-500" />
+        <div className="bg-red-50 dark:bg-red-950/20 p-6 sm:p-8 flex flex-col items-center text-center shrink-0 transition-colors">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4 ring-8 ring-red-50 dark:ring-red-900/20">
+            <AlertTriangle className="w-8 h-8 text-red-500 dark:text-red-400" />
           </div>
-          <h2 className="text-2xl font-bold text-red-900 mb-2">Cancel Order</h2>
-          <p className="text-red-700 font-medium">
+          <h2 className="text-2xl font-bold text-red-900 dark:text-red-100 mb-2 transition-colors">Cancel Order</h2>
+          <p className="text-red-700 dark:text-red-400 font-medium transition-colors">
             Are you sure you want to cancel this order? This action cannot be undone.
           </p>
         </div>
 
-        <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-slate-50/50">
+        <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-slate-50/50 dark:bg-slate-900/50 transition-colors">
           <div className="space-y-4">
-            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm transition-colors">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                  <Package className="w-4 h-4 text-slate-500" />
+                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center transition-colors">
+                  <Package className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</div>
-                  <div className="font-mono font-bold text-slate-700">#{order.id.slice(-8).toUpperCase()}</div>
+                  <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider transition-colors">Order ID</div>
+                  <div className="font-mono font-bold text-slate-700 dark:text-slate-200 transition-colors">#{order.id.slice(-8).toUpperCase()}</div>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-100">
                 <div>
-                  <div className="text-xs font-medium text-slate-400 mb-1 flex items-center gap-1">
+                  <div className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1 flex items-center gap-1 transition-colors">
                     <User className="w-3 h-3" /> Customer
                   </div>
-                  <div className="text-sm font-semibold text-slate-700">{order.customer?.name || "Deleted User"}</div>
+                  <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors">{order.customer?.name || "Deleted User"}</div>
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-slate-400 mb-1 flex items-center gap-1">
+                  <div className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1 flex items-center gap-1 transition-colors">
                     <MapPin className="w-3 h-3" /> Location
                   </div>
-                  <div className="text-sm font-semibold text-slate-700">
+                  <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors">
                     {order.customer?.address ? (
                       <>
                         {order.customer.address}
@@ -89,15 +89,15 @@ const CancelOrderConfirmModal = ({
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
+              <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider transition-colors">
                 Order Items ({order.items?.length || 0})
               </div>
               <div className="divide-y divide-slate-50 overflow-y-auto max-h-40">
                 {order.items?.map((item, idx) => (
                   <div key={idx} className="p-3 flex items-center justify-between text-sm">
                     <div className="flex items-center gap-3 flex-1 min-w-0 pr-4">
-                      <div className="w-10 h-10 bg-slate-100 rounded-lg relative overflow-hidden shrink-0 border border-slate-200/60 flex items-center justify-center">
+                      <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900 rounded-lg relative overflow-hidden shrink-0 border border-slate-200/60 dark:border-slate-700 flex items-center justify-center transition-colors">
                         {item.image ? (
                           <Image
                             src={item.image}
@@ -107,29 +107,29 @@ const CancelOrderConfirmModal = ({
                             unoptimized
                           />
                         ) : (
-                          <Package className="w-4 h-4 text-slate-300" />
+                          <Package className="w-4 h-4 text-slate-300 dark:text-slate-600" />
                         )}
                       </div>
-                      <span className="font-medium text-slate-700 truncate">{item.name}</span>
+                      <span className="font-medium text-slate-700 dark:text-slate-200 truncate transition-colors">{item.name}</span>
                     </div>
-                    <span className="font-semibold text-slate-500 shrink-0">x{item.quantity}</span>
+                    <span className="font-semibold text-slate-500 dark:text-slate-400 shrink-0 transition-colors">x{item.quantity}</span>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100 flex gap-3 text-amber-800 text-sm font-medium">
+            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-100 dark:border-amber-900/40 flex gap-3 text-amber-800 dark:text-amber-300 text-sm font-medium transition-colors">
               <AlertTriangle className="w-5 h-5 shrink-0" />
               <p>Cancelling an order will halt its delivery process, send a cancellation email to the customer, and deduct its total from your revenue statistics.</p>
             </div>
           </div>
         </div>
 
-        <div className="p-6 border-t border-slate-100 bg-white flex flex-col sm:flex-row gap-3 sm:justify-end shrink-0">
+        <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col sm:flex-row gap-3 sm:justify-end shrink-0 transition-colors">
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="px-6 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50 w-full sm:w-auto"
+            className="px-6 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 w-full sm:w-auto"
           >
             Keep Order
           </button>

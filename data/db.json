@@ -78,16 +78,16 @@
     "emptyState": {
       "message": "Your cart is currently empty.",
       "buttonText": "Return to Shop",
-      "redirectUrl": "/"
+      "redirectUrl": "/shop"
     },
     "columns": {
       "product": "Product",
       "total": "Total"
     },
     "placeholders": {
-      "category": "Winter Jacket",
-      "description": "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor...",
-      "noImageText": "No Img"
+      "noImageText": "No Img",
+      "category": "Custom Print",
+      "description": "Premium quality custom printed product designed to your specifications."
     },
     "summary": {
       "title": "Cart Totals",
@@ -149,36 +149,6 @@
   },
   "checkout": {
     "backgroundImage": "https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/breadcrumb-bg.webp",
-    "provinces": [
-      {
-        "code": "PB",
-        "name": "Punjab"
-      },
-      {
-        "code": "SD",
-        "name": "Sindh"
-      },
-      {
-        "code": "KP",
-        "name": "Khyber Pakhtunkhwa"
-      },
-      {
-        "code": "BA",
-        "name": "Balochistan"
-      },
-      {
-        "code": "IS",
-        "name": "Islamabad"
-      },
-      {
-        "code": "GB",
-        "name": "Gilgit-Baltistan"
-      },
-      {
-        "code": "JK",
-        "name": "Azad Kashmir"
-      }
-    ],
     "breadcrumbs": {
       "home": "Home",
       "current": "Checkout"
@@ -281,7 +251,7 @@
       }
     ],
     "contact": {
-      "title": "Keep In Touch",
+      "title": "Keep In touch",
       "address": ["2118 Thornridge Cir. Syracuse,"],
       "email": "tranthuy.nute@gmail.com",
       "phone": "(252) 555-0126",
@@ -437,33 +407,27 @@
     "navigation": [
       {
         "label": "Home",
-        "href": "/",
-        "active": true
+        "href": "/"
       },
       {
         "label": "About",
-        "href": "/#about",
-        "active": false
+        "href": "/#about"
       },
       {
         "label": "Services",
-        "href": "/#services",
-        "active": false
+        "href": "/#services"
       },
       {
         "label": "Products",
-        "href": "/#products",
-        "active": false
+        "href": "/#products"
       },
       {
         "label": "Blog",
-        "href": "/#blog",
-        "active": false
+        "href": "/#blog"
       },
       {
         "label": "Contact",
-        "href": "/#testimonials",
-        "active": false
+        "href": "/#testimonials"
       }
     ]
   },
@@ -539,8 +503,7 @@
     "description": "High-quality custom prints tailored to match your style and needs",
     "headerBtnText": "See Our Products",
     "headerBtnLink": "/shop",
-    "featuredImage": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p1-man-1.webp",
-    "products": []
+    "featuredImage": "https://themexriver.com/wp/printnest/wp-content/uploads/2025/12/p1-man-1.webp"
   },
   "social": {
     "title": "Loved by over 100,000 brands",

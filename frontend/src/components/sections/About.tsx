@@ -25,7 +25,7 @@ const BlindsImage = ({
         {bars.map((_, i) => (
           <motion.div
             key={i}
-            className="flex-1 w-full bg-gray-200 border-b border-white/50"
+            className="flex-1 w-full bg-gray-200 dark:bg-slate-800 border-b border-white/50 dark:border-slate-700/50"
             initial={{ opacity: 1, scaleY: 1 }}
             whileInView={{ opacity: 0, scaleY: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -76,7 +76,7 @@ function About() {
   return (
     <section
       id="about"
-      className="scroll-mt-24 py-16 sm:py-20 lg:py-28 px-4 sm:px-8 lg:px-20 bg-[#F6F9FF] overflow-hidden"
+      className="scroll-mt-24 py-16 sm:py-20 lg:py-28 px-4 sm:px-8 lg:px-20 bg-[#F6F9FF] dark:bg-slate-950 overflow-hidden"
     >
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -111,12 +111,12 @@ function About() {
           <div>
             <div className="mb-10">
               <RevealText className="mb-4" delay={0.2}>
-                <p className="text-sm font-medium text-blue-900 uppercase tracking-widest">
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-400 uppercase tracking-widest">
                   {aboutData.sectionLabel}
                 </p>
               </RevealText>
               <RevealText className="mb-6" delay={0.4}>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-black leading-tight">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-black dark:text-white leading-tight">
                   {aboutData.headingFirst}{" "}
                   <span className="text-[#FF7F7F] underline decoration-4 underline-offset-4 decoration-[#FF7F7F]">
                     {aboutData.headingHighlight}
@@ -124,7 +124,7 @@ function About() {
                 </h2>
               </RevealText>
               <RevealText delay={0.6}>
-                <p className="text-lg text-slate-600 leading-relaxed">
+                <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                   {aboutData.description}
                 </p>
               </RevealText>
@@ -141,10 +141,10 @@ function About() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="text-xl font-bold text-slate-900 mb-2">
+                        <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
                           {item.title}
                         </h4>
-                        <p className="text-slate-500 leading-relaxed text-sm lg:text-base">
+                        <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm lg:text-base">
                           {item.desc}
                         </p>
                       </div>

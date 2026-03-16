@@ -52,10 +52,41 @@ export default function CategoryPage() {
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
+        setLoading(true);
         const [catRes, productsRes] = await Promise.all([
           fetch("/api/admin/categories"),
           fetch("/api/public/content?section=products"),
         ]);
+
+        let allProducts: Product[] = [];
+        if (productsRes.ok) {
+          const productData = await productsRes.json();
+          allProducts = productData.products || [];
+        }
+
+        const filterForCategory = (catTitle: string) => {
+          const lowerTitle = catTitle.toLowerCase();
+          const singularTitle = lowerTitle.replace(/s$/, "");
+          const slugFromTitle = lowerTitle.replace(/\s+/g, "-");
+
+          return allProducts.filter((p) => {
+            const pTitle = p.title.toLowerCase();
+            const pCat = p.category?.toLowerCase() || "";
+            const singularPCat = pCat.replace(/s$/, "");
+
+            const isDirectMatch =
+              pCat === lowerTitle ||
+              singularPCat === singularTitle ||
+              pCat.replace(/\s+/g, "-") === slug ||
+              pCat.replace(/\s+/g, "-") === slugFromTitle;
+
+            const isKeywordMatch =
+              pTitle.includes(singularTitle) ||
+              pTitle.includes(slug.replace(/-/g, " ").replace(/s$/, ""));
+
+            return isDirectMatch || isKeywordMatch;
+          });
+        };
 
         if (catRes.ok) {
           const catData = await catRes.json();
@@ -68,73 +99,36 @@ export default function CategoryPage() {
                 .replace(/\s+/g, "-") === slug || (cat as any).slug === slug,
           );
 
-          if (!foundCategory) {
-            const staticCategories = db.categories.categories;
-            const staticCat = staticCategories.find(
-              (cat: Category) =>
-                cat.title.toLowerCase().replace(/\s+/g, "-") === slug,
-            );
-            setCategory(staticCat || null);
-
-            if (staticCat && productsRes.ok) {
-              const data = await productsRes.json();
-              const allProducts: Product[] = data.products || [];
-              const catTitle = staticCat.title.toLowerCase();
-              const keyword = catTitle.replace(/s$/, "");
-
-              const filtered = allProducts.filter((p) => {
-                const pCat = p.category?.toLowerCase() || "";
-                const isMatch =
-                  pCat === catTitle || pCat.replace(/\s+/g, "-") === slug;
-                if (pCat) return isMatch;
-                return p.title.toLowerCase().includes(keyword);
-              });
-              setCategoryProducts(filtered);
-            }
-          } else {
+          if (foundCategory) {
             const currentCatName =
               (foundCategory as any).name || foundCategory.title;
             setCategory({
               ...foundCategory,
               title: currentCatName,
             });
-            if (productsRes.ok) {
-              const data = await productsRes.json();
-              const allProducts: Product[] = data.products || [];
-              const catTitle = currentCatName.toLowerCase();
-              const keyword = catTitle.replace(/s$/, "");
-
-              const filtered = allProducts.filter((p) => {
-                const pCat = p.category?.toLowerCase() || "";
-                const isMatch =
-                  pCat === catTitle || pCat.replace(/\s+/g, "-") === slug;
-                if (pCat) return isMatch;
-                return p.title.toLowerCase().includes(keyword);
-              });
-              setCategoryProducts(filtered);
+            setCategoryProducts(filterForCategory(currentCatName));
+          } else {
+            const staticCat = db.categories.categories.find(
+              (cat: Category) =>
+                cat.title.toLowerCase().replace(/\s+/g, "-") === slug,
+            );
+            if (staticCat) {
+              setCategory(staticCat);
+              setCategoryProducts(filterForCategory(staticCat.title));
+            } else {
+              setCategory(null);
             }
           }
         } else {
-          const staticCategories = db.categories.categories;
-          const staticCat = staticCategories.find(
+          const staticCat = db.categories.categories.find(
             (cat: Category) =>
               cat.title.toLowerCase().replace(/\s+/g, "-") === slug,
           );
-          setCategory(staticCat || null);
-
-          if (staticCat && productsRes.ok) {
-            const data = await productsRes.json();
-            const allProducts: Product[] = data.products || [];
-            const catTitle = staticCat.title.toLowerCase();
-            const keyword = catTitle.replace(/s$/, "");
-            const filtered = allProducts.filter((p) => {
-              const pCat = p.category?.toLowerCase() || "";
-              const isMatch =
-                pCat === catTitle || pCat.replace(/\s+/g, "-") === slug;
-              if (pCat) return isMatch;
-              return p.title.toLowerCase().includes(keyword);
-            });
-            setCategoryProducts(filtered);
+          if (staticCat) {
+            setCategory(staticCat);
+            setCategoryProducts(filterForCategory(staticCat.title));
+          } else {
+            setCategory(null);
           }
         }
       } catch (error) {
@@ -191,16 +185,16 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-slate-400">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 transition-colors">
+        <div className="text-slate-400 dark:text-slate-500">Loading...</div>
       </div>
     );
   }
 
   if (!category) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-slate-800 font-bold text-xl">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 transition-colors">
+        <div className="text-slate-800 dark:text-slate-200 font-bold text-xl">
           Category not found
         </div>
       </div>
@@ -208,18 +202,17 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-800 pb-32">
+    <div className="min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 pb-32 transition-colors duration-300">
       <PageHeader
         title={`Category: ${category.title}`}
         breadcrumbs={[
           { label: "Shop", href: "/shop" },
           { label: category.title },
         ]}
-        backgroundImage={db.categories.backgroundImage}
       />
       <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
-        <div className="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 rounded-full px-8 py-4 mt-12 mb-12 shadow-sm">
-          <p className="text-slate-500 font-medium text-sm mb-2 sm:mb-0">
+        <div className="flex flex-col sm:flex-row justify-between items-center bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-full px-8 py-4 mt-8 mb-12 shadow-sm transition-colors">
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mb-2 sm:mb-0 transition-colors">
             Showing {categoryProducts.length} Results
           </p>
 
@@ -227,7 +220,7 @@ export default function CategoryPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-2 pl-4 pr-10 rounded-full text-sm font-semibold focus:outline-none focus:border-blue-400 cursor-pointer"
+              className="appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2 pl-4 pr-10 rounded-full text-sm font-semibold focus:outline-none focus:border-blue-400 dark:focus:border-blue-500 cursor-pointer transition-colors"
             >
               <option>Default Sorting</option>
               <option>Popularity</option>
@@ -237,7 +230,7 @@ export default function CategoryPage() {
             </select>
             <ChevronDown
               size={14}
-              className="absolute right-3 top-3 text-slate-500 pointer-events-none"
+              className="absolute right-3 top-3 text-slate-500 dark:text-slate-400 pointer-events-none transition-colors"
             />
           </div>
         </div>
@@ -268,7 +261,7 @@ export default function CategoryPage() {
             ))}
 
           {categoryProducts.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+            <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500 transition-colors">
               <p className="text-lg">No products found for {category.title}.</p>
             </div>
           )}
@@ -298,14 +291,19 @@ function SimpleProductCard({
   onToggleWishlist: () => void;
 }) {
   const [addingToCart, setAddingToCart] = useState(false);
+  const isOutOfStock = (product as any).stockQuantity <= 0;
 
-  const handleCartClick = () => {
+  const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock) return;
     setAddingToCart(true);
     onAddToCart();
     setTimeout(() => setAddingToCart(false), 700);
   };
+
   return (
-    <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
+    <div className="group bg-white dark:bg-slate-950 rounded-2xl overflow-hidden hover:shadow-xl dark:hover:shadow-black/40 transition-all duration-300 relative border border-slate-100 dark:border-slate-800/50">
       <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
         {(product.badges || (product.badge ? [product.badge] : [])).map(
           (badge: string, idx: number) => (
@@ -322,81 +320,87 @@ function SimpleProductCard({
       </div>
 
       <button
-        onClick={onToggleWishlist}
-        className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all duration-300 ${
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggleWishlist();
+        }}
+        className={`absolute top-4 right-4 z-20 w-9 h-9 flex items-center justify-center rounded-full shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 ${
           isWishlisted
-            ? "bg-red-50 text-red-500"
-            : "bg-white text-slate-400 hover:bg-red-50 hover:text-red-500"
+            ? "bg-red-500 text-white"
+            : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-red-500 hover:text-white"
         }`}
         title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
       >
-        <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+        <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} />
       </button>
 
-      <div className="relative h-72 bg-[#F6F7FB] flex items-center justify-center p-6 group-hover:bg-[#ebf0f7] transition-colors">
-        <div className="relative w-full h-full">
-          {product.image ? (
-            <Image
-              src={product.image}
-              alt={product.title}
-              fill
-              className="object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-300">
-              No Image
-            </div>
-          )}
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/5">
-          {isInCart ? (
-            <>
-              <button
-                onClick={handleCartClick}
-                disabled={addingToCart}
-                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed"
-              >
-                {addingToCart ? (
-                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <ShoppingBag size={14} fill="currentColor" />
-                )}
-                {addingToCart ? "Adding..." : "Add Again"}
-              </button>
-              <Link
-                href="/cart"
-                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
-              >
-                View cart
-              </Link>
-            </>
-          ) : (
-            <button
-              onClick={handleCartClick}
-              disabled={addingToCart}
-              className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed"
-            >
-              {addingToCart ? (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <ShoppingBag size={16} fill="currentColor" />
-              )}
-              {addingToCart ? "Adding..." : "Add to cart"}
-            </button>
-          )}
-        </div>
-      </div>
+      <Link
+        href={`/product/${product.title.toLowerCase().replace(/\s+/g, "-")}`}
+        className="flex relative h-64 bg-slate-50 dark:bg-slate-900/50 items-center justify-center p-6 group-hover:bg-slate-100 dark:group-hover:bg-slate-900 transition-colors overflow-hidden"
+      >
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.title}
+            fill
+            className={`object-contain p-2 ${isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-110"} transition-transform duration-500`}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-slate-300">
+            No Image
+          </div>
+        )}
 
-      <div className="p-4 text-center bg-white">
-        <h3 className="font-bold text-slate-800 text-lg mb-2 truncate group-hover:text-purple-600 transition-colors">
-          {product.title}
-        </h3>
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <span className="bg-red-500 text-white font-bold px-3 py-1 rounded text-[10px] uppercase tracking-tighter rotate-12">
+              Out of Stock
+            </span>
+          </div>
+        )}
+
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/5 dark:bg-black/20">
+          <button
+            onClick={handleCartClick}
+            disabled={addingToCart || isOutOfStock}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer font-bold text-sm ${
+              isOutOfStock
+                ? "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed grayscale"
+                : "bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white"
+            }`}
+          >
+            {addingToCart ? (
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <ShoppingBag
+                size={16}
+                fill={isOutOfStock ? "none" : "currentColor"}
+              />
+            )}
+            {isOutOfStock
+              ? "NOT AVAILABLE"
+              : addingToCart
+                ? "Adding..."
+                : "Add to cart"}
+          </button>
+        </div>
+      </Link>
+
+      <div className="p-5 text-center bg-white dark:bg-slate-950 transition-colors">
+        <Link
+          href={`/product/${product.title.toLowerCase().replace(/\s+/g, "-")}`}
+        >
+          <h3 className="font-bold text-slate-800 dark:text-white text-sm mb-2 truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+            {product.title}
+          </h3>
+        </Link>
         <div className="flex items-center justify-center gap-2">
-          <span className="text-sm font-bold text-blue-900">
+          <span className="text-sm font-bold text-purple-600 dark:text-purple-400 transition-colors">
             {product.price}
           </span>
           {product.oldPrice && (
-            <span className="text-xs text-red-400 line-through">
+            <span className="text-[10px] text-slate-400 dark:text-slate-600 line-through transition-colors">
               {product.oldPrice}
             </span>
           )}

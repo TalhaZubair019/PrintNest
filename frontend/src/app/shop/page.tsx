@@ -16,6 +16,7 @@ import {
   Filter,
   Menu,
   X,
+  Search,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import db from "@data/db.json";
@@ -25,7 +26,6 @@ import PageHeader from "@/components/ui/PageHeader";
 
 const pageConfig = {
   title: "Shop",
-  backgroundImage: db.shop.backgroundImage,
 };
 
 const ITEMS_PER_PAGE = 16;
@@ -36,6 +36,7 @@ export default function ShopPage() {
   const { cartItems } = useSelector((state: RootState) => state.cart);
   const searchParams = useSearchParams();
   const router = useRouter();
+
   const pageParam = searchParams.get("page");
   const catParam = searchParams.get("category");
   const sortParam = searchParams.get("sort");
@@ -64,11 +65,20 @@ export default function ShopPage() {
   const [isMobileSortOpen, setIsMobileSortOpen] = useState(false);
 
   useEffect(() => {
+    setCurrentPage(pageParam ? parseInt(pageParam) : 1);
+    setSelectedCategory(catParam || "All Categories");
+    setSortBy(sortParam || "Default Sorting");
+    setSearchTerm(qParam || "");
+  }, [pageParam, catParam, sortParam, qParam]);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const [productsResponse, categoriesResponse] = await Promise.all([
           fetch("/api/public/content?section=products"),
-          fetch("/api/public/content?section=categories").catch(() => null),
+          fetch("/api/public/content?section=categories&all=true").catch(
+            () => null,
+          ),
         ]);
 
         if (productsResponse.ok) {
@@ -78,8 +88,7 @@ export default function ShopPage() {
 
         if (categoriesResponse && categoriesResponse.ok) {
           const catData = await categoriesResponse.json();
-          const dbCategories = catData.categories || [];
-          setCategories(dbCategories);
+          setCategories(catData.categories || []);
         } else {
           setCategories(db.categories.categories || []);
         }
@@ -119,13 +128,7 @@ export default function ShopPage() {
 
         filtered = filtered.filter((p) => {
           const pCat = p.category?.toLowerCase() || "";
-          const isMatch =
-            pCat === catName || pCat.replace(/\s+/g, "-") === catSlug;
-
-          if (pCat) return isMatch;
-
-          const keyword = catName.replace(/s$/, "");
-          return p.title.toLowerCase().includes(keyword);
+          return pCat === catName || pCat.replace(/\s+/g, "-") === catSlug;
         });
       }
     }
@@ -170,7 +173,9 @@ export default function ShopPage() {
   );
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, [currentPage]);
 
   const showToast = (message: string, type: "add" | "remove") => {
@@ -245,7 +250,7 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
       <QuickViewModal
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
@@ -262,27 +267,27 @@ export default function ShopPage() {
               ]
             : [{ label: "Shop" }]
         }
-        backgroundImage={pageConfig.backgroundImage}
       />
 
       <div className="relative z-40">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-40">
             <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-slate-400 font-medium tracking-tight">
+            <p className="text-slate-400 dark:text-slate-500 font-medium tracking-tight">
               Loading premium products...
             </p>
           </div>
         ) : (
           <div className="max-w-7xl mx-auto mt-20 px-4 lg:px-8 pb-32">
-            <div className="flex flex-col lg:flex-row justify-between items-center mb-8 px-6 py-4 bg-white rounded-3xl border border-slate-200 shadow-sm relative z-50 gap-4">
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-                <p className="text-sm font-semibold text-slate-500 whitespace-nowrap hidden sm:block">
+            {/* Filters Bar */}
+            <div className="flex flex-col lg:flex-row justify-between items-center mb-12 px-6 py-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm relative z-50 gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap hidden sm:block">
                   Showing {startIndex + 1}–
                   {Math.min(startIndex + ITEMS_PER_PAGE, sortedProducts.length)}{" "}
                   Of {sortedProducts.length} Results
                 </p>
-                <div className="relative w-full sm:w-64">
+                <div className="relative w-full sm:w-72 group">
                   <input
                     type="text"
                     placeholder="Search products..."
@@ -292,31 +297,32 @@ export default function ShopPage() {
                       setCurrentPage(1);
                       updateURL(1, selectedCategory, sortBy, e.target.value);
                     }}
-                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 transition-all font-medium"
+                    className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 dark:focus:border-purple-500 transition-all font-bold dark:text-white dark:placeholder-slate-500"
                   />
-                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <ShoppingBag size={14} />
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-500 transition-colors">
+                    <Search size={18} />
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 lg:gap-4 relative w-full lg:w-auto justify-between lg:justify-end">
-                <div className="flex items-center gap-2 lg:hidden w-full overflow-x-auto pb-1 no-scrollbar">
+              <div className="flex items-center gap-4 relative w-full lg:w-auto justify-between lg:justify-end">
+                {/* Mobile Filters */}
+                <div className="flex items-center gap-3 lg:hidden w-full overflow-x-auto pb-1 no-scrollbar">
                   <button
                     onClick={() => {
                       setIsMobileCategoryOpen(!isMobileCategoryOpen);
                       setIsMobileSortOpen(false);
                     }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-colors whitespace-nowrap shrink-0 ${
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs transition-all whitespace-nowrap shrink-0 ${
                       isMobileCategoryOpen
-                        ? "bg-purple-600 text-white"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        ? "bg-purple-600 text-white shadow-lg shadow-purple-200 dark:shadow-none"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                     }`}
                   >
-                    <Filter size={12} />
+                    <Filter size={14} />
                     <span>Categories</span>
                     <ChevronDown
-                      size={12}
+                      size={14}
                       className={`transition-transform duration-200 ${isMobileCategoryOpen ? "rotate-180" : ""}`}
                     />
                   </button>
@@ -326,41 +332,40 @@ export default function ShopPage() {
                       setIsMobileSortOpen(!isMobileSortOpen);
                       setIsMobileCategoryOpen(false);
                     }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-colors whitespace-nowrap shrink-0 ${
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs transition-all whitespace-nowrap shrink-0 ${
                       isMobileSortOpen
-                        ? "bg-purple-600 text-white"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        ? "bg-purple-600 text-white shadow-lg shadow-purple-200 dark:shadow-none"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                     }`}
                   >
-                    <Menu size={12} />
+                    <Menu size={14} />
                     <span>Sort By</span>
                     <ChevronDown
-                      size={12}
+                      size={14}
                       className={`transition-transform duration-200 ${isMobileSortOpen ? "rotate-180" : ""}`}
                     />
                   </button>
-
-                  <div className="ml-auto pl-2 flex items-center shrink-0">
-                    <p className="text-[10px] font-bold text-slate-400 border-l border-slate-200 pl-3 uppercase tracking-wider">
-                      {sortedProducts.length} Items
-                    </p>
-                  </div>
                 </div>
-
-                <div className="hidden lg:flex items-center gap-4">
+                <div className="hidden lg:flex items-center gap-6">
                   <div className="relative">
                     <button
                       onClick={() => {
                         setIsCategoryOpen(!isCategoryOpen);
                         setIsSortOpen(false);
                       }}
-                      className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors px-4 py-2 border-r border-slate-200"
+                      className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors px-4 py-2 border-r border-slate-200 dark:border-slate-800"
                     >
-                      <span>Category:</span> {selectedCategory}{" "}
-                      <ChevronDown size={14} />
+                      <span className="text-slate-400 font-medium">
+                        Category:
+                      </span>{" "}
+                      {selectedCategory}
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform duration-200 ${isCategoryOpen ? "rotate-180" : ""}`}
+                      />
                     </button>
                     {isCategoryOpen && (
-                      <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden py-1 z-50 animate-in fade-in zoom-in duration-200">
+                      <div className="absolute left-0 top-full mt-3 w-64 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden py-2 z-50 animate-in fade-in zoom-in duration-200">
                         {[
                           "All Categories",
                           ...categories.map((c: any) => c.title || c.name),
@@ -373,10 +378,10 @@ export default function ShopPage() {
                               setCurrentPage(1);
                               updateURL(1, option, sortBy, searchTerm);
                             }}
-                            className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
+                            className={`w-full text-left px-5 py-3 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
                               selectedCategory === option
-                                ? "bg-purple-50 text-purple-600"
-                                : "text-slate-600"
+                                ? "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400"
+                                : "text-slate-600 dark:text-slate-400"
                             }`}
                           >
                             {option}
@@ -392,12 +397,17 @@ export default function ShopPage() {
                         setIsSortOpen(!isSortOpen);
                         setIsCategoryOpen(false);
                       }}
-                      className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors px-4 py-2"
+                      className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors px-4 py-2"
                     >
-                      <span>Sort:</span> {sortBy} <ChevronDown size={14} />
+                      <span className="text-slate-400 font-medium">Sort:</span>{" "}
+                      {sortBy}
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`}
+                      />
                     </button>
                     {isSortOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden py-1 z-50 animate-in fade-in zoom-in duration-200">
+                      <div className="absolute right-0 top-full mt-3 w-64 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden py-2 z-50 animate-in fade-in zoom-in duration-200">
                         {[
                           "Default Sorting",
                           "Sort By Popularity",
@@ -418,10 +428,10 @@ export default function ShopPage() {
                                 searchTerm,
                               );
                             }}
-                            className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-slate-50 hover:text-purple-600 transition-colors ${
+                            className={`w-full text-left px-5 py-3 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-purple-600 dark:hover:text-purple-400 transition-colors ${
                               sortBy === option
-                                ? "bg-purple-50 text-purple-600"
-                                : "text-slate-600"
+                                ? "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400"
+                                : "text-slate-600 dark:text-slate-400"
                             }`}
                           >
                             {option}
@@ -432,16 +442,16 @@ export default function ShopPage() {
                   </div>
                 </div>
                 {isMobileCategoryOpen && (
-                  <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 z-100 animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden">
+                  <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-6 z-100 animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden text-center">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-bold text-slate-900 text-sm">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">
                         Select Category
                       </h3>
                       <button
                         onClick={() => setIsMobileCategoryOpen(false)}
-                        className="p-1.5 bg-slate-100 rounded-lg text-slate-400"
+                        className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-400"
                       >
-                        <X size={14} />
+                        <X size={16} />
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">
@@ -457,10 +467,10 @@ export default function ShopPage() {
                             updateURL(1, option, sortBy, searchTerm);
                             setIsMobileCategoryOpen(false);
                           }}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                             selectedCategory === option
                               ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
-                              : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                              : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                           }`}
                         >
                           {option}
@@ -471,16 +481,16 @@ export default function ShopPage() {
                 )}
 
                 {isMobileSortOpen && (
-                  <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 z-100 animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden">
+                  <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-6 z-100 animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-bold text-slate-900 text-sm">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">
                         Sort Products
                       </h3>
                       <button
                         onClick={() => setIsMobileSortOpen(false)}
-                        className="p-1.5 bg-slate-100 rounded-lg text-slate-400"
+                        className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-400"
                       >
-                        <X size={14} />
+                        <X size={16} />
                       </button>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -499,10 +509,10 @@ export default function ShopPage() {
                             updateURL(1, selectedCategory, option, searchTerm);
                             setIsMobileSortOpen(false);
                           }}
-                          className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                          className={`w-full text-left px-5 py-3 rounded-xl text-xs font-bold transition-all ${
                             sortBy === option
-                              ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20 px-6"
-                              : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                              ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20 px-8"
+                              : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                           }`}
                         >
                           {option}
@@ -513,8 +523,7 @@ export default function ShopPage() {
                 )}
               </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 tablet:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-10">
               {currentProducts.map((product: any) => (
                 <SimpleProductCard
                   key={product.id}
@@ -525,20 +534,20 @@ export default function ShopPage() {
                   isInCart={cartItems.some(
                     (item: any) => item.id === product.id,
                   )}
-                  onAddToCart={() => handleAddToCart(product)}
+                  onAddToCart={(p: any) => handleAddToCart(p)}
                   onToggleWishlist={() => handleToggleWishlist(product)}
                   onQuickView={() => setQuickViewProduct(product)}
                 />
               ))}
             </div>
             {totalPages > 1 && (
-              <div className="mt-16 flex justify-center items-center gap-3">
+              <div className="mt-20 flex justify-center items-center gap-4">
                 {currentPage > 1 && (
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold hover:bg-purple-100 hover:text-purple-600 transition-all rotate-180"
+                    className="w-12 h-12 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold hover:bg-purple-600 hover:text-white transition-all rotate-180 shadow-sm"
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={20} />
                   </button>
                 )}
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -546,10 +555,10 @@ export default function ShopPage() {
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all shadow-md ${
+                      className={`w-12 h-12 flex items-center justify-center rounded-full font-black transition-all shadow-md ${
                         currentPage === page
-                          ? "bg-blue-900 text-white hover:bg-blue-800"
-                          : "bg-slate-100 text-slate-500 hover:bg-purple-100 hover:text-purple-600"
+                          ? "bg-purple-600 text-white scale-110"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400"
                       }`}
                     >
                       {page}
@@ -559,9 +568,9 @@ export default function ShopPage() {
                 {currentPage < totalPages && (
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold hover:bg-purple-100 hover:text-purple-600 transition-all"
+                    className="w-12 h-12 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold hover:bg-purple-600 hover:text-white transition-all shadow-sm"
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={20} />
                   </button>
                 )}
               </div>
@@ -602,7 +611,7 @@ function SimpleProductCard({
     }
     if (addingToCart || isOutOfStock) return;
     setAddingToCart(true);
-    onAddToCart(product, 1);
+    onAddToCart(product);
     setTimeout(() => setAddingToCart(false), 700);
   };
 
@@ -611,13 +620,13 @@ function SimpleProductCard({
   const isOutOfStock = !product.stockQuantity || product.stockQuantity === 0;
 
   return (
-    <div className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
+    <div className="group bg-white dark:bg-slate-900 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 relative border border-transparent hover:border-purple-200 dark:hover:border-purple-900/40">
       <button
         onClick={onToggleWishlist}
-        className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-md transition-all duration-300 ${
+        className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-lg backdrop-blur-md transition-all duration-300 ${
           showFilled
-            ? "bg-red-50 text-red-500"
-            : "bg-white text-slate-400 hover:bg-red-50 hover:text-red-500"
+            ? "bg-red-500 text-white"
+            : "bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
         }`}
         title={showFilled ? "Remove from wishlist" : "Add to wishlist"}
       >
@@ -629,13 +638,13 @@ function SimpleProductCard({
           e.stopPropagation();
           onQuickView();
         }}
-        className="absolute top-16 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-md bg-white text-slate-400 hover:bg-blue-500 hover:text-white transition-all duration-300 opacity-100 lg:opacity-0 group-hover:opacity-100 translate-x-0 lg:translate-x-4 group-hover:translate-x-0"
+        className="absolute top-16 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full shadow-lg backdrop-blur-md bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:bg-purple-600 dark:hover:bg-purple-500 hover:text-white transition-all duration-300 opacity-100 lg:opacity-0 group-hover:opacity-100 translate-x-0 lg:translate-x-4 group-hover:translate-x-0"
         title="Quick View"
       >
         <Eye size={18} />
       </button>
 
-      <div className="relative h-72 bg-[#F6F7FB] flex items-center justify-center p-6 group-hover:bg-[#ebf0f7] transition-colors">
+      <div className="relative h-80 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center p-8 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-colors duration-500">
         <Link
           href={`/product/${product.title.toLowerCase().replace(/\s+/g, "-")}`}
           className="relative w-full h-full block"
@@ -644,34 +653,31 @@ function SimpleProductCard({
             src={product.image}
             alt={product.title}
             fill
-            className={`object-contain p-2 mix-blend-multiply transition-transform duration-500 ${
-              isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-105"
+            className={`object-contain p-2 mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 ${
+              isOutOfStock ? "grayscale opacity-40" : "group-hover:scale-110"
             }`}
           />
           {isOutOfStock && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-              <span className="bg-red-500/90 text-white font-bold px-4 py-2 rounded-lg rotate-12 backdrop-blur-sm shadow-xl border border-white/20 whitespace-nowrap text-xs">
-                OUT OF STOCK
+              <span className="bg-red-500/90 text-white font-black px-5 py-2.5 rounded-xl rotate-12 backdrop-blur-sm shadow-2xl border border-white/20 whitespace-nowrap text-[10px] tracking-widest uppercase">
+                Sold Out
               </span>
             </div>
           )}
         </Link>
         <div
-          className={`absolute inset-0 flex items-center justify-center gap-2 transition-opacity duration-300 z-10 bg-black/5 ${isOutOfStock ? "opacity-100" : "opacity-100 lg:opacity-0 group-hover:opacity-100"}`}
+          className={`absolute inset-0 flex items-center justify-center gap-3 transition-opacity duration-500 z-10 bg-black/5 dark:bg-white/5 ${isOutOfStock ? "opacity-100" : "opacity-100 lg:opacity-0 group-hover:opacity-100"}`}
         >
           {isOutOfStock ? (
-            <div className="flex items-center gap-2 px-6 py-2.5 bg-slate-400 text-white text-sm font-bold rounded-full shadow-lg cursor-not-allowed">
-              <span>Out of Stock</span>
+            <div className="flex items-center gap-2 px-6 py-3 bg-slate-400 text-white text-xs font-black rounded-full shadow-2xl cursor-not-allowed uppercase tracking-wider backdrop-blur-md">
+              <span>Notify Me</span>
             </div>
           ) : showInCart ? (
             <>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCartClick(e);
-                }}
+                onClick={handleCartClick}
                 disabled={addingToCart}
-                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-80 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-5 py-3 bg-linear-to-r from-purple-600 to-indigo-600 text-white text-xs font-black rounded-full shadow-2xl hover:shadow-purple-500/30 hover:scale-105 transition-all disabled:opacity-80 active:scale-95 uppercase tracking-wider"
               >
                 {addingToCart ? (
                   <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -682,16 +688,16 @@ function SimpleProductCard({
               </button>
               <Link
                 href="/cart"
-                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-xs font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                className="flex items-center gap-2 px-5 py-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-black rounded-full shadow-2xl hover:shadow-white/10 hover:scale-105 transition-all active:scale-95 uppercase tracking-wider border border-slate-200 dark:border-slate-700"
               >
-                View cart
+                Cart
               </Link>
             </>
           ) : (
             <button
               onClick={handleCartClick}
               disabled={addingToCart}
-              className="flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white text-sm font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-80 disabled:cursor-not-allowed"
+              className="flex items-center gap-3 px-8 py-3.5 bg-linear-to-r from-purple-600 to-indigo-600 text-white text-xs font-black rounded-full shadow-2xl hover:shadow-purple-500/40 hover:scale-110 transition-all disabled:opacity-80 active:scale-95 uppercase tracking-widest"
             >
               {addingToCart ? (
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -704,25 +710,25 @@ function SimpleProductCard({
         </div>
       </div>
 
-      <Link
-        href={`/product/${product.title.toLowerCase().replace(/\s+/g, "-")}`}
-      >
-        <div className="p-4 text-center bg-white cursor-pointer">
-          <h3 className="font-bold text-slate-800 text-lg mb-2 truncate group-hover:text-purple-600 transition-colors">
+      <div className="p-6 text-center bg-white dark:bg-slate-900 border-t border-slate-50 dark:border-slate-800 transition-colors">
+        <Link
+          href={`/product/${product.title.toLowerCase().replace(/\s+/g, "-")}`}
+        >
+          <h3 className="font-bold text-slate-800 dark:text-white text-base mb-2 truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors tracking-tight">
             {product.title}
           </h3>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-sm font-bold text-blue-900">
-              {product.price}
+        </Link>
+        <div className="flex items-center justify-center gap-3">
+          <span className="text-sm font-black text-purple-600 dark:text-purple-400">
+            {product.price}
+          </span>
+          {product.oldPrice && (
+            <span className="text-xs text-slate-400 dark:text-slate-500 line-through font-medium">
+              {product.oldPrice}
             </span>
-            {product.oldPrice && (
-              <span className="text-xs text-red-400 line-through">
-                {product.oldPrice}
-              </span>
-            )}
-          </div>
+          )}
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

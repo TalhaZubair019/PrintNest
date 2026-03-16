@@ -248,18 +248,18 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="container mx-auto px-4 text-center">Loading...</div>
+      <section className="py-20 lg:py-28 bg-white dark:bg-slate-950 transition-colors">
+        <div className="container mx-auto px-4 text-center text-slate-800 dark:text-slate-200">Loading...</div>
       </section>
     );
   }
 
   if (!product) {
     return (
-      <section className="py-20 lg:py-28 bg-white">
+      <section className="py-20 lg:py-28 bg-white dark:bg-slate-950 transition-colors">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-4">Product not found</h1>
-          <Link href="/shop" className="text-blue-500 hover:underline">
+          <h1 className="text-3xl font-bold mb-4 text-slate-900 dark:text-white">Product not found</h1>
+          <Link href="/shop" className="text-blue-500 dark:text-blue-400 hover:underline">
             Return to shop
           </Link>
         </div>
@@ -275,33 +275,19 @@ export default function ProductPage() {
     : "0.0";
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-800">
+    <div className="relative min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 transition-colors duration-300">
       <PageHeader
         title={product.title}
         breadcrumbs={[
           { label: "Shop", href: "/shop" },
           { label: product.title },
         ]}
-        backgroundImage="https://themexriver.com/wp/printnest/wp-content/uploads/2026/01/breadcrumb-bg.webp"
       />
 
       <div className="relative z-10">
-        <div className="max-w-6xl mx-auto px-4 mt-12 mb-8">
-          <button
-            onClick={() => router.back()}
-            className="group flex items-center gap-2 text-slate-600 hover:text-purple-600 font-semibold transition-all duration-300 bg-white/50 backdrop-blur-sm px-5 py-2.5 rounded-full border border-slate-200 shadow-sm hover:shadow-md hover:-translate-x-1"
-          >
-            <ArrowLeft
-              size={18}
-              className="group-hover:-translate-x-0.5 transition-transform"
-            />
-            <span>Go Back</span>
-          </button>
-        </div>
-
         <section className="max-w-6xl mx-auto px-6 sm:px-8 pb-16 mt-8 md:mt-12">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mb-12">
-            <div className="relative w-full aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
+            <div className="relative w-full aspect-square bg-gray-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 transition-colors">
               <Image
                 src={product.image}
                 alt={product.title}
@@ -312,7 +298,7 @@ export default function ProductPage() {
             </div>
 
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-2 transition-colors">
                 {product.title}
               </h1>
               <div className="flex items-center gap-2 mb-4">
@@ -329,7 +315,7 @@ export default function ProductPage() {
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-slate-400 transition-colors">
                   ({reviews.length}{" "}
                   {reviews.length === 1 ? "Review" : "Reviews"})
                 </span>
@@ -337,7 +323,7 @@ export default function ProductPage() {
 
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-blue-600">
+                  <span className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400 transition-colors">
                     {product.price}
                   </span>
                 </div>
@@ -346,22 +332,22 @@ export default function ProductPage() {
                   const threshold = product.lowStockThreshold || 5;
                   if (stock <= 0) {
                     return (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 font-bold text-xs rounded-full ring-1 ring-red-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold text-xs rounded-full ring-1 ring-red-500/20 transition-colors">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400 animate-pulse" />
                         Out of Stock
                       </span>
                     );
                   } else if (stock <= threshold) {
                     return (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 font-bold text-xs rounded-full ring-1 ring-amber-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-bold text-xs rounded-full ring-1 ring-amber-500/20 transition-colors">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
                         Low Stock ({stock} left)
                       </span>
                     );
                   } else {
                     return (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs rounded-full ring-1 ring-emerald-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs rounded-full ring-1 ring-emerald-500/20 transition-colors">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
                         In Stock
                       </span>
                     );
@@ -369,25 +355,25 @@ export default function ProductPage() {
                 })()}
               </div>
 
-              <p className="text-sm sm:text-base text-gray-600 mb-8 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 mb-8 leading-relaxed transition-colors">
                 {product.description ||
                   "Premium quality product perfect for your needs. Customizable and high-quality printing."}
               </p>
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-4">
-                  <label className="font-semibold text-black">Quantity:</label>
-                  <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+                  <label className="font-semibold text-black dark:text-white transition-colors">Quantity:</label>
+                  <div className="flex items-center border border-gray-300 dark:border-slate-700 rounded overflow-hidden">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       disabled={
                         !product.stockQuantity || product.stockQuantity === 0
                       }
-                      className="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition-colors"
+                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors"
                     >
                       -
                     </button>
-                    <span className="px-5 py-2 font-medium bg-white border-x border-gray-200">
+                    <span className="px-5 py-2 font-medium bg-white dark:bg-slate-900 border-x border-gray-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition-colors">
                       {quantity}
                     </span>
                     <button
@@ -399,7 +385,7 @@ export default function ProductPage() {
                         !product.stockQuantity ||
                         quantity >= product.stockQuantity
                       }
-                      className="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition-colors"
+                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors"
                     >
                       +
                     </button>
@@ -435,7 +421,7 @@ export default function ProductPage() {
                   </button>
                   <button
                     onClick={handleToggleWishlist}
-                    className={`w-full sm:w-auto px-8 py-3.5 font-bold rounded-full transition-all flex items-center justify-center gap-2 ${isInWishlist ? "bg-red-500 text-white hover:bg-red-600 shadow-md" : "border-2 border-gray-300 text-black hover:border-red-500 hover:text-red-500"}`}
+                    className={`w-full sm:w-auto px-8 py-3.5 font-bold rounded-full transition-all flex items-center justify-center gap-2 ${isInWishlist ? "bg-red-500 text-white hover:bg-red-600 shadow-md" : "border-2 border-gray-300 dark:border-slate-700 text-black dark:text-white hover:border-red-500 dark:hover:border-red-500 hover:text-red-500"}`}
                   >
                     <span>{isInWishlist ? "♥" : "♡"}</span>
                     <span>Wishlist</span>
@@ -443,7 +429,7 @@ export default function ProductPage() {
                 </div>
               </div>
 
-              <div className="space-y-4 text-sm text-gray-600 border-t pt-8">
+              <div className="space-y-4 text-sm text-gray-600 dark:text-slate-400 border-t border-gray-100 dark:border-slate-800 pt-8 transition-colors">
                 <div className="flex justify-between">
                   <span>SKU:</span>
                   <span className="font-semibold">{product.sku || "N/A"}</span>
@@ -458,8 +444,8 @@ export default function ProductPage() {
             </div>
           </div>
 
-          <div className="mt-20 pt-12 border-t border-gray-200">
-            <h2 className="text-2xl md:text-3xl font-bold text-black mb-10">
+          <div className="mt-20 pt-12 border-t border-gray-200 dark:border-slate-800 transition-colors">
+            <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white mb-10 transition-colors">
               Customer Reviews
             </h2>
 
@@ -469,8 +455,8 @@ export default function ProductPage() {
                   {editingReviewId ? "Edit Your Review" : "Write a Review"}
                 </h3>
                 {!isAuthenticated ? (
-                  <div className="bg-blue-50/50 p-8 rounded-2xl text-center border border-blue-100">
-                    <p className="mb-4 text-blue-900 font-medium">
+                  <div className="bg-blue-50/50 dark:bg-blue-900/10 p-8 rounded-2xl text-center border border-blue-100 dark:border-blue-900/30 transition-colors">
+                    <p className="mb-4 text-blue-900 dark:text-blue-300 font-medium transition-colors">
                       You must be logged in to leave a review.
                     </p>
                     <Link
@@ -483,10 +469,10 @@ export default function ProductPage() {
                 ) : (
                   <form
                     onSubmit={handleSubmitReview}
-                    className="space-y-5 bg-gray-50 p-6 sm:p-8 rounded-2xl border border-gray-100"
+                    className="space-y-5 bg-gray-50 dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-slate-800 transition-colors"
                   >
                     <div>
-                      <label className="block font-semibold mb-3 text-slate-800">
+                      <label className="block font-semibold mb-3 text-slate-800 dark:text-slate-200 transition-colors">
                         Overall Rating
                       </label>
                       <div className="flex gap-2">
@@ -504,7 +490,7 @@ export default function ProductPage() {
                               className={
                                 (hoveredStar || rating) >= star
                                   ? "text-yellow-400 fill-current"
-                                  : "text-gray-300"
+                                  : "text-gray-300 dark:text-slate-700"
                               }
                             />
                           </button>
@@ -512,7 +498,7 @@ export default function ProductPage() {
                       </div>
                     </div>
                     <div>
-                      <label className="block font-semibold mb-3 text-slate-800">
+                      <label className="block font-semibold mb-3 text-slate-800 dark:text-slate-200 transition-colors">
                         Your Review
                       </label>
                       <textarea
@@ -520,7 +506,7 @@ export default function ProductPage() {
                         rows={4}
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+                        className="w-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-500 outline-none text-slate-800 dark:text-slate-200 transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                         placeholder="What did you like or dislike about this product?"
                       />
                     </div>
@@ -533,14 +519,14 @@ export default function ProductPage() {
                             setComment("");
                             setRating(5);
                           }}
-                          className="flex-1 px-6 py-4 bg-gray-200 text-gray-800 font-bold rounded-xl hover:bg-gray-300 transition-all shadow-md"
+                          className="flex-1 px-6 py-4 bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-slate-200 font-bold rounded-xl hover:bg-gray-300 dark:hover:bg-slate-700 transition-all shadow-md"
                         >
                           Cancel
                         </button>
                       )}
                       <button
                         type="submit"
-                        className="flex-1 px-6 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-md"
+                        className="flex-1 px-6 py-4 bg-slate-900 dark:bg-purple-600 text-white font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-purple-700 transition-all shadow-md"
                       >
                         {editingReviewId ? "Update Review" : "Submit Review"}
                       </button>
@@ -556,7 +542,7 @@ export default function ProductPage() {
                     {reviews.length === 1 ? "Review" : "Reviews"}
                   </h3>
                   {reviews.length > 0 && (
-                    <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full text-sm font-semibold text-yellow-800">
+                    <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900/30 px-3 py-1 rounded-full text-sm font-semibold text-yellow-800 dark:text-yellow-400 transition-colors">
                       <Star
                         size={14}
                         className="fill-current text-yellow-500"
@@ -567,9 +553,9 @@ export default function ProductPage() {
                 </div>
 
                 {reviews.length === 0 ? (
-                  <div className="text-center py-12 px-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                    <Star size={48} className="mx-auto text-gray-300 mb-4" />
-                    <p className="text-gray-500 font-medium">
+                  <div className="text-center py-12 px-6 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-gray-200 dark:border-slate-800 transition-colors">
+                    <Star size={48} className="mx-auto text-gray-300 dark:text-slate-700 mb-4 transition-colors" />
+                    <p className="text-gray-500 dark:text-slate-400 font-medium transition-colors">
                       No reviews yet. Be the first to review this product!
                     </p>
                   </div>
@@ -578,15 +564,15 @@ export default function ProductPage() {
                     {reviews.map((review) => (
                       <div
                         key={review.id}
-                        className={`bg-white p-5 sm:p-6 rounded-2xl border shadow-xs transition-all ${editingReviewId === review.id ? "border-blue-500 ring-2 ring-blue-100" : "border-gray-100"}`}
+                        className={`bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border shadow-sm transition-all ${editingReviewId === review.id ? "border-blue-500 dark:border-blue-500 ring-2 ring-blue-100 dark:ring-blue-900/30" : "border-gray-100 dark:border-slate-800"}`}
                       >
                         <div className="flex justify-between items-start mb-3">
-                          <div className="font-semibold text-slate-900">
+                          <div className="font-semibold text-slate-900 dark:text-white transition-colors">
                             {review.userName}
                           </div>
                           <div className="text-sm text-slate-400 tracking-wide font-medium flex items-center gap-2">
                             {review.isEdited && (
-                              <span className="text-[10px] uppercase bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">
+                              <span className="text-[10px] uppercase bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 transition-colors">
                                 Edited
                               </span>
                             )}
@@ -601,25 +587,25 @@ export default function ProductPage() {
                               className={
                                 i < review.rating
                                   ? "text-yellow-400 fill-current"
-                                  : "text-gray-200"
+                                  : "text-gray-200 dark:text-slate-700"
                               }
                             />
                           ))}
                         </div>
-                        <p className="text-gray-600 leading-relaxed text-sm mb-4">
+                        <p className="text-gray-600 dark:text-slate-300 leading-relaxed text-sm mb-4 transition-colors">
                           {review.comment}
                         </p>
                         {user && user.id === review.userId && (
-                          <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-gray-50">
+                          <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-gray-50 dark:border-slate-800 transition-colors">
                             <button
                               onClick={() => handleEdit(review)}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-800 px-3 py-1 rounded hover:bg-blue-50 transition-colors"
+                              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 px-3 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => handleDelete(review.id)}
-                              className="text-sm font-medium text-red-600 hover:text-red-800 px-3 py-1 rounded hover:bg-red-50 transition-colors"
+                              className="text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 px-3 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                             >
                               Delete
                             </button>

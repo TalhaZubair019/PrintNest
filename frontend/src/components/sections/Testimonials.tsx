@@ -48,7 +48,7 @@ function Testimonials() {
   return (
     <section
       id="testimonials"
-      className="scroll-mt-24 py-16 sm:py-24 px-4 sm:px-8 lg:px-20 bg-[#f8fbff] overflow-hidden font-sans"
+      className="scroll-mt-24 py-16 sm:py-24 px-4 sm:px-8 lg:px-20 bg-[#f8fbff] dark:bg-slate-950 overflow-hidden font-sans"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16">
@@ -67,7 +67,7 @@ function Testimonials() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827]"
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] dark:text-white"
           >
             {header.titleMain} <br />
             <span className="text-[#ff6b6b] relative inline-block mt-2">
@@ -104,9 +104,9 @@ function Testimonials() {
             <NavButton onClick={nextSlide} icon={<ChevronRight size={20} />} />
           </div>
 
-          <div className="grow w-full h-0.5 bg-gray-200 relative overflow-hidden rounded-full">
+          <div className="grow w-full h-0.5 bg-gray-200 dark:bg-slate-800 relative overflow-hidden rounded-full">
             <div
-              className="absolute left-0 top-0 h-full bg-[#1e1b4b] transition-all duration-500"
+              className="absolute left-0 top-0 h-full bg-[#1e1b4b] dark:bg-blue-600 transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
@@ -118,7 +118,7 @@ function Testimonials() {
 
 const TestimonialCard = ({ item }: { item: any }) => {
   return (
-    <div className="bg-white p-6 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-xl transition-all duration-300 group">
+    <div className="bg-white dark:bg-slate-950 p-6 sm:p-10 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col h-full hover:shadow-xl transition-all duration-300 group">
       <div className="flex items-center gap-4 mb-6 sm:mb-8">
         <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden shrink-0">
           <Image
@@ -129,11 +129,11 @@ const TestimonialCard = ({ item }: { item: any }) => {
           />
         </div>
         <div>
-          <h4 className="font-bold text-[#111827] leading-none">{item.name}</h4>
+          <h4 className="font-bold text-[#111827] dark:text-white leading-none">{item.name}</h4>
           <p className="text-gray-400 text-sm mt-1">{item.role}</p>
         </div>
       </div>
-      <p className="text-gray-600 leading-relaxed mb-8 sm:mb-10 grow text-sm sm:text-base">
+      <p className="text-gray-600 dark:text-slate-400 leading-relaxed mb-8 sm:mb-10 grow text-sm sm:text-base">
         &quot;{item.content}&quot;
       </p>
       <div className="flex justify-between items-center mt-auto">
@@ -144,7 +144,7 @@ const TestimonialCard = ({ item }: { item: any }) => {
         </div>
         <Quote
           size={28}
-          className="text-[#111827] rotate-180 opacity-80 group-hover:text-[#3b82f6] transition-colors"
+          className="text-[#111827] dark:text-slate-300 rotate-180 opacity-80 group-hover:text-[#3b82f6] transition-colors"
         />
       </div>
     </div>
@@ -161,7 +161,7 @@ const NavButton = ({
   return (
     <button
       onClick={onClick}
-      className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-[#1e1b4b] flex items-center justify-center text-[#1e1b4b] hover:bg-[#1e1b4b] hover:text-white transition-all active:scale-95 cursor-pointer"
+      className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-[#1e1b4b] dark:border-slate-700 flex items-center justify-center text-[#1e1b4b] dark:text-slate-300 hover:bg-[#1e1b4b] dark:hover:bg-slate-800 hover:text-white transition-all active:scale-95 cursor-pointer"
     >
       {icon}
     </button>

@@ -8,8 +8,8 @@ interface ReviewRatingChartProps {
 
 const ReviewRatingChart = ({ stats }: ReviewRatingChartProps) => {
   return (
-    <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-      <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500">
+      <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
         Review Rating Distribution
         <div className="h-2 w-2 bg-yellow-400 rounded-full animate-pulse shadow-lg shadow-yellow-200" />
       </h3>
@@ -23,24 +23,24 @@ const ReviewRatingChart = ({ stats }: ReviewRatingChartProps) => {
 
           return (
             <div key={rating} className="flex items-center gap-3">
-              <span className="flex items-center gap-1 w-12 text-sm font-medium text-slate-600">
+              <span className="flex items-center gap-1 w-12 text-sm font-medium text-slate-600 dark:text-slate-400">
                 {rating}{" "}
                 <Star size={12} className="fill-yellow-400 text-yellow-400" />
               </span>
-              <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-yellow-400 rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${percentage}%` }}
                 />
               </div>
-              <span className="text-xs text-slate-500 w-12 text-right">
+              <span className="text-xs text-slate-500 dark:text-slate-400 w-12 text-right transition-colors">
                 {count} ({percentage.toFixed(0)}%)
               </span>
             </div>
           );
         })}
         <div className="pt-4 text-center">
-          <div className="text-3xl font-bold text-slate-700">
+          <div className="text-3xl font-bold text-slate-700 dark:text-slate-200">
             {(
               Object.entries(stats.ratingDistribution || {}).reduce(
                 (acc, [stars, count]) => acc + Number(stars) * count,
@@ -76,7 +76,7 @@ const ReviewRatingChart = ({ stats }: ReviewRatingChartProps) => {
               />
             ))}
           </div>
-          <p className="text-xs text-slate-400">Average Rating</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 transition-colors">Average Rating</p>
         </div>
       </div>
     </div>

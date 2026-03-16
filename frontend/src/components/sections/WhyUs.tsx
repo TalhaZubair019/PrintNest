@@ -19,7 +19,7 @@ function WhyChooseUs() {
   return (
     <section
       id="services"
-      className="scroll-mt-24 py-20 px-4 bg-[#f8fbff] font-sans"
+      className="scroll-mt-24 py-20 px-4 bg-[#f8fbff] dark:bg-slate-950 font-sans"
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
@@ -28,7 +28,7 @@ function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-base text-blue-800 uppercase mb-3"
+            className="text-base text-blue-800 dark:text-blue-400 uppercase mb-3"
           >
             {header.label}
           </motion.p>
@@ -38,7 +38,7 @@ function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-2xl lg:text-5xl font-medium text-slate-900 leading-tight"
+            className="text-2xl lg:text-5xl font-medium text-slate-900 dark:text-white leading-tight"
           >
             {header.titleMain} <br />
             <span className="text-[#FF7F7F] border-b-4 border-[#FF7F7F] pb-1">
@@ -100,7 +100,7 @@ const FeatureCard = ({ item, index }: { item: any; index?: number }) => {
   };
   return (
     <motion.div
-      className="relative bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center p-8 text-center h-full overflow-hidden cursor-pointer"
+      className="relative bg-white dark:bg-slate-950 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col items-center p-8 text-center h-full overflow-hidden cursor-pointer transition-colors duration-300"
       initial="initial"
       whileHover="hover"
       variants={{
@@ -119,17 +119,17 @@ const FeatureCard = ({ item, index }: { item: any; index?: number }) => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
       />
       <motion.div
-        className="relative z-10 p-4 rounded-full border-6 mb-6 text-white"
+        className="relative z-10 p-4 rounded-full border-6 border-white dark:border-slate-800 mb-6 text-white"
         style={{ backgroundColor: colors.iconBg }}
         variants={iconVariants}
       >
         <Icon size={32} strokeWidth={1.5} />
       </motion.div>
 
-      <h3 className="text-xl font-bold text-gray-800 mb-3 leading-tight">
+      <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100 mb-3 leading-tight">
         {item.title}
       </h3>
-      <p className="text-gray-500 leading-relaxed text-sm">
+      <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm">
         {item.description}
       </p>
     </motion.div>

@@ -34,7 +34,7 @@ const BlindsImage = ({
         {bars.map((_, i) => (
           <motion.div
             key={i}
-            className="flex-1 w-full bg-slate-200 border-b border-white/50"
+            className="flex-1 w-full bg-slate-200 dark:bg-slate-800 border-b border-white/50 dark:border-slate-700/50"
             initial={{ opacity: 1, scaleY: 1 }}
             whileInView={{ opacity: 0, scaleY: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -107,7 +107,7 @@ function Categories() {
   return (
     <section
       id="services"
-      className="py-16 sm:py-20 lg:py-28 mx-4 sm:mx-8 lg:mx-20 overflow-hidden scroll-mt-24"
+      className="py-16 sm:py-20 lg:py-28 scroll-mt-24 bg-white dark:bg-slate-950 px-4 sm:px-8 lg:px-20 overflow-hidden"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
@@ -117,7 +117,7 @@ function Categories() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-sm font-medium text-blue-900 uppercase tracking-widest mb-4"
+              className="text-sm font-medium text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-4"
             >
               {categoriesData.sectionLabel}
             </motion.p>
@@ -126,12 +126,12 @@ function Categories() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-3xl sm:text-4xl lg:text-5xl font-medium text-black leading-tight"
+              className="text-3xl sm:text-4xl lg:text-5xl font-medium text-black dark:text-white leading-tight"
             >
               {categoriesData.headingMain} <br />
-              <span className="relative inline-block text-[#FF7F7F]">
+              <span className="relative inline-block text-[#FF7F7F] pb-2">
                 {categoriesData.headingHighlight}
-                <span className="absolute left-0 bottom-1 w-full h-1 bg-[#FF7F7F] rounded-full"></span>
+                <span className="absolute left-0 bottom-0 w-full h-1.5 bg-[#FF7F7F] rounded-full"></span>
               </span>
             </motion.h2>
           </div>
@@ -141,7 +141,7 @@ function Categories() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-black text-base sm:text-lg lg:text-xl font-light"
+              className="text-black dark:text-slate-300 text-base sm:text-lg lg:text-xl font-light"
             >
               {categoriesData.description}
             </motion.p>
@@ -182,7 +182,7 @@ function Categories() {
                   .replace(/\s+/g, "-")}`}
                 className="group flex flex-col items-center"
               >
-                <div className="relative w-full h-100 group-hover:h-110 rounded-4xl overflow-hidden shadow-sm transition-all duration-500 ease-in-out group-hover:shadow-2xl group-hover:shadow-blue-900/20 bg-white">
+                <div className="relative w-full h-100 group-hover:h-110 rounded-4xl overflow-hidden shadow-sm transition-all duration-500 ease-in-out group-hover:shadow-2xl group-hover:shadow-blue-900/20 bg-white dark:bg-slate-950">
                   <BlindsImage
                     src={category.image}
                     alt={category.title}
@@ -194,7 +194,7 @@ function Categories() {
                   <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-300 pointer-events-none"></div>
                 </div>
                 <div className="relative z-10 w-full flex justify-center mt-6 transition-all duration-500 ease-out group-hover:-translate-y-24">
-                  <div className="bg-white/95 backdrop-blur-sm px-8 py-3 w-[80%] text-center rounded-full group-hover:scale-105 transition-all duration-300 hover:bg-linear-to-r from-blue-500 to-cyan-400 text-slate-800 hover:text-white">
+                  <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-8 py-3 w-[80%] text-center rounded-full group-hover:scale-105 transition-all duration-300 hover:bg-linear-to-r from-blue-500 to-cyan-400 text-slate-800 dark:text-slate-200 hover:text-white">
                     <span className="text-lg font-bold px-4 py-2">
                       {category.title}
                     </span>

@@ -29,7 +29,7 @@ function PricingSection() {
   };
 
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-8 lg:px-20 bg-white min-h-screen">
+    <section className="py-16 sm:py-24 px-4 sm:px-8 lg:px-20 bg-white dark:bg-slate-950 min-h-screen">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
         <motion.div
           className="flex flex-col items-start"
@@ -40,14 +40,14 @@ function PricingSection() {
         >
           <motion.span
             variants={itemVariants}
-            className="text-blue-800 tracking-widest text-s uppercase mb-4 block"
+            className="text-blue-800 dark:text-blue-400 tracking-widest text-s uppercase mb-4 block"
           >
             {header.label}
           </motion.span>
 
           <motion.h2
             variants={itemVariants}
-            className="text-[40px] font-medium text-[#111827] leading-[1.1] mb-6"
+            className="text-[40px] font-medium text-[#111827] dark:text-white leading-[1.1] mb-6"
           >
             {header.titleMain} <br />
             <span className="text-[#ff6b6b] relative inline-block">
@@ -58,7 +58,7 @@ function PricingSection() {
 
           <motion.p
             variants={itemVariants}
-            className="text-gray-500 mb-10 max-w-xs leading-relaxed"
+            className="text-gray-500 dark:text-slate-400 mb-10 max-w-xs leading-relaxed"
           >
             {header.description}
           </motion.p>
@@ -68,7 +68,7 @@ function PricingSection() {
             className="flex items-center gap-4 mb-10"
           >
             <span
-              className={`text-sm font-bold ${!isAnnual ? "text-[#111827]" : "text-gray-400"}`}
+              className={`text-sm font-bold ${!isAnnual ? "text-[#111827] dark:text-white" : "text-gray-400 dark:text-slate-500"}`}
             >
               {toggles.monthly}
             </span>
@@ -82,7 +82,7 @@ function PricingSection() {
               />
             </button>
             <span
-              className={`text-sm font-bold ${isAnnual ? "text-[#111827]" : "text-gray-400"}`}
+              className={`text-sm font-bold ${isAnnual ? "text-[#111827] dark:text-white" : "text-gray-400 dark:text-slate-500"}`}
             >
               {toggles.annual}
             </span>
@@ -124,11 +124,11 @@ function PricingSection() {
 
 const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
   return (
-    <div className="relative p-10 rounded-[2.5rem] border border-gray-100 bg-white transition-all duration-500 group cursor-default hover:bg-linear-to-br hover:from-[#6366f1] hover:to-[#06b6d4] hover:-translate-y-2 hover:shadow-2xl">
+    <div className="relative p-10 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 transition-all duration-500 group cursor-default hover:bg-linear-to-br hover:from-[#6366f1] hover:to-[#06b6d4] hover:-translate-y-2 hover:shadow-2xl">
       <span className="inline-block px-5 py-1.5 rounded-full text-xs font-bold mb-6 bg-black text-white group-hover:bg-white/20 transition-colors">
         {plan.name}
       </span>
-      <p className="text-sm mb-8 leading-relaxed text-gray-500 group-hover:text-white transition-colors">
+      <p className="text-sm mb-8 leading-relaxed text-gray-500 dark:text-slate-400 group-hover:text-white transition-colors">
         {plan.description}
       </p>
 
@@ -136,12 +136,12 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
         <span className="text-5xl font-black">
           ${isAnnual ? plan.price.yearly : plan.price.monthly}
         </span>
-        <span className="text-sm font-medium text-gray-400 group-hover:text-white/80 transition-colors">
+        <span className="text-sm font-medium text-gray-400 dark:text-slate-500 group-hover:text-white/80 transition-colors">
           / Per {isAnnual ? "Year" : "Month"}
         </span>
       </div>
 
-      <button className="w-full py-4 rounded-full border border-gray-200 font-bold text-sm mb-10 transition-all bg-white text-gray-900 group-hover:border-transparent group-hover:bg-white/95 cursor-pointer">
+      <button className="w-full py-4 rounded-full border border-gray-200 dark:border-slate-700 font-bold text-sm mb-10 transition-all bg-white dark:bg-slate-800 text-gray-900 dark:text-white group-hover:border-transparent group-hover:bg-white/95 group-hover:text-slate-900 cursor-pointer">
         Get Started
       </button>
 
@@ -150,9 +150,9 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
           <div key={idx} className="flex items-center gap-3">
             <Check
               size={18}
-              className="text-gray-800 group-hover:text-white transition-colors shrink-0"
+              className="text-gray-800 dark:text-slate-200 group-hover:text-white transition-colors shrink-0"
             />
-            <span className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
+            <span className="text-sm text-gray-600 dark:text-slate-300 group-hover:text-white/90 transition-colors">
               {feature}
             </span>
           </div>

@@ -64,20 +64,20 @@ export default function StockAdjustmentModal({ product, onClose, onSuccess }: St
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-white dark:border-slate-800 transition-colors">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-lg border shadow-sm flex items-center justify-center text-purple-600">
+            <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg border dark:border-slate-700 shadow-sm flex items-center justify-center text-purple-600 dark:text-purple-400 transition-colors">
               <Package size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-800">Adjust Inventory</h2>
-              <p className="text-xs text-slate-500 truncate max-w-[300px]">{product.title}</p>
+              <h2 className="text-lg font-bold text-slate-800 dark:text-white transition-colors">Adjust Inventory</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[300px] transition-colors">{product.title}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -87,47 +87,47 @@ export default function StockAdjustmentModal({ product, onClose, onSuccess }: St
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold mb-1.5 text-slate-600 uppercase tracking-wider">SKU</label>
+                <label className="block text-xs font-bold mb-1.5 text-slate-600 dark:text-slate-400 uppercase tracking-wider transition-colors">SKU</label>
                 <input
                   type="text"
                   value={sku}
                   onChange={(e) => setSku(e.target.value)}
                   placeholder="e.g., TS-001"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200 font-mono text-sm"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200 font-mono text-sm text-slate-700 dark:text-slate-200 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold mb-1.5 text-slate-600 uppercase tracking-wider">Low Stock Threshold</label>
+                <label className="block text-xs font-bold mb-1.5 text-slate-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Low Stock Threshold</label>
                 <input
                   type="number"
                   min="0"
                   required
                   value={lowStockThreshold}
                   onChange={(e) => setLowStockThreshold(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200 font-mono text-sm"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200 font-mono text-sm text-slate-700 dark:text-slate-200 transition-all"
                 />
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-100">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 transition-colors">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-800">Warehouse Locations</h4>
-                  <p className="text-xs text-slate-500 font-medium">Manage stock across different locations</p>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white transition-colors">Warehouse Locations</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium transition-colors">Manage stock across different locations</p>
                 </div>
                 <div className="text-right">
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Total Stock</span>
-                  <span className="text-xl font-black text-purple-600 leading-none">{totalStock}</span>
+                  <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1 transition-colors">Total Stock</span>
+                  <span className="text-xl font-black text-purple-600 dark:text-purple-400 leading-none transition-colors">{totalStock}</span>
                 </div>
               </div>
 
               {warehouses.length === 0 ? (
-                <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                  <p className="text-sm text-slate-500 font-medium mb-3">No inventory locations set up.</p>
+                <div className="text-center py-8 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 transition-colors">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3 transition-colors">No inventory locations set up.</p>
                   <button
                     type="button"
                     onClick={addWarehouse}
-                    className="text-xs font-bold bg-white text-slate-700 py-1.5 px-3 rounded-lg border shadow-sm hover:bg-slate-50 transition-colors"
+                    className="text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-1.5 px-3 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     + Add First Location
                   </button>
@@ -135,46 +135,46 @@ export default function StockAdjustmentModal({ product, onClose, onSuccess }: St
               ) : (
                 <div className="space-y-3">
                   {warehouses.map((wh, idx) => (
-                    <div key={idx} className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 relative group animate-in fade-in">
+                    <div key={idx} className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 relative group animate-in fade-in transition-colors">
                       <button
                         type="button"
                         onClick={() => removeWarehouse(idx)}
-                        className="absolute -top-2 -right-2 bg-white text-rose-500 border border-red-200 w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-50 shadow-sm z-10"
+                        className="absolute -top-2 -right-2 bg-white dark:bg-slate-800 text-rose-500 border border-red-200 dark:border-red-900/50 w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-50 dark:hover:bg-rose-900/50 shadow-sm z-10"
                       >
                         ×
                       </button>
                       <div className="grid grid-cols-12 gap-3 items-end">
                         <div className="col-span-5">
-                          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 pl-0.5">Name</label>
+                          <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 pl-0.5 transition-colors">Name</label>
                           <input
                             required
                             type="text"
                             placeholder="e.g. Main Hub"
                             value={wh.warehouseName}
                             onChange={(e) => updateWarehouse(idx, "warehouseName", e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-slate-200 rounded text-sm outline-none focus:border-purple-500"
+                            className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm text-slate-700 dark:text-slate-200 outline-none focus:border-purple-500 transition-colors"
                           />
                         </div>
                         <div className="col-span-4">
-                          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 pl-0.5">Location</label>
+                          <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 pl-0.5 transition-colors">Location</label>
                           <input
                             required
                             type="text"
                             placeholder="e.g. NY"
                             value={wh.location}
                             onChange={(e) => updateWarehouse(idx, "location", e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-slate-200 rounded text-sm outline-none focus:border-purple-500"
+                            className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm text-slate-700 dark:text-slate-200 outline-none focus:border-purple-500 transition-colors"
                           />
                         </div>
                         <div className="col-span-3">
-                          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 pl-0.5">Qty</label>
+                          <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 pl-0.5 transition-colors">Qty</label>
                           <input
                             required
                             type="number"
                             min="0"
                             value={wh.quantity}
                             onChange={(e) => updateWarehouse(idx, "quantity", parseInt(e.target.value) || 0)}
-                            className="w-full px-2.5 py-1.5 border border-slate-200 rounded font-mono text-sm text-center outline-none focus:border-purple-500 font-bold"
+                            className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded font-mono text-sm text-center text-slate-700 dark:text-slate-200 outline-none focus:border-purple-500 font-bold transition-colors"
                           />
                         </div>
                       </div>
@@ -195,11 +195,11 @@ export default function StockAdjustmentModal({ product, onClose, onSuccess }: St
           </form>
         </div>
 
-        <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 rounded-b-2xl">
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-end gap-3 rounded-b-2xl transition-colors">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-white text-slate-700 text-sm font-bold rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors"
+            className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             Cancel
           </button>

@@ -10,8 +10,8 @@ const OrderVelocityChart = ({ stats }: OrderVelocityChartProps) => {
   const maxCount = Math.max(...data.map((d) => d.count)) || 1;
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 hover:shadow-2xl transition-all duration-500">
-      <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-6">
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-6 rounded-3xl shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500">
+      <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-6">
         Order Velocity
         <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-300" />
       </h3>
@@ -33,7 +33,7 @@ const OrderVelocityChart = ({ stats }: OrderVelocityChartProps) => {
                 className="flex-1 flex flex-col items-center gap-2 group h-full justify-end"
                 style={{ minWidth: "28px" }}
               >
-                <div className="w-full bg-slate-50/50 rounded-t-lg relative flex items-end h-[85%] border-b border-slate-100">
+                <div className="w-full bg-slate-50/50 dark:bg-slate-800/50 rounded-t-lg relative flex items-end h-[85%] border-b border-slate-100 dark:border-slate-800">
                   <div
                     className="w-full bg-linear-to-t from-blue-600 to-indigo-500 rounded-t-lg transition-all duration-300 ease-out group-hover:scale-x-105 group-hover:brightness-110 shadow-lg group-hover:shadow-blue-200/50"
                     style={{ height: d.count === 0 ? "5%" : height }}
@@ -52,7 +52,7 @@ const OrderVelocityChart = ({ stats }: OrderVelocityChartProps) => {
                   </div>
                 </div>
 
-                <span className="text-[10px] text-slate-500 font-medium">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                   {d.hour}
                 </span>
               </div>
@@ -61,7 +61,7 @@ const OrderVelocityChart = ({ stats }: OrderVelocityChartProps) => {
         </div>
       </div>
 
-      <p className="text-xs text-slate-500 mt-4 text-center italic">
+      <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors mt-4 text-center italic">
         Customer activity distribution throughout the day (24-hour format)
       </p>
     </div>
