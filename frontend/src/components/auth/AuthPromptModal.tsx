@@ -18,49 +18,51 @@ const AuthPromptModal = ({ onClose, redirectUrl }: AuthPromptModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative animate-in zoom-in-95 duration-300 border border-slate-200/50 dark:border-slate-800">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all hover:rotate-90 duration-300"
         >
           <X size={20} />
         </button>
 
-        <div className="p-8 text-center">
-          <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <LogIn size={32} />
+        <div className="p-10 text-center">
+          <div className="w-20 h-20 bg-linear-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-8 rotate-3 hover:rotate-0 transition-transform duration-300 shadow-inner">
+            <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm">
+              <LogIn size={28} className="animate-pulse" />
+            </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
             Account Required
           </h2>
-          <p className="text-slate-500 mb-8">
+          <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed max-w-[280px] mx-auto">
             Please login or create an account to complete your purchase and
             track your order.
           </p>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Link
               href={loginUrl}
-              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-linear-to-r from-purple-600 to-blue-500 text-white font-bold shadow-lg shadow-purple-200 hover:shadow-xl hover:scale-[1.02] transition-all"
+              className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-linear-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:shadow-[0_15px_25px_rgba(79,70,229,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
             >
-              <LogIn size={18} />
-              Login
+              <LogIn size={20} />
+              Login to Account
             </Link>
 
             <Link
               href={signupUrl}
-              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all"
+              className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-100 dark:hover:border-indigo-900/30 transition-all duration-300 shadow-sm active:scale-[0.98]"
             >
-              <UserPlus size={18} />
-              Create Account
+              <UserPlus size={20} />
+              Create New Account
             </Link>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-100">
+          <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
             <button
               onClick={onClose}
-              className="text-sm text-slate-400 hover:text-slate-600 font-medium"
+              className="text-sm text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold tracking-wide uppercase transition-colors"
             >
               Return to Cart
             </button>
