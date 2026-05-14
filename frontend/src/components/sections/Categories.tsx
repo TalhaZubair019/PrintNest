@@ -88,14 +88,46 @@ function Categories() {
       }
     };
 
-    fetchCategories();
+    // fetchCategories();
   }, []);
 
   if (loading) {
     return (
-      <section className="py-20 lg:py-28 bg-white overflow-hidden min-h-[800px]">
+      <section className="py-16 sm:py-20 lg:py-28 scroll-mt-24 bg-white dark:bg-slate-950 px-4 sm:px-8 lg:px-20 overflow-hidden min-h-[800px] animate-pulse">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center">Loading...</div>
+          <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
+            <div className="w-full max-w-2xl flex flex-col gap-4">
+              {/* Section Label Skeleton */}
+              <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+              {/* Heading Main Skeleton */}
+              <div className="h-10 sm:h-12 w-full max-w-md bg-slate-200 dark:bg-slate-800 rounded"></div>
+              <div className="h-10 sm:h-12 w-2/3 bg-slate-200 dark:bg-slate-800 rounded"></div>
+            </div>
+            <div className="w-full max-w-md flex flex-col items-start gap-6">
+              {/* Description Skeleton */}
+              <div className="space-y-2 w-full">
+                <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+                <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-5/6"></div>
+                <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-4/6"></div>
+              </div>
+              {/* Button Skeleton */}
+              <div className="h-14 w-44 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+            </div>
+          </div>
+
+          {/* Categories Grid Skeleton */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center w-full">
+                {/* Card Image Skeleton */}
+                <div className="w-full h-100 rounded-4xl bg-slate-200 dark:bg-slate-800/60 relative overflow-hidden shadow-sm"></div>
+                {/* Card Title Skeleton */}
+                <div className="relative z-10 w-full flex justify-center mt-6">
+                  <div className="bg-slate-100 dark:bg-slate-800/80 h-12 w-[80%] rounded-full shadow-sm"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );
