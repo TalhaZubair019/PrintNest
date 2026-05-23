@@ -33,17 +33,16 @@ const transporter = nodemailer.createTransport({
 });
 
 function shouldUseEmailRoute() {
-  return (
-    process.env.USE_VERCEL_EMAIL_ROUTE === "true" &&
-    !!EMAIL_API_ENDPOINT
-  );
+  return !!EMAIL_API_ENDPOINT;
 }
 
 async function sendMail(mailOptions) {
   if (shouldUseEmailRoute()) {
+    console.debug("Mailer: sending via email route", EMAIL_API_ENDPOINT);
     return sendMailViaEmailRoute(mailOptions);
   }
 
+  console.debug("Mailer: sending via SMTP", { smtpHost, smtpPort, smtpSecure });
   return transporter.sendMail(mailOptions);
 }
 
