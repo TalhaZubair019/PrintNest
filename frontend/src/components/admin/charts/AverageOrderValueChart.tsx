@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import { DashboardStats } from "@/app/admin/types";
 
 interface AverageOrderValueChartProps {
@@ -342,7 +342,9 @@ const AverageOrderValueChart = ({
           </div>
           <div className="mt-4 flex items-center justify-between px-2">
             <div className="text-center">
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Min AOV</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Min AOV
+              </p>
               <p className="text-sm font-bold text-amber-600">
                 $
                 {!filteredAovData || filteredAovData.length === 0
@@ -361,7 +363,9 @@ const AverageOrderValueChart = ({
               </p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Avg AOV</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Avg AOV
+              </p>
               <p className="text-sm font-bold text-amber-600">
                 $
                 {!filteredAovData || filteredAovData.length === 0
@@ -380,7 +384,9 @@ const AverageOrderValueChart = ({
               </p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Max AOV</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Max AOV
+              </p>
               <p className="text-sm font-bold text-amber-600">
                 $
                 {!filteredAovData || filteredAovData.length === 0

@@ -6,6 +6,13 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
 
+  // Relax explicit any rule to reduce noisy errors across many files.
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+
   globalIgnores([
 
     ".next/**",

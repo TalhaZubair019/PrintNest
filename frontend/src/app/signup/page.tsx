@@ -118,13 +118,9 @@ export default function SignupPage() {
     }
   };
 
-  React.useEffect(() => {
-    if (otp.length === 6 && isVerifying) {
-      handleVerifyOTP();
-    }
-  }, [otp]);
+  
 
-  const handleVerifyOTP = async (e?: React.FormEvent) => {
+  const handleVerifyOTP = React.useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (isExpired) {
       setError("Verification code has expired. Please request a new one.");
@@ -156,7 +152,13 @@ export default function SignupPage() {
     } finally {
       setVerifyingLoading(false);
     }
-  };
+  }, [otp, isExpired, formData.email, dispatch, router, redirect]);
+
+  React.useEffect(() => {
+    if (otp.length === 6 && isVerifying) {
+      handleVerifyOTP();
+    }
+  }, [otp, isVerifying, handleVerifyOTP]);
 
   const handleResendOTP = async () => {
     setResendLoading(true);
@@ -229,7 +231,7 @@ export default function SignupPage() {
                   <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight transition-colors">
                     Secure Access
                   </h2>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm max-w-[280px] mx-auto leading-relaxed font-medium transition-colors">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm max-w-70 mx-auto leading-relaxed font-medium transition-colors">
                     Please enter the 6-digit code sent to
                     <span className="block font-extrabold text-slate-800 dark:text-slate-200 mt-1 bg-slate-100 dark:bg-slate-800 py-1 px-3 rounded-full border border-slate-200/50 dark:border-slate-700/50 transition-colors">
                       {formData.email}
@@ -279,7 +281,7 @@ export default function SignupPage() {
                       autoFocus
                     />
                     <div
-                      className="flex justify-between gap-3 max-w-[340px] mx-auto cursor-text"
+                      className="flex justify-between gap-3 max-w-85 mx-auto cursor-text"
                       onClick={() => otpInputRef.current?.focus()}
                     >
                       {[...Array(6)].map((_, index) => {

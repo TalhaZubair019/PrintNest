@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
@@ -10,7 +9,6 @@ import AuthPromptModal from "@/components/auth/AuthPromptModal";
 import Toast from "@/components/products/Toast";
 
 import { ChevronLeft } from "lucide-react";
-import db from "@data/db.json";
 import { Country, State, City } from "country-state-city";
 
 import ContactSection from "@/components/checkout/ContactSection";
@@ -18,8 +16,6 @@ import BillingSection from "@/components/checkout/BillingSection";
 import PaymentSection from "@/components/checkout/PaymentSection";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import PageHeader from "@/components/ui/PageHeader";
-
-const checkoutConfig = db.checkout;
 
 interface CheckoutData {
   email: string;
@@ -128,9 +124,6 @@ export default function CheckoutPage() {
           const data = await response.json();
           if (data && data.products) {
             hasSynced.current = true;
-            const activeProductIds = data.products.map((p: any) =>
-              String(p.id),
-            );
             const removedItems = cartItems.filter((item: any) => {
               const p = data.products.find(
                 (prod: any) => String(prod.id) === String(item.id),
@@ -337,10 +330,7 @@ export default function CheckoutPage() {
           }}
         />
       )}
-      <PageHeader
-        title="Checkout"
-        breadcrumb="Checkout"
-      />
+      <PageHeader title="Checkout" breadcrumb="Checkout" />
 
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto mt-16 px-4 lg:px-8 pb-32">
@@ -401,7 +391,9 @@ export default function CheckoutPage() {
                   </Link>
                   <button
                     type="submit"
-                    disabled={isSubmitting || (hasMounted && cartItems.length === 0)}
+                    disabled={
+                      isSubmitting || (hasMounted && cartItems.length === 0)
+                    }
                     className={`w-full sm:w-auto px-10 py-4 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#2DD4BF] text-white font-bold text-lg shadow-lg shadow-purple-200 transition-all duration-300 ${
                       isSubmitting || (hasMounted && cartItems.length === 0)
                         ? "opacity-60 cursor-not-allowed grayscale"

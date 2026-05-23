@@ -23,7 +23,7 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
   let currentOffset = 0;
 
   return (
-    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-8 rounded-[32px] shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500 flex flex-col h-full">
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-8 rounded-4xl shadow-lg border border-slate-200/50 dark:border-slate-800/50 hover:shadow-2xl transition-all duration-500 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-8">
         <h3 className="font-bold text-xl text-slate-800 dark:text-white tracking-tight">
           Sales by Category
@@ -95,7 +95,7 @@ const CategorySalesChart = ({ stats }: CategorySalesChartProps) => {
                       ${item.value.toLocaleString()}
                     </span>
                     <div
-                      className="px-2 py-0.5 rounded-md text-[10px] font-bold min-w-[45px] text-center border"
+                      className="px-2 py-0.5 rounded-md text-[10px] font-bold min-w-11.25 text-center border"
                       style={{
                         backgroundColor: `${categoryColor}${i % 2 === 0 ? "10" : "20"}`,
                         borderColor: `${categoryColor}30`,

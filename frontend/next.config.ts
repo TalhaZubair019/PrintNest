@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [
         {
+          source: "/api/email/:path*",
+          destination: "/api/email/:path*",
+        },
+        {
           source: "/api/:path*",
           destination: `${BACKEND_URL}/api/:path*`,
         },

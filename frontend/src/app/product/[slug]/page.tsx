@@ -1,10 +1,10 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Star, ArrowLeft } from "lucide-react";
+import { Star } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/redux/CartSlice";
 import { toggleWishlist } from "@/redux/WishListSlice";
@@ -38,7 +38,6 @@ interface Product {
 
 export default function ProductPage() {
   const params = useParams();
-  const router = useRouter();
   const slug = params.slug as string;
   const dispatch = useDispatch();
 
@@ -249,7 +248,9 @@ export default function ProductPage() {
   if (loading) {
     return (
       <section className="py-20 lg:py-28 bg-white dark:bg-slate-950 transition-colors">
-        <div className="container mx-auto px-4 text-center text-slate-800 dark:text-slate-200">Loading...</div>
+        <div className="container mx-auto px-4 text-center text-slate-800 dark:text-slate-200">
+          Loading...
+        </div>
       </section>
     );
   }
@@ -258,8 +259,13 @@ export default function ProductPage() {
     return (
       <section className="py-20 lg:py-28 bg-white dark:bg-slate-950 transition-colors">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-4 text-slate-900 dark:text-white">Product not found</h1>
-          <Link href="/shop" className="text-blue-500 dark:text-blue-400 hover:underline">
+          <h1 className="text-3xl font-bold mb-4 text-slate-900 dark:text-white">
+            Product not found
+          </h1>
+          <Link
+            href="/shop"
+            className="text-blue-500 dark:text-blue-400 hover:underline"
+          >
             Return to shop
           </Link>
         </div>
@@ -362,7 +368,9 @@ export default function ProductPage() {
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-4">
-                  <label className="font-semibold text-black dark:text-white transition-colors">Quantity:</label>
+                  <label className="font-semibold text-black dark:text-white transition-colors">
+                    Quantity:
+                  </label>
                   <div className="flex items-center border border-gray-300 dark:border-slate-700 rounded overflow-hidden">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -554,13 +562,16 @@ export default function ProductPage() {
 
                 {reviews.length === 0 ? (
                   <div className="text-center py-12 px-6 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-gray-200 dark:border-slate-800 transition-colors">
-                    <Star size={48} className="mx-auto text-gray-300 dark:text-slate-700 mb-4 transition-colors" />
+                    <Star
+                      size={48}
+                      className="mx-auto text-gray-300 dark:text-slate-700 mb-4 transition-colors"
+                    />
                     <p className="text-gray-500 dark:text-slate-400 font-medium transition-colors">
                       No reviews yet. Be the first to review this product!
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-6 max-h-[500px] lg:max-h-[600px] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar">
+                  <div className="space-y-6 max-h-125 lg:max-h-150 overflow-y-auto pr-2 sm:pr-4 custom-scrollbar">
                     {reviews.map((review) => (
                       <div
                         key={review.id}

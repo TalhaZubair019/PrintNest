@@ -101,7 +101,11 @@ const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                     <span className="text-white text-xs font-black">✓</span>
                   ) : (
                     <span
-                      className={isCurrent ? "text-white" : "text-slate-300 dark:text-slate-600"}
+                      className={
+                        isCurrent
+                          ? "text-white"
+                          : "text-slate-300 dark:text-slate-600"
+                      }
                     >
                       {step.icon}
                     </span>
@@ -109,8 +113,10 @@ const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                 </div>
                 {!isLast && (
                   <div
-                    className={`w-0.5 flex-1 my-1 min-h-[32px] rounded-full transition-colors ${
-                      isCompleted ? "bg-emerald-400 dark:bg-emerald-600" : "bg-slate-100 dark:bg-slate-800"
+                    className={`w-0.5 flex-1 my-1 min-h-8 rounded-full transition-colors ${
+                      isCompleted
+                        ? "bg-emerald-400 dark:bg-emerald-600"
+                        : "bg-slate-100 dark:bg-slate-800"
                     }`}
                   />
                 )}

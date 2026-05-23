@@ -88,7 +88,7 @@ function Categories() {
       }
     };
 
-    // fetchCategories();
+    fetchCategories();
   }, []);
 
   if (loading) {

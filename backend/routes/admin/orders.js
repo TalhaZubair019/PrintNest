@@ -2,7 +2,7 @@ const express = require("express");
 const { connectDB } = require("../../lib/db");
 const { OrderModel, ProductModel } = require("../../lib/models");
 const { requireAdmin } = require("../../middleware/auth");
-const { transporter } = require("../../lib/mailer");
+const { sendMail } = require("../../lib/mailer");
 const { logActivity } = require("../../lib/activityLog");
 
 const router = express.Router();
@@ -265,8 +265,7 @@ router.patch("/:id", requireAdmin, async (req, res) => {
       );
       const content = getStatusContent(status, order);
 
-      transporter
-        .sendMail({
+      sendMail({
           from: `"PrintNest" <${process.env.EMAIL_USER}>`,
           to: order.customer?.email,
           subject: content.subject,

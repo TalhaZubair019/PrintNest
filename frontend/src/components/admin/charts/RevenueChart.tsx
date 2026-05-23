@@ -200,9 +200,6 @@ const RevenueChart = ({
                 1;
               const height = `${(d.revenue / maxRev) * 100}%`;
               const isLong = total > 10;
-              const step =
-                total <= 7 ? 1 : total <= 14 ? 2 : total <= 21 ? 3 : 5;
-              const showLabel = i % step === 0 || i === total - 1;
               return (
                 <div
                   key={i}

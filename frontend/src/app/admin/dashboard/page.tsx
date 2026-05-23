@@ -21,20 +21,21 @@ import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 
 export default function AdminDashboard() {
   const d = useAdminDashboard();
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [, setIsSidebarOpen] = React.useState(false);
+  const { activeTab, fetchStats, user } = d;
 
   React.useEffect(() => {
-    if (d.user?.isAdmin) {
-      d.fetchStats();
+    if (user?.isAdmin) {
+      fetchStats();
     }
-  }, [d.activeTab, d.fetchStats]);
+  }, [activeTab, fetchStats, user?.isAdmin]);
   React.useEffect(() => {
     const handleFocus = () => {
-      if (d.user?.isAdmin) d.fetchStats();
+      if (user?.isAdmin) fetchStats();
     };
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [d.fetchStats, d.user?.isAdmin]);
+  }, [fetchStats, user?.isAdmin]);
 
   if (d.isAuthLoading || d.loading || !d.stats) {
     return (
@@ -136,7 +137,10 @@ export default function AdminDashboard() {
             stats={d.stats}
           />
 
-          <div id="admin-content-area" className="flex-1 w-full lg:min-w-0 max-w-full overflow-x-hidden pb-10">
+          <div
+            id="admin-content-area"
+            className="flex-1 w-full lg:min-w-0 max-w-full overflow-x-hidden pb-10"
+          >
             {d.activeTab === "overview" && (
               <OverviewTab
                 stats={d.stats}

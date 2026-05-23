@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, ChevronDown, ShoppingBag, Heart } from "lucide-react";
+import { ChevronDown, ShoppingBag, Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/redux/CartSlice";
 import { toggleWishlist } from "@/redux/WishListSlice";
@@ -280,7 +280,6 @@ export default function CategoryPage() {
 function SimpleProductCard({
   product,
   onAddToCart,
-  isInCart,
   isWishlisted,
   onToggleWishlist,
 }: {

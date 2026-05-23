@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const { connectDB } = require("../../lib/db");
 const { OrderModel, UserModel, ProductModel } = require("../../lib/models");
 const { requireAuth, JWT_SECRET } = require("../../middleware/auth");
-const { transporter } = require("../../lib/mailer");
+const { sendMail } = require("../../lib/mailer");
 const db = require("../../../data/db.json");
 
 const router = express.Router();
@@ -318,14 +318,14 @@ router.post("/place-order", async (req, res) => {
 
       console.log(`Sending email to ${customer.email} and admin...`);
       Promise.all([
-        transporter.sendMail({
+        sendMail({
           from: `"Store Orders" <${process.env.EMAIL_USER}>`,
           to: process.env.EMAIL_USER,
           replyTo: customer.email,
           subject: `New Order #${orderId} from ${customer.firstName}`,
           html: emailHtml,
         }),
-        transporter.sendMail({
+        sendMail({
           from: `"Store Orders" <${process.env.EMAIL_USER}>`,
           to: customer.email,
           subject: `Order Confirmation #${orderId}`,

@@ -110,8 +110,8 @@ router.post("/signup", async (req, res) => {
     });
 
     try {
-      const { transporter } = require("../lib/mailer");
-      await transporter.sendMail({
+        const { sendMail } = require("../lib/mailer");
+        await sendMail({
         from: `"PrintNest" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: "Verify your email - PrintNest",
@@ -227,8 +227,8 @@ router.post("/forgot-password", async (req, res) => {
       process.env.FRONTEND_URL || req.headers.origin || "http://localhost:3000";
     const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-    const { transporter } = require("../lib/mailer");
-    await transporter.sendMail({
+      const { sendMail } = require("../lib/mailer");
+      await sendMail({
       from: `"PrintNest Support" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Password Reset Request - PrintNest",
@@ -383,8 +383,8 @@ router.post("/resend-otp", async (req, res) => {
     user.otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
     await user.save();
 
-    const { transporter } = require("../lib/mailer");
-    await transporter.sendMail({
+      const { sendMail } = require("../lib/mailer");
+      await sendMail({
       from: `"PrintNest" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Your new verification code - PrintNest",

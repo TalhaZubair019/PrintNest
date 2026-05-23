@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Package, Heart, ShoppingCart, LogOut, Shield } from "lucide-react";
+import { LogOut, Shield } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/Store";
 import { loginSuccess, logout } from "@/redux/AuthSlice";
@@ -169,8 +169,8 @@ function AccountContent() {
         });
         setOrders(sortedOrders);
       }
-    } catch (err) {
-      console.error("Failed to fetch orders");
+    } catch (err: any) {
+      console.error("Failed to fetch orders", err);
     }
   };
 
@@ -248,7 +248,8 @@ function AccountContent() {
           loginSuccess({ user: { ...user, ...profileForm }, token: "active" }),
         );
       }
-    } catch (error) {
+    } catch (err: any) {
+      console.error("Failed to update profile", err);
       alert("Failed to update profile");
     }
   };
@@ -333,7 +334,7 @@ function AccountContent() {
             <select
               value={activeTab}
               onChange={(e) => setActiveTab(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-purple-400 text-[10px] sm:text-xs font-bold py-1.5 px-1.5 sm:py-2 sm:px-3 rounded-lg border border-slate-200 dark:border-slate-700 outline-none max-w-[90px] sm:max-w-none transition-colors"
+              className="bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-purple-400 text-[10px] sm:text-xs font-bold py-1.5 px-1.5 sm:py-2 sm:px-3 rounded-lg border border-slate-200 dark:border-slate-700 outline-none max-w-22.5 sm:max-w-none transition-colors"
             >
               <option value="dashboard">Dashboard</option>
               <option value="profile">Edit Profile</option>
