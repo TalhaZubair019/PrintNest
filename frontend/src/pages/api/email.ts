@@ -1,13 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
-
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 const emailFrom = process.env.EMAIL_FROM || process.env.EMAIL_USER;
 
 function getTransporter() {
-  // Cache transporter across invocations when possible
   const globalObj = global as any;
   if (globalObj.__mail_transporter) return globalObj.__mail_transporter;
 
@@ -33,17 +29,21 @@ function getTransporter() {
   return transporter;
 }
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { from, to, subject, html, replyTo } = body;
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { from, to, subject, html, replyTo } = req.body || {};
 
   if (!to || !subject || !html) {
-    return NextResponse.json({ error: "Missing required email fields: to, subject, html." }, { status: 400 });
+    return res.status(400).json({ error: "Missing required email fields: to, subject, html." });
   }
 
   const sender = from || emailFrom;
   if (!sender) {
-    return NextResponse.json({ error: "Missing from address. Set EMAIL_FROM or provide from in request." }, { status: 500 });
+    return res.status(500).json({ error: "Missing from address. Set EMAIL_FROM or provide from in request." });
   }
 
   try {
@@ -57,9 +57,9 @@ export async function POST(req: NextRequest) {
       replyTo,
     });
 
-    return NextResponse.json({ ok: true });
+    return res.status(200).json({ ok: true });
   } catch (error: any) {
-    console.error("Error sending email via Vercel API route (nodemailer):", error);
-    return NextResponse.json({ error: error?.message || "Email send failed" }, { status: 500 });
+    console.error("Error sending email via Vercel Pages API route (nodemailer):", error);
+    return res.status(500).json({ error: error?.message || "Email send failed" });
   }
 }

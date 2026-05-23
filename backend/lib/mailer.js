@@ -5,8 +5,14 @@ const EMAIL_ROUTE_URL =
   process.env.FRONTEND_URL ||
   process.env.NEXT_PUBLIC_APP_URL ||
   null;
+
+function normalizeEmailRouteUrl(url) {
+  const trimmed = url.trim().replace(/\/$/, "");
+  return trimmed.endsWith("/api/email") ? trimmed : `${trimmed}/api/email`;
+}
+
 const EMAIL_API_ENDPOINT = EMAIL_ROUTE_URL
-  ? `${EMAIL_ROUTE_URL.replace(/\/$/, "")}/api/email`
+  ? normalizeEmailRouteUrl(EMAIL_ROUTE_URL)
   : null;
 
 const smtpHost = process.env.EMAIL_HOST || "smtp.gmail.com";
