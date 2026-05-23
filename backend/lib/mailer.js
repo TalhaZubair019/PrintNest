@@ -4,10 +4,15 @@ const EMAIL_ROUTE_URL =
   process.env.EMAIL_ROUTE_URL || process.env.FRONTEND_URL || "http://localhost:3000";
 const EMAIL_API_ENDPOINT = `${EMAIL_ROUTE_URL.replace(/\/$/, "")}/api/email`;
 
+const smtpHost = process.env.EMAIL_HOST || "smtp.gmail.com";
+const smtpPort = Number(process.env.EMAIL_PORT || "465");
+const smtpSecure =
+  process.env.EMAIL_SECURE === "true" || smtpPort === 465;
+
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -22,8 +27,16 @@ const transporter = nodemailer.createTransport({
   logger: true,
 });
 
+function shouldUseEmailRoute() {
+  return (
+    process.env.USE_VERCEL_EMAIL_ROUTE === "true" ||
+    !!process.env.EMAIL_ROUTE_URL ||
+    !!process.env.RESEND_API_KEY
+  );
+}
+
 async function sendMail(mailOptions) {
-  if (process.env.USE_VERCEL_EMAIL_ROUTE === "true" || process.env.RESEND_API_KEY) {
+  if (shouldUseEmailRoute()) {
     return sendMailViaEmailRoute(mailOptions);
   }
 
