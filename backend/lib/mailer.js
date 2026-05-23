@@ -4,8 +4,10 @@ const EMAIL_ROUTE_URL =
   process.env.EMAIL_ROUTE_URL ||
   process.env.FRONTEND_URL ||
   process.env.NEXT_PUBLIC_APP_URL ||
-  "http://localhost:3000";
-const EMAIL_API_ENDPOINT = `${EMAIL_ROUTE_URL.replace(/\/$/, "")}/api/email`;
+  null;
+const EMAIL_API_ENDPOINT = EMAIL_ROUTE_URL
+  ? `${EMAIL_ROUTE_URL.replace(/\/$/, "")}/api/email`
+  : null;
 
 const smtpHost = process.env.EMAIL_HOST || "smtp.gmail.com";
 const smtpPort = Number(process.env.EMAIL_PORT || "465");
@@ -32,9 +34,8 @@ const transporter = nodemailer.createTransport({
 
 function shouldUseEmailRoute() {
   return (
-    process.env.USE_VERCEL_EMAIL_ROUTE === "true" ||
-    !!process.env.EMAIL_ROUTE_URL ||
-    !!process.env.RESEND_API_KEY
+    process.env.USE_VERCEL_EMAIL_ROUTE === "true" &&
+    !!EMAIL_API_ENDPOINT
   );
 }
 
@@ -51,6 +52,12 @@ async function sendMailViaEmailRoute(mailOptions) {
 
   if (!to || !subject || !html) {
     throw new Error("Missing required email fields: to, subject, html.");
+  }
+
+  if (!EMAIL_API_ENDPOINT) {
+    throw new Error(
+      "EMAIL_ROUTE_URL is not configured. Set EMAIL_ROUTE_URL in the environment when USE_VERCEL_EMAIL_ROUTE=true.",
+    );
   }
 
   const response = await fetch(EMAIL_API_ENDPOINT, {
