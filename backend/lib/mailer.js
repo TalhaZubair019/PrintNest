@@ -1,7 +1,10 @@
 const nodemailer = require("nodemailer");
 
 const EMAIL_ROUTE_URL =
-  process.env.EMAIL_ROUTE_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+  process.env.EMAIL_ROUTE_URL ||
+  process.env.FRONTEND_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  "http://localhost:3000";
 const EMAIL_API_ENDPOINT = `${EMAIL_ROUTE_URL.replace(/\/$/, "")}/api/email`;
 
 const smtpHost = process.env.EMAIL_HOST || "smtp.gmail.com";
