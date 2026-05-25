@@ -41,7 +41,13 @@ function shouldUseEmailRoute() {
 async function sendMail(mailOptions) {
   if (shouldUseEmailRoute()) {
     console.debug("Mailer: sending via email route", EMAIL_API_ENDPOINT);
-    return sendMailViaEmailRoute(mailOptions);
+    try {
+      return await sendMailViaEmailRoute(mailOptions);
+    } catch (error) {
+      console.warn("Email route failed, falling back to SMTP:", error.message);
+      console.debug("Mailer: sending via SMTP (fallback)", { smtpHost, smtpPort, smtpSecure });
+      return transporter.sendMail(mailOptions);
+    }
   }
 
   console.debug("Mailer: sending via SMTP", { smtpHost, smtpPort, smtpSecure });
