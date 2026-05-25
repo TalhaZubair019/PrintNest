@@ -1,10 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const EMAIL_ROUTE_URL =
-  process.env.EMAIL_ROUTE_URL ||
-  process.env.FRONTEND_URL ||
-  process.env.NEXT_PUBLIC_APP_URL ||
-  null;
+const EMAIL_ROUTE_URL = process.env.EMAIL_ROUTE_URL || null;
 
 function normalizeEmailRouteUrl(url) {
   const trimmed = url.trim().replace(/\/$/, "");

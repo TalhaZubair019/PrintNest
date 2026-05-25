@@ -21,7 +21,7 @@ const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
   message: { error: "Too many requests from this IP, please try again later." },
-  keyGenerator: (req) => req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress,
+  keyGenerator: rateLimit.ipKeyGenerator,
 });
 app.use("/api/", apiLimiter);
 
