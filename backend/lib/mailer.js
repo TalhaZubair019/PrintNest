@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const EMAIL_ROUTE_URL = process.env.EMAIL_ROUTE_URL || null;
+const EMAIL_ROUTE_URL = process.env.EMAIL_ROUTE_URL || process.env.NEXT_PUBLIC_APP_URL || null;
 
 function normalizeEmailRouteUrl(url) {
   const trimmed = url.trim().replace(/\/$/, "");
@@ -71,6 +71,7 @@ async function sendMailViaEmailRoute(mailOptions) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.EMAIL_API_KEY || process.env.JWT_SECRET || ""}`,
     },
     body: JSON.stringify({ from, to, subject, html, replyTo }),
   });

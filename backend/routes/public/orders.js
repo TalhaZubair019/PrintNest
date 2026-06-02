@@ -110,8 +110,7 @@ router.post("/place-order", async (req, res) => {
             <p>Please restock this item soon to avoid turning away customers.</p>
           `;
 
-          transporter
-            .sendMail({
+          sendMail({
               from: `"Store Alerts" <${process.env.EMAIL_USER}>`,
               to: process.env.EMAIL_USER,
               subject: `⚠️ Low Stock Alert: ${product.title}`,

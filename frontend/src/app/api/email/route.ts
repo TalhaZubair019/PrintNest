@@ -34,6 +34,18 @@ function getTransporter() {
 }
 
 export async function POST(req: NextRequest) {
+  // Authorization Check to prevent spam/abuse of this API route
+  const authHeader = req.headers.get("Authorization");
+  const apiKey = process.env.EMAIL_API_KEY || process.env.JWT_SECRET;
+  
+  if (apiKey) {
+    if (authHeader !== `Bearer ${apiKey}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  } else {
+    console.warn("WARNING: Vercel /api/email is running without an EMAIL_API_KEY or JWT_SECRET. The route is public and insecure.");
+  }
+
   const body = await req.json();
   const { from, to, subject, html, replyTo } = body;
 
