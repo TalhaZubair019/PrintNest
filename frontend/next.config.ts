@@ -15,17 +15,13 @@ const nextConfig: NextConfig = {
 
   async rewrites() {
     return {
-      beforeFiles: [
-        {
-          source: "/api/email/:path*",
-          destination: "/api/email/:path*",
-        },
+      beforeFiles: [],
+      afterFiles: [
         {
           source: "/api/:path*",
           destination: `${BACKEND_URL}/api/:path*`,
         },
       ],
-      afterFiles: [],
       fallback: [],
     };
   },
