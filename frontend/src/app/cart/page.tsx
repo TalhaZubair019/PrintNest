@@ -47,6 +47,34 @@ export default function CartPage() {
     message: "",
     type: "add",
   });
+  const [selectedCoupon, setSelectedCoupon] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSelectedCoupon(localStorage.getItem("appliedCoupon") || "");
+    }
+  }, []);
+
+  const handleCouponChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedCoupon(val);
+    if (typeof window !== "undefined") {
+      if (val) {
+        localStorage.setItem("appliedCoupon", val);
+      } else {
+        localStorage.removeItem("appliedCoupon");
+      }
+    }
+  };
+
+  const discount = selectedCoupon === "DISCOUNT20"
+    ? totalAmount * 0.20
+    : selectedCoupon === "WELCOME10"
+    ? totalAmount * 0.10
+    : 0;
+
+  const finalAmount = totalAmount - discount;
+
 
   useEffect(() => {
     setIsClient(true);
@@ -170,6 +198,10 @@ export default function CartPage() {
               <div className="lg:col-span-4">
                 <CartSummary
                   totalAmount={totalAmount}
+                  discount={discount}
+                  finalAmount={finalAmount}
+                  selectedCoupon={selectedCoupon}
+                  onCouponChange={handleCouponChange}
                   onCheckout={handleCheckoutClick}
                 />
               </div>
@@ -283,9 +315,17 @@ function CartItem({ item }: { item: CartItemType }) {
 }
 function CartSummary({
   totalAmount,
+  discount,
+  finalAmount,
+  selectedCoupon,
+  onCouponChange,
   onCheckout,
 }: {
   totalAmount: number;
+  discount: number;
+  finalAmount: number;
+  selectedCoupon: string;
+  onCouponChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onCheckout: (e: React.MouseEvent) => void;
 }) {
   return (
@@ -298,8 +338,12 @@ function CartSummary({
           {cartData.summary.couponLabel}
         </label>
         <div className="relative border-b border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-colors">
-          <select className="w-full appearance-none bg-transparent py-3 pr-8 text-slate-500 dark:text-slate-400 focus:outline-none cursor-pointer text-sm font-medium">
-            <option className="bg-white dark:bg-slate-900">
+          <select
+            value={selectedCoupon}
+            onChange={onCouponChange}
+            className="w-full appearance-none bg-transparent py-3 pr-8 text-slate-500 dark:text-slate-400 focus:outline-none cursor-pointer text-sm font-medium"
+          >
+            <option value="" className="bg-white dark:bg-slate-900">
               {cartData.summary.couponPlaceholder}
             </option>
             {cartData.summary.coupons.map((coupon) => (
@@ -318,13 +362,25 @@ function CartSummary({
           />
         </div>
       </div>
-      <div className="flex justify-between items-center mb-8 pb-8 border-b border-slate-100 dark:border-slate-800 transition-colors">
-        <span className="text-lg font-bold text-slate-900 dark:text-white">
-          {cartData.summary.totalLabel}
-        </span>
-        <span className="text-xl font-bold text-slate-900 dark:text-white">
-          ${totalAmount.toFixed(2)}
-        </span>
+      <div className="space-y-4 mb-8 pb-8 border-b border-slate-100 dark:border-slate-800 transition-colors">
+        <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-400">
+          <span>Subtotal</span>
+          <span>${totalAmount.toFixed(2)}</span>
+        </div>
+        {discount > 0 && (
+          <div className="flex justify-between items-center text-sm font-medium text-green-600 dark:text-green-400">
+            <span>Discount ({selectedCoupon === "DISCOUNT20" ? "20%" : "10%"})</span>
+            <span>-${discount.toFixed(2)}</span>
+          </div>
+        )}
+        <div className="flex justify-between items-center pt-2">
+          <span className="text-lg font-bold text-slate-900 dark:text-white">
+            {cartData.summary.totalLabel}
+          </span>
+          <span className="text-xl font-bold text-slate-900 dark:text-white">
+            ${finalAmount.toFixed(2)}
+          </span>
+        </div>
       </div>
       <Link
         href={cartData.summary.checkoutUrl}

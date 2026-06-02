@@ -5,11 +5,17 @@ import { ChevronDown } from "lucide-react";
 interface OrderSummaryProps {
   cartItems: any[];
   subtotal: number;
+  discount?: number;
+  total?: number;
+  selectedCoupon?: string;
 }
 
 export default function OrderSummary({
   cartItems,
   subtotal,
+  discount = 0,
+  total = subtotal,
+  selectedCoupon = "",
 }: OrderSummaryProps) {
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 lg:p-8 shadow-sm sticky top-40 transition-colors">
@@ -49,8 +55,8 @@ export default function OrderSummary({
       </div>
       <div className="py-4 border-t border-b border-slate-100 dark:border-slate-800 mb-4 transition-colors">
         <div className="flex justify-between items-center cursor-pointer group">
-          <span className="text-sm text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            Add coupon
+          <span className={`text-sm ${selectedCoupon ? "text-green-600 dark:text-green-400 font-semibold" : "text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"} transition-colors`}>
+            {selectedCoupon ? `✓ Coupon "${selectedCoupon}" Applied` : "Add coupon"}
           </span>
           <ChevronDown size={14} className="text-slate-400 dark:text-slate-500" />
         </div>
@@ -62,13 +68,19 @@ export default function OrderSummary({
             ${subtotal.toFixed(2)}
           </span>
         </div>
+        {discount > 0 && (
+          <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400">
+            <span>Discount ({selectedCoupon === "DISCOUNT20" ? "20%" : "10%"})</span>
+            <span>-${discount.toFixed(2)}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center text-sm">
           <span className="text-slate-600 dark:text-slate-400 transition-colors">Shipping</span>
           <span className="font-medium text-slate-900 dark:text-white transition-colors">Free</span>
         </div>
         <div className="flex justify-between items-center text-xl font-bold pt-4 border-t border-slate-100 dark:border-slate-800 mt-4 transition-colors">
           <span className="text-slate-800 dark:text-slate-200">Total</span>
-          <span className="text-slate-900 dark:text-white">${subtotal.toFixed(2)}</span>
+          <span className="text-slate-900 dark:text-white">${total.toFixed(2)}</span>
         </div>
       </div>
     </div>

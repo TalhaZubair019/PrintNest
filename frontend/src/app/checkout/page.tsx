@@ -54,6 +54,23 @@ export default function CheckoutPage() {
     0,
   );
 
+  const [selectedCoupon, setSelectedCoupon] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSelectedCoupon(localStorage.getItem("appliedCoupon") || "");
+    }
+  }, []);
+
+  const discount = selectedCoupon === "DISCOUNT20"
+    ? subtotal * 0.20
+    : selectedCoupon === "WELCOME10"
+    ? subtotal * 0.10
+    : 0;
+
+  const totalAmount = subtotal - discount;
+
+
   const [formData, setFormData] = useState<CheckoutData>({
     email: "",
     firstName: "",
@@ -240,7 +257,7 @@ export default function CheckoutPage() {
     const payload = {
       customer: formData,
       items: cartItems,
-      totalAmount: subtotal,
+      totalAmount: totalAmount,
       paymentStatus,
     };
     const response = await fetch("/api/public/place-order", {
@@ -277,6 +294,7 @@ export default function CheckoutPage() {
             items: cartItems,
             customerEmail: formData.email,
             orderId: orderId,
+            couponCode: selectedCoupon,
           }),
         });
         const session = await response.json();
@@ -295,7 +313,7 @@ export default function CheckoutPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            totalAmount: subtotal,
+            totalAmount: totalAmount,
             customer: formData,
             orderId: orderId,
           }),
@@ -311,6 +329,7 @@ export default function CheckoutPage() {
       if (formData.paymentMethod === "cod") {
         await saveOrderToDB("Pending");
         localStorage.removeItem("pendingCheckoutData");
+        localStorage.removeItem("appliedCoupon");
         dispatch(clearCart());
         router.push("/thank-you");
       }
@@ -348,7 +367,13 @@ export default function CheckoutPage() {
             >
               <div className="lg:col-span-5">
                 {hasMounted ? (
-                  <OrderSummary cartItems={cartItems} subtotal={subtotal} />
+                  <OrderSummary
+                    cartItems={cartItems}
+                    subtotal={subtotal}
+                    discount={discount}
+                    total={totalAmount}
+                    selectedCoupon={selectedCoupon}
+                  />
                 ) : (
                   <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 lg:p-8 animate-pulse transition-colors">
                     <div className="h-6 w-32 bg-slate-100 dark:bg-slate-800/50 rounded mb-6" />

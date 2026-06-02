@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 router.post("/checkout", async (req, res) => {
   try {
-    const { items, customerEmail, orderId } = req.body;
+    const { items, customerEmail, orderId, couponCode } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Cart items are required." });
@@ -61,12 +61,33 @@ router.post("/checkout", async (req, res) => {
       quantity: item.quantity || 1,
     }));
 
+    let discounts = [];
+    if (couponCode) {
+      let percentOff = 0;
+      if (couponCode === "DISCOUNT20") percentOff = 20;
+      else if (couponCode === "WELCOME10") percentOff = 10;
+
+      if (percentOff > 0) {
+        try {
+          const stripeCoupon = await stripe.coupons.create({
+            percent_off: percentOff,
+            duration: "once",
+            name: `${percentOff}% Off PrintNest Coupon`,
+          });
+          discounts.push({ coupon: stripeCoupon.id });
+        } catch (err) {
+          console.error("Failed to create Stripe coupon:", err.message);
+        }
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
       customer_email: customerEmail,
       client_reference_id: orderId,
+      discounts: discounts,
       success_url: `${ensureAbsoluteUrl("/thank-you")}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${ensureAbsoluteUrl("/checkout")}`,
     });

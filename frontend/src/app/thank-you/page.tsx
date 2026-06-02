@@ -29,19 +29,28 @@ export default function ThankYouPage() {
             0,
           );
 
+          const savedCoupon = localStorage.getItem("appliedCoupon") || "";
+          const discount = savedCoupon === "DISCOUNT20"
+            ? subtotal * 0.20
+            : savedCoupon === "WELCOME10"
+            ? subtotal * 0.10
+            : 0;
+          const totalAmount = subtotal - discount;
+
           const response = await fetch("/api/public/place-order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               customer: customerData,
               items: cartItems,
-              totalAmount: subtotal,
+              totalAmount: totalAmount,
               paymentStatus: "Completed",
             }),
           });
 
           if (response.ok) {
             localStorage.removeItem("pendingCheckoutData");
+            localStorage.removeItem("appliedCoupon");
             dispatch(clearCart());
           }
         }
